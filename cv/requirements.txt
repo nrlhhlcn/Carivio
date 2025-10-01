@@ -1,0 +1,26 @@
+# CV Analyzer Dependencies
+PyPDF2==3.0.1
+pdfplumber==0.10.3
+pandas==2.1.4
+numpy==1.24.3
+nltk==3.8.1
+spacy==3.7.2
+scikit-learn==1.3.2
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Optional for advanced NLP
+sentence-transformers==2.2.2
+transformers==4.36.2
+
+# Web framework (later)
+streamlit==1.29.0
+flask==3.0.0
+
+# Database
+sqlite3
+
+# Utils
+tqdm==4.66.1
+colorama==0.4.6
+
