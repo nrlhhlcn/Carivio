@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Navbar from "@/components/navbar"
+import ProtectedRoute from "@/components/ProtectedRoute"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -137,8 +138,9 @@ export default function InterviewSimulationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background">
+        <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* Header */}
@@ -605,6 +607,7 @@ export default function InterviewSimulationPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }

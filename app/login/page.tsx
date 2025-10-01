@@ -3,28 +3,64 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { Chrome } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const { signIn, signInWithGoogle } = useAuth()
+  const { toast } = useToast()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Mock authentication - replace with real auth later
-    setTimeout(() => {
-      console.log("Login attempt:", { email, password })
+    try {
+      await signIn(email, password)
+      toast({
+        title: "Başarılı!",
+        description: "Giriş yapıldı, yönlendiriliyorsunuz...",
+      })
+      router.push("/")
+    } catch (error: any) {
+      toast({
+        title: "Hata!",
+        description: error.message || "Giriş yapılırken bir hata oluştu.",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-      // Redirect to home page
-      window.location.href = "/"
-    }, 1000)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      await signInWithGoogle()
+      toast({
+        title: "Başarılı!",
+        description: "Google ile giriş yapıldı, yönlendiriliyorsunuz...",
+      })
+      router.push("/")
+    } catch (error: any) {
+      toast({
+        title: "Hata!",
+        description: error.message || "Google ile giriş yapılırken bir hata oluştu.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -79,6 +115,28 @@ export default function LoginPage() {
                 {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
               </Button>
             </form>
+            
+            <div className="mt-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">veya</span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 mt-4"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+              >
+                <Chrome className="w-4 h-4 mr-2" />
+                Google ile Giriş Yap
+              </Button>
+            </div>
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Hesabınız yok mu?{" "}

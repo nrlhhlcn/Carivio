@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Navbar from "@/components/navbar"
+import ProtectedRoute from "@/components/ProtectedRoute"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -215,8 +216,9 @@ export default function RankingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background">
+        <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* Header */}
@@ -501,6 +503,7 @@ export default function RankingsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }

@@ -2,8 +2,11 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "@/components/navbar"
+import ProtectedRoute from "@/components/ProtectedRoute"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -37,17 +40,8 @@ import {
   Zap,
 } from "lucide-react"
 
-// Mock user data
-const mockUserData = {
-  id: 1,
-  firstName: "Ahmet",
-  lastName: "Yılmaz",
-  email: "ahmet.yilmaz@email.com",
-  phone: "+90 555 123 4567",
-  location: "İstanbul, Türkiye",
-  joinDate: "2024-01-15",
-  bio: "Yazılım geliştirici olarak 5 yıllık deneyimim var. React, Node.js ve Python teknolojilerinde uzmanım. Kariyerimde sürekli gelişim göstermeyi hedefliyorum.",
-  avatar: "/professional-man.jpg",
+// Mock stats data - sadece istatistikler için
+const mockStats = {
   currentRank: 12,
   totalScore: 1980,
   cvScore: 72,
@@ -110,8 +104,31 @@ const achievements = [
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState(mockUserData)
   const [activeTab, setActiveTab] = useState("overview")
+  const { user } = useAuth()
+  const { toast } = useToast()
+
+  // Kullanıcı bilgilerini Firebase'den al
+  const userData = {
+    id: user?.uid || '',
+    firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
+    lastName: user?.displayName?.split(' ').slice(1).join(' ') || '',
+    email: user?.email || '',
+    phone: user?.phoneNumber || '',
+    location: 'Türkiye',
+    joinDate: user?.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR'),
+    bio: 'Profil bilgilerinizi güncelleyin.',
+    avatar: user?.photoURL || '',
+    isVerified: user?.emailVerified || false,
+    ...mockStats, // İstatistikleri ekle
+  }
+
+  const [formData, setFormData] = useState(userData)
+
+  // Kullanıcı bilgileri değiştiğinde formData'yı güncelle
+  useEffect(() => {
+    setFormData(userData)
+  }, [user])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -120,14 +137,35 @@ export default function ProfilePage() {
     }))
   }
 
-  const handleSave = () => {
-    // Mock save operation
-    console.log("Saving profile data:", formData)
-    setIsEditing(false)
+  const handleSave = async () => {
+    try {
+      // Firebase'de kullanıcı profilini güncelle
+      const { updateProfile } = await import('firebase/auth')
+      const { auth } = await import('@/lib/firebase')
+      
+      if (user && auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: `${formData.firstName} ${formData.lastName}`.trim()
+        })
+        
+        toast({
+          title: "Başarılı!",
+          description: "Profil bilgileriniz güncellendi.",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Hata!",
+        description: "Profil güncellenirken bir hata oluştu.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsEditing(false)
+    }
   }
 
   const handleCancel = () => {
-    setFormData(mockUserData)
+    setFormData(userData)
     setIsEditing(false)
   }
 
@@ -155,8 +193,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 text-gray-900">
-      <Navbar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 text-gray-900">
+        <Navbar />
 
       {/* Unique Profile Header */}
       <div className="relative overflow-hidden">
@@ -179,11 +218,20 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <div className="relative group">
                   <div className="relative">
-                    <div className="w-40 h-40 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl transform group-hover:scale-105 transition-all duration-500">
-                      <span className="text-5xl font-black text-white">
-                        {formData.firstName[0]}{formData.lastName[0]}
-                      </span>
-                    </div>
+                    {userData.avatar ? (
+                      <Avatar className="w-40 h-40 rounded-2xl shadow-2xl transform group-hover:scale-105 transition-all duration-500">
+                        <AvatarImage src={userData.avatar} alt={`${formData.firstName} ${formData.lastName}`} />
+                        <AvatarFallback className="bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 text-5xl font-black text-white">
+                          {formData.firstName[0]}{formData.lastName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div className="w-40 h-40 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl transform group-hover:scale-105 transition-all duration-500">
+                        <span className="text-5xl font-black text-white">
+                          {formData.firstName[0]}{formData.lastName[0]}
+                        </span>
+                      </div>
+                    )}
                     {/* Glow Effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
                     {/* Edit Button */}
@@ -206,6 +254,12 @@ export default function ProfilePage() {
                       <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-200 rounded-full text-cyan-700 text-sm font-medium">
                         {formData.level}
                       </span>
+                      {userData.isVerified && (
+                        <Badge className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 text-green-700 text-sm font-medium">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Email Doğrulandı
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-gray-600 text-lg leading-relaxed max-w-2xl">
                       {formData.bio}
@@ -1029,7 +1083,8 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }
 

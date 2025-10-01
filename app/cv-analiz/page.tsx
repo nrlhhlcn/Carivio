@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Navbar from "@/components/navbar"
+import ProtectedRoute from "@/components/ProtectedRoute"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -130,8 +131,9 @@ export default function CVAnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
-      <Navbar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
+        <Navbar />
 
       <div className="max-w-6xl mx-auto px-6 py-8 pt-24">
         <div
@@ -489,6 +491,7 @@ export default function CVAnalysisPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }

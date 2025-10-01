@@ -676,7 +676,6 @@ export default function HomePage() {
                 {[
                   { name: "Giriş Yap", href: "/login", icon: ArrowRight },
                   { name: "Kayıt Ol", href: "/register", icon: Users },
-                  { name: "Profil", href: "/profil", icon: Award },
                 ].map((item, index) => (
                   <li key={index}>
                     <Link 

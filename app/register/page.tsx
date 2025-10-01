@@ -3,11 +3,15 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { Chrome } from "lucide-react"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -18,6 +22,9 @@ export default function RegisterPage() {
     confirmPassword: "",
   })
   const [isLoading, setIsLoading] = useState(false)
+  const { signUp, signInWithGoogle } = useAuth()
+  const { toast } = useToast()
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -31,18 +38,51 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Şifreler eşleşmiyor!")
+      toast({
+        title: "Hata!",
+        description: "Şifreler eşleşmiyor!",
+        variant: "destructive",
+      })
       setIsLoading(false)
       return
     }
 
-    // Mock registration - replace with real auth later
-    setTimeout(() => {
-      console.log("Registration attempt:", formData)
+    try {
+      await signUp(formData.email, formData.password, formData.firstName, formData.lastName)
+      toast({
+        title: "Başarılı!",
+        description: "Hesabınız oluşturuldu, giriş yapabilirsiniz.",
+      })
+      router.push("/login")
+    } catch (error: any) {
+      toast({
+        title: "Hata!",
+        description: error.message || "Kayıt olurken bir hata oluştu.",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-      // Redirect to login page
-      window.location.href = "/login"
-    }, 1000)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      await signInWithGoogle()
+      toast({
+        title: "Başarılı!",
+        description: "Google ile giriş yapıldı, yönlendiriliyorsunuz...",
+      })
+      router.push("/")
+    } catch (error: any) {
+      toast({
+        title: "Hata!",
+        description: error.message || "Google ile giriş yapılırken bir hata oluştu.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -135,6 +175,28 @@ export default function RegisterPage() {
                 {isLoading ? "Kayıt oluşturuluyor..." : "Kayıt Ol"}
               </Button>
             </form>
+            
+            <div className="mt-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">veya</span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 mt-4"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+              >
+                <Chrome className="w-4 h-4 mr-2" />
+                Google ile Kayıt Ol
+              </Button>
+            </div>
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Zaten hesabınız var mı?{" "}
