@@ -56,32 +56,16 @@ const mockAnalysisResult = {
 
 export default function CVAnalysisPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisComplete, setAnalysisComplete] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [loadingProgress, setLoadingProgress] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setIsVisible(true)
   }, [])
 
-  useEffect(() => {
-    if (isAnalyzing) {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval)
-            return 100
-          }
-          return prev + Math.random() * 15
-        })
-      }, 200)
-      return () => clearInterval(interval)
-    } else {
-      setProgress(0)
-    }
-  }, [isAnalyzing])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -95,13 +79,24 @@ export default function CVAnalysisPage() {
   const handleAnalyze = () => {
     if (!uploadedFile) return
 
-    setIsAnalyzing(true)
-    setProgress(0)
-    setTimeout(() => {
-      setIsAnalyzing(false)
-      setAnalysisComplete(true)
-      setShowResults(true)
-    }, 3000)
+    // Loading ekranını başlat
+    setIsLoading(true)
+    setLoadingProgress(0)
+    
+    // 3 saniye boyunca progress animasyonu
+    const progressInterval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval)
+          setIsLoading(false)
+          // Loading bittiğinde direkt sonuçları göster
+          setAnalysisComplete(true)
+          setShowResults(true)
+          return 100
+        }
+        return prev + 2 // Her 100ms'de %2 artır (3 saniyede %100)
+      })
+    }, 60) // Her 60ms'de güncelle (3 saniyede %100)
   }
 
   const getStatusColor = (status: string) => {
@@ -153,7 +148,111 @@ export default function CVAnalysisPage() {
           </p>
         </div>
 
-        {!showResults ? (
+        {isLoading ? (
+          // Loading Screen
+          <div className="max-w-4xl mx-auto">
+            <div className="min-h-[600px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-xl relative overflow-hidden">
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0">
+                <div className="absolute top-10 left-10 w-20 h-20 bg-blue-500/20 rounded-full animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-16 h-16 bg-purple-500/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute bottom-20 left-20 w-24 h-24 bg-cyan-500/20 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute bottom-10 right-10 w-12 h-12 bg-indigo-500/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              </div>
+              
+              <div className="text-center space-y-8 relative z-10 animate-fade-in">
+                {/* Circular Progress with Glow Effect */}
+                <div className="relative w-48 h-48 mx-auto animate-scale-pulse">
+                  {/* Outer Glow Ring */}
+                  <div className="absolute inset-0 w-48 h-48 rounded-full bg-white/10 animate-ping"></div>
+                  
+                  {/* Progress Ring Container */}
+                  <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 animate-rotate-slow">
+                    <div className="absolute inset-2 rounded-full bg-slate-900/50"></div>
+                  </div>
+                  
+                  {/* Main Progress Circle */}
+                  <div className="absolute inset-0">
+                    <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
+                      {/* Background Circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        fill="none"
+                        className="text-slate-600"
+                      />
+                      {/* Progress Circle with Glow */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 45}`}
+                        strokeDashoffset={`${2 * Math.PI * 45 * (1 - loadingProgress / 100)}`}
+                        className="text-white transition-all duration-100 ease-out animate-pulse-glow"
+                        style={{
+                          filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.5)) drop-shadow(0 0 20px rgba(59,130,246,0.5))'
+                        }}
+                      />
+                    </svg>
+                  </div>
+                  
+                  {/* Progress Text with Pulse */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-4xl font-bold text-white drop-shadow-lg animate-pulse">
+                      {Math.round(loadingProgress)}%
+                    </span>
+                  </div>
+                  
+                  {/* Rotating Dots Around Circle */}
+                  <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-purple-300 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+                  </div>
+                </div>
+                
+                {/* Loading Text with Typewriter Effect */}
+                <div className="space-y-4 animate-slide-in-top">
+                  <h2 className="text-2xl font-semibold text-white drop-shadow-lg animate-pulse">
+                    CV İNCELENİYOR...
+                  </h2>
+                  <p className="text-slate-300 animate-fade-in">
+                    Yapay zeka CV'nizi analiz ediyor, lütfen bekleyin
+                  </p>
+                </div>
+                
+                {/* Enhanced Loading Dots Animation */}
+                <div className="flex justify-center space-x-2 animate-fade-in">
+                  <div className="w-3 h-3 bg-white rounded-full animate-bounce shadow-lg animate-pulse-glow" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-3 h-3 bg-blue-300 rounded-full animate-bounce shadow-lg animate-pulse-glow" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-3 h-3 bg-purple-300 rounded-full animate-bounce shadow-lg animate-pulse-glow" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-3 h-3 bg-cyan-300 rounded-full animate-bounce shadow-lg animate-pulse-glow" style={{ animationDelay: '450ms' }}></div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="w-64 mx-auto animate-fade-in">
+                  <div className="h-3 bg-slate-700 rounded-full overflow-hidden shadow-inner">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-100 ease-out shadow-lg animate-pulse-glow"
+                      style={{ width: `${loadingProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-2 animate-pulse">
+                    {Math.round(loadingProgress)}% tamamlandı
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : !showResults ? (
           <div className="max-w-4xl mx-auto">
             <Card
               className={`mb-8 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 transform ${
@@ -204,10 +303,10 @@ export default function CVAnalysisPage() {
                       </div>
                       <Button
                         onClick={handleAnalyze}
-                        disabled={isAnalyzing}
+                        disabled={isLoading}
                         className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 group"
                       >
-                        {isAnalyzing ? (
+                        {isLoading ? (
                           <>
                             <Clock className="w-5 h-5 mr-2 animate-spin" />
                             Analiz Ediliyor...
@@ -225,26 +324,6 @@ export default function CVAnalysisPage() {
               </CardContent>
             </Card>
 
-            {isAnalyzing && (
-              <Card className="mb-8 border-0 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50 animate-in slide-in-from-bottom duration-500">
-                <CardContent className="pt-8 pb-8">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse shadow-2xl">
-                      <Sparkles className="w-10 h-10 text-white animate-spin" style={{ animationDuration: "2s" }} />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">CV'niz inceleniyor</h3>
-                    <p className="text-gray-600 mb-6 text-lg">Yapay zeka teknolojisi ile detaylı analiz yapılıyor...</p>
-                    <div className="w-full max-w-md mx-auto bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-300 ease-out"
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      />
-                    </div>
-                    <p className="text-sm text-gray-500">{Math.round(Math.min(progress, 100))}% tamamlandı</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
