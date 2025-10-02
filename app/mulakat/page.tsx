@@ -29,6 +29,9 @@ import {
   Brain,
   CheckCircle,
   Award,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
 } from "lucide-react"
 
 // Mock interview data
@@ -76,6 +79,25 @@ export default function InterviewSimulationPage() {
   const [interviewStarted, setInterviewStarted] = useState(false)
   const [aiSpeaking, setAiSpeaking] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
+  const [cameraPermission, setCameraPermission] = useState<"pending" | "granted" | "denied">("denied")
+  const [micPermission, setMicPermission] = useState<"pending" | "granted" | "denied">("denied")
+  const [permissionError, setPermissionError] = useState<string | null>(null)
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
+  const [userVideoRef, setUserVideoRef] = useState<HTMLVideoElement | null>(null)
+
+  // Check browser support on component mount
+  useEffect(() => {
+    console.log("Tarayıcı desteği kontrol ediliyor...")
+    console.log("navigator.mediaDevices:", !!navigator.mediaDevices)
+    console.log("getUserMedia:", !!navigator.mediaDevices?.getUserMedia)
+    console.log("HTTPS:", window.location.protocol === 'https:')
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setPermissionError("Bu tarayıcı kamera/mikrofon erişimini desteklemiyor. Lütfen güncel bir tarayıcı kullanın.")
+    } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      setPermissionError("Kamera ve mikrofon erişimi için HTTPS gerekli. Lütfen güvenli bağlantı kullanın.")
+    }
+  }, [])
 
   // Timer for recording
   useEffect(() => {
@@ -88,6 +110,23 @@ export default function InterviewSimulationPage() {
     return () => clearInterval(interval)
   }, [isRecording])
 
+  // Cleanup camera stream when component unmounts or interview ends
+  useEffect(() => {
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop())
+      }
+    }
+  }, [cameraStream])
+
+  // Update video element when stream changes
+  useEffect(() => {
+    if (userVideoRef && cameraStream) {
+      userVideoRef.srcObject = cameraStream
+      userVideoRef.play().catch(console.error)
+    }
+  }, [userVideoRef, cameraStream])
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -95,8 +134,136 @@ export default function InterviewSimulationPage() {
     }
   }
 
-  const startInterview = () => {
+  const requestCameraPermission = async () => {
+    console.log("Kamera izni fonksiyonu çağrıldı!")
+    setPermissionError(null)
+    setCameraPermission("pending")
+    
+    try {
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Bu tarayıcı kamera erişimini desteklemiyor.")
+      }
+      
+      console.log("Kamera izni isteniyor...")
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      })
+      
+      console.log("Kamera izni verildi!")
+      setCameraPermission("granted")
+      setIsCameraOn(true)
+      
+      // Stop the stream immediately as we just needed permission
+      stream.getTracks().forEach(track => track.stop())
+    } catch (error) {
+      console.error("Kamera izni hatası:", error)
+      setCameraPermission("denied")
+      setIsCameraOn(false)
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          setPermissionError("Kamera izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.")
+        } else if (error.name === "NotFoundError") {
+          setPermissionError("Kamera bulunamadı. Lütfen bir kamera bağlı olduğundan emin olun.")
+        } else if (error.name === "NotSupportedError") {
+          setPermissionError("Bu tarayıcı kamera erişimini desteklemiyor. HTTPS kullanıyor musunuz?")
+        } else {
+          setPermissionError(`Kamera izni alınırken bir hata oluştu: ${error.message}`)
+        }
+      } else {
+        setPermissionError("Bilinmeyen bir hata oluştu.")
+      }
+    }
+  }
+
+  const requestMicrophonePermission = async () => {
+    try {
+      setPermissionError(null)
+      setMicPermission("pending")
+      
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Bu tarayıcı mikrofon erişimini desteklemiyor.")
+      }
+      
+      console.log("Mikrofon izni isteniyor...")
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true
+        }
+      })
+      
+      console.log("Mikrofon izni verildi!")
+      setMicPermission("granted")
+      setIsMicOn(true)
+      
+      // Stop the stream immediately as we just needed permission
+      stream.getTracks().forEach(track => track.stop())
+    } catch (error) {
+      console.error("Mikrofon izni hatası:", error)
+      setMicPermission("denied")
+      setIsMicOn(false)
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          setPermissionError("Mikrofon izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.")
+        } else if (error.name === "NotFoundError") {
+          setPermissionError("Mikrofon bulunamadı. Lütfen bir mikrofon bağlı olduğundan emin olun.")
+        } else if (error.name === "NotSupportedError") {
+          setPermissionError("Bu tarayıcı mikrofon erişimini desteklemiyor. HTTPS kullanıyor musunuz?")
+        } else {
+          setPermissionError(`Mikrofon izni alınırken bir hata oluştu: ${error.message}`)
+        }
+      } else {
+        setPermissionError("Bilinmeyen bir hata oluştu.")
+      }
+    }
+  }
+
+  const startCameraStream = async () => {
+    try {
+      console.log("Kamera stream başlatılıyor...")
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: true
+      })
+      
+      setCameraStream(stream)
+      console.log("Kamera stream başlatıldı!")
+      
+      // Video element'e stream'i bağla
+      if (userVideoRef) {
+        userVideoRef.srcObject = stream
+        userVideoRef.play()
+      }
+    } catch (error) {
+      console.error("Kamera stream hatası:", error)
+      setPermissionError("Kamera akışı başlatılamadı.")
+    }
+  }
+
+  const stopCameraStream = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop())
+      setCameraStream(null)
+      if (userVideoRef) {
+        userVideoRef.srcObject = null
+      }
+    }
+  }
+
+  const startInterview = async () => {
     if (!uploadedCV || !jobDescription.trim()) return
+    
+    // Kamera stream'ini başlat
+    await startCameraStream()
+    
     setCurrentStep("interview")
     setInterviewStarted(true)
     // Simulate AI speaking
@@ -113,7 +280,8 @@ export default function InterviewSimulationPage() {
       setAiSpeaking(true)
       setTimeout(() => setAiSpeaking(false), 2000)
     } else {
-      // Interview completed
+      // Interview completed - stop camera stream
+      stopCameraStream()
       setCurrentStep("results")
       setIsRecording(false)
     }
@@ -218,30 +386,109 @@ export default function InterviewSimulationPage() {
                 <CardDescription>Mülakat için kamera ve mikrofon izinlerini verin</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    variant={isCameraOn ? "default" : "outline"}
-                    onClick={() => setIsCameraOn(!isCameraOn)}
-                    className="flex items-center space-x-2"
-                  >
-                    {isCameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-                    <span>{isCameraOn ? "Kamera Açık" : "Kamerayı Aç"}</span>
-                  </Button>
-                  <Button
-                    variant={isMicOn ? "default" : "outline"}
-                    onClick={() => setIsMicOn(!isMicOn)}
-                    className="flex items-center space-x-2"
-                  >
-                    {isMicOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-                    <span>{isMicOn ? "Mikrofon Açık" : "Mikrofonu Aç"}</span>
-                  </Button>
+                <div className="space-y-4">
+                  {/* Camera Permission */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Video className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Kamera İzni</p>
+                        <p className="text-sm text-muted-foreground">Mülakat sırasında görüntü kaydı için gerekli</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {cameraPermission === "granted" && (
+                        <div className="flex items-center space-x-2 text-secondary">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span className="text-sm">İzin Verildi</span>
+                        </div>
+                      )}
+                      {cameraPermission === "denied" && (
+                        <div className="flex items-center space-x-2 text-destructive">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-sm">İzin Reddedildi</span>
+                        </div>
+                      )}
+                      {cameraPermission === "pending" && (
+                        <div className="flex items-center space-x-2 text-muted-foreground">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-sm">İzin Bekleniyor</span>
+                        </div>
+                      )}
+                      <Button
+                        variant={cameraPermission === "granted" ? "outline" : "default"}
+                        onClick={() => {
+                          console.log("Kamera butonu tıklandı!")
+                          requestCameraPermission()
+                        }}
+                        disabled={false}
+                        className="flex items-center space-x-2"
+                      >
+                        <Video className="w-4 h-4" />
+                        <span>Kamera İzni Ver</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Microphone Permission */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Mic className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Mikrofon İzni</p>
+                        <p className="text-sm text-muted-foreground">Mülakat sırasında ses kaydı için gerekli</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {micPermission === "granted" && (
+                        <div className="flex items-center space-x-2 text-secondary">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span className="text-sm">İzin Verildi</span>
+                        </div>
+                      )}
+                      {micPermission === "denied" && (
+                        <div className="flex items-center space-x-2 text-destructive">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-sm">İzin Reddedildi</span>
+                        </div>
+                      )}
+                      {micPermission === "pending" && (
+                        <div className="flex items-center space-x-2 text-muted-foreground">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-sm">İzin Bekleniyor</span>
+                        </div>
+                      )}
+                      <Button
+                        variant={micPermission === "granted" ? "outline" : "default"}
+                        onClick={() => {
+                          console.log("Mikrofon butonu tıklandı!")
+                          requestMicrophonePermission()
+                        }}
+                        disabled={false}
+                        className="flex items-center space-x-2"
+                      >
+                        <Mic className="w-4 h-4" />
+                        <span>Mikrofon İzni Ver</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Permission Error */}
+                  {permissionError && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{permissionError}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Success Message */}
+                  {cameraPermission === "granted" && micPermission === "granted" && (
+                    <Alert>
+                      <CheckCircle className="h-4 w-4" />
+                      <AlertDescription>Kamera ve mikrofon izinleri verildi! Mülakata başlayabilirsiniz.</AlertDescription>
+                    </Alert>
+                  )}
                 </div>
-                {isCameraOn && isMicOn && (
-                  <Alert className="mt-4">
-                    <CheckCircle className="h-4 w-4" />
-                    <AlertDescription>Kamera ve mikrofon hazır! Mülakata başlayabilirsiniz.</AlertDescription>
-                  </Alert>
-                )}
               </CardContent>
             </Card>
 
@@ -250,12 +497,17 @@ export default function InterviewSimulationPage() {
               <Button
                 size="lg"
                 onClick={startInterview}
-                disabled={!uploadedCV || !jobDescription.trim() || !isCameraOn || !isMicOn}
+                disabled={!uploadedCV || !jobDescription.trim() || cameraPermission !== "granted" || micPermission !== "granted"}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3"
               >
                 Mülakata Başla
                 <Play className="w-5 h-5 ml-2" />
               </Button>
+              {(!uploadedCV || !jobDescription.trim() || cameraPermission !== "granted" || micPermission !== "granted") && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Mülakata başlamak için CV yüklemeniz, iş ilanı girmeniz ve kamera/mikrofon izinlerini vermeniz gerekiyor.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -292,12 +544,24 @@ export default function InterviewSimulationPage() {
                         </div>
                       </div>
 
-                      {/* User Video Placeholder */}
-                      <div className="absolute bottom-4 right-4 w-32 h-24 bg-background rounded-lg border-2 border-border flex items-center justify-center">
-                        <div className="text-center">
-                          <Video className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
-                          <p className="text-xs text-muted-foreground">Siz</p>
-                        </div>
+                      {/* User Video */}
+                      <div className="absolute bottom-4 right-4 w-32 h-24 bg-background rounded-lg border-2 border-border overflow-hidden">
+                        {cameraStream ? (
+                          <video
+                            ref={setUserVideoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="text-center">
+                              <Video className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+                              <p className="text-xs text-muted-foreground">Siz</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Current Question */}
@@ -590,6 +854,7 @@ export default function InterviewSimulationPage() {
                 <div className="text-center">
                   <Button
                     onClick={() => {
+                      stopCameraStream()
                       setCurrentStep("setup")
                       setCurrentQuestion(0)
                       setIsRecording(false)
