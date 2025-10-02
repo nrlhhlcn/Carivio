@@ -7,6 +7,7 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
+import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults } from "@/lib/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -54,44 +55,38 @@ const mockStats = {
   streak: 3,
 }
 
-const recentActivity = [
-  {
-    id: 1,
-    type: "cv-analysis",
-    title: "CV Analizi Tamamlandı",
-    description: "Genel skor: 78/100",
-    date: "2025-01-20",
-    icon: FileText,
-    color: "text-primary",
-  },
-  {
-    id: 2,
-    type: "interview",
-    title: "Mülakat Simülasyonu",
-    description: "Performans skoru: 82/100",
-    date: "2025-01-18",
-    icon: MessageSquare,
-    color: "text-secondary",
-  },
-  {
-    id: 3,
-    type: "achievement",
-    title: "Başarım Kazanıldı",
-    description: "İlk CV Analizi rozetini kazandınız",
-    date: "2025-01-15",
-    icon: Award,
-    color: "text-accent",
-  },
-  {
-    id: 4,
-    type: "rank-up",
-    title: "Sıralama Yükselişi",
-    description: "15. sıradan 12. sıraya yükseldiniz",
-    date: "2025-01-14",
-    icon: TrendingUp,
-    color: "text-secondary",
-  },
-]
+// Dinamik aktivite listesi oluştur - sadece gerçek verilerden
+const getRecentActivity = (cvResults: any[], interviewResults: any[]) => {
+  const activities = []
+
+  // CV analiz sonuçlarından aktiviteler oluştur
+  cvResults.forEach((result, index) => {
+    activities.push({
+      id: `cv-${result.id || index}`,
+      type: "cv-analysis",
+      title: "CV Analizi Tamamlandı",
+      description: `Genel skor: ${result.overallScore}/100`,
+      date: result.analysisDate?.toDate?.()?.toISOString()?.split('T')[0] || new Date().toISOString().split('T')[0],
+      icon: FileText,
+      color: "text-primary",
+    })
+  })
+
+  // Mülakat sonuçlarından aktiviteler oluştur
+  interviewResults.forEach((result, index) => {
+    activities.push({
+      id: `interview-${result.id || index}`,
+      type: "interview",
+      title: "Mülakat Simülasyonu",
+      description: `Performans skoru: ${result.overallScore}/100`,
+      date: result.interviewDate?.toDate?.()?.toISOString()?.split('T')[0] || new Date().toISOString().split('T')[0],
+      icon: MessageSquare,
+      color: "text-secondary",
+    })
+  })
+
+  return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
 
 const achievements = [
   { name: "İlk CV Analizi", icon: FileText, unlocked: true, date: "2025-01-15" },
@@ -105,30 +100,82 @@ const achievements = [
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const [userStats, setUserStats] = useState<any>(null)
+  const [cvResults, setCvResults] = useState<any[]>([])
+  const [interviewResults, setInterviewResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
   const { toast } = useToast()
 
-  // Kullanıcı bilgilerini Firebase'den al
-  const userData = {
-    id: user?.uid || '',
-    firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
-    lastName: user?.displayName?.split(' ').slice(1).join(' ') || '',
-    email: user?.email || '',
-    phone: user?.phoneNumber || '',
-    location: 'Türkiye',
-    joinDate: user?.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR'),
-    bio: 'Profil bilgilerinizi güncelleyin.',
-    avatar: user?.photoURL || '',
-    isVerified: user?.emailVerified || false,
-    ...mockStats, // İstatistikleri ekle
-  }
-
-  const [formData, setFormData] = useState(userData)
-
-  // Kullanıcı bilgileri değiştiğinde formData'yı güncelle
+  // Firebase verilerini yükle
   useEffect(() => {
-    setFormData(userData)
+    const loadUserData = async () => {
+      if (!user) return
+
+      try {
+        setLoading(true)
+        
+        // Kullanıcı istatistiklerini yükle
+        const stats = await getUserStats(user.uid)
+        setUserStats(stats)
+
+        // CV analiz sonuçlarını yükle
+        const cvResults = await getUserCVAnalysisResults(user.uid)
+        setCvResults(cvResults)
+
+        // Mülakat sonuçlarını yükle
+        const interviewResults = await getUserInterviewResults(user.uid)
+        setInterviewResults(interviewResults)
+
+      } catch (error) {
+        console.error('Kullanıcı verileri yüklenirken hata:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadUserData()
   }, [user])
+
+  const [formData, setFormData] = useState({
+    id: '',
+    firstName: 'Kullanıcı',
+    lastName: '',
+    email: '',
+    phone: '',
+    location: 'Türkiye',
+    joinDate: new Date().toLocaleDateString('tr-TR'),
+    bio: 'Profil bilgilerinizi güncelleyin.',
+    avatar: '',
+    isVerified: false,
+    ...mockStats,
+  })
+
+  // Kullanıcı bilgileri veya istatistikler değiştiğinde formData'yı güncelle
+  useEffect(() => {
+    // En son CV analizi ve mülakat skorlarını al
+    const latestCvScore = cvResults.length > 0 ? cvResults[0].overallScore : 0
+    const latestInterviewScore = interviewResults.length > 0 ? interviewResults[0].overallScore : 0
+    
+    const updatedUserData = {
+      id: user?.uid || '',
+      firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
+      lastName: user?.displayName?.split(' ').slice(1).join(' ') || '',
+      email: user?.email || '',
+      phone: user?.phoneNumber || '',
+      location: 'Türkiye',
+      joinDate: user?.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR'),
+      bio: 'Profil bilgilerinizi güncelleyin.',
+      avatar: user?.photoURL || '',
+      isVerified: user?.emailVerified || false,
+      // Firebase'den gelen istatistikleri kullan, yoksa mock verileri kullan
+      ...(userStats || mockStats),
+      // En son skorları kullan
+      cvScore: latestCvScore,
+      interviewScore: latestInterviewScore,
+    }
+    setFormData(updatedUserData)
+  }, [user, userStats, cvResults, interviewResults])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -165,7 +212,28 @@ export default function ProfilePage() {
   }
 
   const handleCancel = () => {
-    setFormData(userData)
+    // En son CV analizi ve mülakat skorlarını al
+    const latestCvScore = cvResults.length > 0 ? cvResults[0].overallScore : 0
+    const latestInterviewScore = interviewResults.length > 0 ? interviewResults[0].overallScore : 0
+    
+    const updatedUserData = {
+      id: user?.uid || '',
+      firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
+      lastName: user?.displayName?.split(' ').slice(1).join(' ') || '',
+      email: user?.email || '',
+      phone: user?.phoneNumber || '',
+      location: 'Türkiye',
+      joinDate: user?.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR'),
+      bio: 'Profil bilgilerinizi güncelleyin.',
+      avatar: user?.photoURL || '',
+      isVerified: user?.emailVerified || false,
+      // Firebase'den gelen istatistikleri kullan, yoksa mock verileri kullan
+      ...(userStats || mockStats),
+      // En son skorları kullan
+      cvScore: latestCvScore,
+      interviewScore: latestInterviewScore,
+    }
+    setFormData(updatedUserData)
     setIsEditing(false)
   }
 
@@ -190,6 +258,22 @@ export default function ProfilePage() {
       default:
         return Target
     }
+  }
+
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 text-gray-900">
+          <Navbar />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Profil bilgileri yükleniyor...</p>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
   }
 
   return (
@@ -218,9 +302,9 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <div className="relative group">
                   <div className="relative">
-                    {userData.avatar ? (
+                    {formData.avatar ? (
                       <Avatar className="w-40 h-40 rounded-2xl shadow-2xl transform group-hover:scale-105 transition-all duration-500">
-                        <AvatarImage src={userData.avatar} alt={`${formData.firstName} ${formData.lastName}`} />
+                        <AvatarImage src={formData.avatar} alt={`${formData.firstName} ${formData.lastName}`} />
                         <AvatarFallback className="bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 text-5xl font-black text-white">
                           {formData.firstName[0]}{formData.lastName[0]}
                         </AvatarFallback>
@@ -254,7 +338,7 @@ export default function ProfilePage() {
                       <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-200 rounded-full text-cyan-700 text-sm font-medium">
                         {formData.level}
                       </span>
-                      {userData.isVerified && (
+                      {formData.isVerified && (
                         <Badge className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 text-green-700 text-sm font-medium">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Email Doğrulandı
@@ -398,7 +482,7 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-bold text-gray-900">Aktivite Akışı</h3>
               </div>
               <div className="space-y-4">
-                {recentActivity.slice(0, 3).map((activity, index) => {
+                {getRecentActivity(cvResults, interviewResults).slice(0, 3).map((activity, index) => {
                   const IconComponent = activity.icon
                   return (
                     <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-300 group">
@@ -593,13 +677,15 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="space-y-6">
-                    {recentActivity.map((activity, index) => {
-                      const IconComponent = activity.icon
-                      return (
-                        <div key={activity.id} className="relative flex items-start space-x-6">
-                          {index !== recentActivity.length - 1 && (
-                            <div className="absolute left-6 top-12 w-0.5 h-16 bg-gradient-to-b from-blue-200 to-transparent"></div>
-                          )}
+                    {(() => {
+                      const activities = getRecentActivity(cvResults, interviewResults).slice(0, 5)
+                      return activities.map((activity, index) => {
+                        const IconComponent = activity.icon
+                        return (
+                          <div key={activity.id} className="relative flex items-start space-x-6">
+                            {index !== activities.length - 1 && (
+                              <div className="absolute left-6 top-12 w-0.5 h-16 bg-gradient-to-b from-blue-200 to-transparent"></div>
+                            )}
                           <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
                             <IconComponent className="w-6 h-6 text-white" />
                           </div>
@@ -615,8 +701,9 @@ export default function ProfilePage() {
                             </div>
                           </div>
                         </div>
-                      )
-                    })}
+                        )
+                      })
+                    })()}
                   </div>
                 </div>
               </TabsContent>

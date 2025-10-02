@@ -2,9 +2,11 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { useAuth } from "@/contexts/AuthContext"
+import { saveCVAnalysisResult, saveUserStats, getUserStats } from "@/lib/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -61,6 +63,13 @@ export default function CVAnalysisPage() {
   const [isVisible, setIsVisible] = useState(false)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [savedFiles, setSavedFiles] = useState<Set<string>>(new Set())
+  const { user } = useAuth()
+  
+  // Global çift kaydetme koruması - daha güçlü
+  const globalSavingState = useRef<Set<string>>(new Set())
+  const lastSaveTime = useRef<number>(0)
 
   useEffect(() => {
     setIsVisible(true)
@@ -73,6 +82,90 @@ export default function CVAnalysisPage() {
       setUploadedFile(file)
       setAnalysisComplete(false)
       setShowResults(false)
+      // Yeni dosya yüklendiğinde savedFiles'ı ve global state'i temizle
+      setSavedFiles(new Set())
+      globalSavingState.current.clear()
+    }
+  }
+
+  const saveAnalysisToFirebase = async () => {
+    if (!user || !uploadedFile) return
+
+    // Zaman bazlı koruma - son 5 saniye içinde kaydetme yapıldıysa engelle
+    const now = Date.now()
+    if (now - lastSaveTime.current < 5000) {
+      console.log(`[${now}] Son 5 saniye içinde kaydetme yapıldı, çift kaydetme önlendi`)
+      return
+    }
+
+    // Unique key oluştur
+    const fileKey = `${user.uid}_${uploadedFile.name}_${uploadedFile.size}_${uploadedFile.lastModified}`
+    
+    // Global çift kaydetme koruması - useRef ile
+    if (globalSavingState.current.has(fileKey)) {
+      console.log(`[${fileKey}] Bu dosya zaten kaydediliyor, çift kaydetme önlendi`)
+      return
+    }
+
+    // Zaman damgasını güncelle
+    lastSaveTime.current = now
+    
+    // Global state'e ekle
+    globalSavingState.current.add(fileKey)
+    setIsSaving(true)
+    setSavedFiles(prev => new Set(prev).add(fileKey))
+
+    try {
+      console.log(`[${fileKey}] CV analiz sonucu kaydediliyor...`)
+      
+      // CV analiz sonucunu kaydet
+      await saveCVAnalysisResult({
+        userId: user.uid,
+        fileName: uploadedFile.name,
+        overallScore: mockAnalysisResult.overallScore,
+        sections: mockAnalysisResult.sections,
+        recommendations: mockAnalysisResult.recommendations
+      })
+
+      // Kullanıcı istatistiklerini güncelle
+      const currentStats = await getUserStats(user.uid)
+      const newStats = {
+        userId: user.uid,
+        currentRank: currentStats?.currentRank || 12,
+        totalScore: (currentStats?.totalScore || 0) + mockAnalysisResult.overallScore,
+        cvScore: mockAnalysisResult.overallScore,
+        interviewScore: currentStats?.interviewScore || 0,
+        badge: currentStats?.badge || "Yeni Katılımcı",
+        level: currentStats?.level || "Başlangıç",
+        completedAnalyses: (currentStats?.completedAnalyses || 0) + 1,
+        completedInterviews: currentStats?.completedInterviews || 0,
+        totalActiveDays: currentStats?.totalActiveDays || 1,
+        streak: currentStats?.streak || 1,
+        lastActivityDate: new Date()
+      }
+
+      await saveUserStats(newStats)
+      
+      console.log(`[${fileKey}] CV analiz sonucu ve istatistikler Firebase'e kaydedildi`)
+      console.log(`[${fileKey}] Kaydedilen CV analiz sonucu:`, {
+        userId: user.uid,
+        fileName: uploadedFile.name,
+        overallScore: mockAnalysisResult.overallScore
+      })
+      console.log(`[${fileKey}] Kaydedilen kullanıcı istatistikleri:`, newStats)
+    } catch (error) {
+      console.error('Firebase kaydetme hatası:', error)
+      // Hata durumunda global state'den kaldır
+      globalSavingState.current.delete(fileKey)
+      setSavedFiles(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(fileKey)
+        return newSet
+      })
+    } finally {
+      setIsSaving(false)
+      // Başarılı kaydetme sonrası global state'den kaldır
+      globalSavingState.current.delete(fileKey)
     }
   }
 
@@ -89,7 +182,8 @@ export default function CVAnalysisPage() {
         if (prev >= 100) {
           clearInterval(progressInterval)
           setIsLoading(false)
-          // Loading bittiğinde direkt sonuçları göster
+          // Loading bittiğinde analiz sonuçlarını Firebase'e kaydet
+          saveAnalysisToFirebase()
           setAnalysisComplete(true)
           setShowResults(true)
           return 100

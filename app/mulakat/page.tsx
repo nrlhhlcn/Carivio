@@ -2,9 +2,12 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
+import { saveInterviewResult, saveUserStats, getUserStats } from "@/lib/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -66,6 +69,13 @@ const mockInterviewResult = {
     "Sorulara daha yapılandırılmış cevaplar verin",
     "Stresli durumlarda sakin kalma tekniklerini uygulayın",
   ],
+  questions: [
+    "Kendinizi kısaca tanıtır mısınız?",
+    "Bu pozisyon için neden uygun olduğunuzu düşünüyorsunuz?",
+    "En güçlü yönleriniz nelerdir?",
+    "Zayıf yönleriniz nelerdir ve bunları nasıl geliştiriyorsunuz?",
+    "Gelecek 5 yıl içindeki hedefleriniz nelerdir?"
+  ],
 }
 
 export default function InterviewSimulationPage() {
@@ -84,6 +94,13 @@ export default function InterviewSimulationPage() {
   const [permissionError, setPermissionError] = useState<string | null>(null)
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
   const [userVideoRef, setUserVideoRef] = useState<HTMLVideoElement | null>(null)
+  const [isSavingInterview, setIsSavingInterview] = useState(false)
+  const { user } = useAuth()
+  const { toast } = useToast()
+  
+  // Global çift kaydetme koruması - daha güçlü
+  const globalInterviewSavingState = useRef<Set<string>>(new Set())
+  const lastSaveTime = useRef<number>(0)
   const [userSpeaking, setUserSpeaking] = useState(false)
   const [audioLevel, setAudioLevel] = useState(0)
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
@@ -359,7 +376,7 @@ export default function InterviewSimulationPage() {
     }
     
     // Ses analizini durdur
-    if (audioContext) {
+    if (audioContext && audioContext.state !== 'closed') {
       audioContext.close()
       setAudioContext(null)
       setAnalyser(null)
@@ -376,6 +393,9 @@ export default function InterviewSimulationPage() {
     
     setCurrentStep("interview")
     setInterviewStarted(true)
+    
+    // Yeni mülakat başladığında global state'i temizle
+    globalInterviewSavingState.current.clear()
     
     // Loading ekranını başlat
     setIsLoading(true)
@@ -426,6 +446,89 @@ export default function InterviewSimulationPage() {
       setIsRecording(false)
       setSilenceTimer(0)
       setIsSilent(false)
+      
+      // Mülakat sonuçlarını Firebase'e kaydet
+      saveInterviewToFirebase()
+    }
+  }
+
+  const saveInterviewToFirebase = async () => {
+    if (!user) return
+
+    // Zaman bazlı koruma - son 5 saniye içinde kaydetme yapıldıysa engelle
+    const now = Date.now()
+    if (now - lastSaveTime.current < 5000) {
+      console.log(`[${now}] Son 5 saniye içinde kaydetme yapıldı, çift kaydetme önlendi`)
+      return
+    }
+
+    // Unique key oluştur - mülakat için
+    const interviewKey = `interview_${user.uid}_${now}`
+    
+    // Global çift kaydetme koruması - useRef ile
+    if (globalInterviewSavingState.current.has(interviewKey) || isSavingInterview) {
+      console.log(`[${interviewKey}] Bu mülakat zaten kaydediliyor, çift kaydetme önlendi`)
+      return
+    }
+
+    // Zaman damgasını güncelle
+    lastSaveTime.current = now
+    
+    // Global state'e ekle
+    globalInterviewSavingState.current.add(interviewKey)
+    setIsSavingInterview(true)
+
+    try {
+      console.log(`[${interviewKey}] Mülakat sonucu kaydediliyor...`)
+      // Mülakat sonucunu kaydet
+      await saveInterviewResult({
+        userId: user.uid,
+        overallScore: mockInterviewResult.overallScore,
+        cvCompatibility: mockInterviewResult.cvCompatibility,
+        stressManagement: mockInterviewResult.stressManagement,
+        communicationSkills: mockInterviewResult.communicationSkills,
+        technicalKnowledge: mockInterviewResult.technicalKnowledge,
+        bodyLanguage: mockInterviewResult.bodyLanguage,
+        feedback: mockInterviewResult.feedback,
+        recommendations: mockInterviewResult.recommendations,
+        questions: mockInterviewResult.questions,
+        duration: recordingTime
+      })
+
+      // Kullanıcı istatistiklerini güncelle
+      const currentStats = await getUserStats(user.uid)
+      const newStats = {
+        userId: user.uid,
+        currentRank: currentStats?.currentRank || 12,
+        totalScore: (currentStats?.totalScore || 0) + mockInterviewResult.overallScore,
+        cvScore: currentStats?.cvScore || 0,
+        interviewScore: mockInterviewResult.overallScore,
+        badge: currentStats?.badge || "Yeni Katılımcı",
+        level: currentStats?.level || "Başlangıç",
+        completedAnalyses: currentStats?.completedAnalyses || 0,
+        completedInterviews: (currentStats?.completedInterviews || 0) + 1,
+        totalActiveDays: currentStats?.totalActiveDays || 1,
+        streak: currentStats?.streak || 1,
+        lastActivityDate: new Date()
+      }
+
+      await saveUserStats(newStats)
+      
+      console.log(`[${interviewKey}] Mülakat sonucu ve istatistikler Firebase'e kaydedildi`)
+      console.log(`[${interviewKey}] Kaydedilen mülakat sonucu:`, {
+        userId: user.uid,
+        overallScore: mockInterviewResult.overallScore,
+        duration: recordingTime
+      })
+      console.log(`[${interviewKey}] Kaydedilen kullanıcı istatistikleri:`, newStats)
+    } catch (error) {
+      console.error('Firebase kaydetme hatası:', error)
+      // Hata durumunda global state'den kaldır
+      globalInterviewSavingState.current.delete(interviewKey)
+    } finally {
+      setIsSavingInterview(false)
+      // Başarılı kaydetme sonrası global state'den kaldır
+      globalInterviewSavingState.current.delete(interviewKey)
     }
   }
 
