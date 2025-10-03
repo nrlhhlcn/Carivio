@@ -83,6 +83,7 @@ export default function InterviewSimulationPage() {
   const [uploadedCV, setUploadedCV] = useState<File | null>(null)
   const [jobDescription, setJobDescription] = useState("")
   const [jdFit, setJdFit] = useState<any | null>(null)
+  const userVideoLocalRef = useRef<HTMLVideoElement | null>(null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
   const [isCameraOn, setIsCameraOn] = useState(false)
@@ -93,6 +94,7 @@ export default function InterviewSimulationPage() {
   const [cameraPermission, setCameraPermission] = useState<"pending" | "granted" | "denied">("denied")
   const [micPermission, setMicPermission] = useState<"pending" | "granted" | "denied">("denied")
   const [permissionError, setPermissionError] = useState<string | null>(null)
+  const [rtReadyWarning, setRtReadyWarning] = useState<string | null>(null)
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
   const [userVideoRef, setUserVideoRef] = useState<HTMLVideoElement | null>(null)
   const [isSavingInterview, setIsSavingInterview] = useState(false)
@@ -154,6 +156,28 @@ export default function InterviewSimulationPage() {
       userVideoRef.play().catch(console.error)
     }
   }, [userVideoRef, cameraStream])
+
+  // Posture detection hook (uses local ref to avoid ref setter conflicts)
+  const postureVideoRef = userVideoLocalRef
+  const { usePosture } = require("@/hooks/use-posture")
+  const postureState = usePosture(postureVideoRef)
+  const { useGaze } = require("@/hooks/use-gaze")
+  const gazeState = useGaze(postureVideoRef)
+  const { useEmotion } = require("@/hooks/use-emotion")
+  const emotionState = useEmotion(postureVideoRef, { intervalMs: 500 })
+
+  useEffect(() => {
+    // Readiness banner
+    if (currentStep === "interview") {
+      if (!postureState?.ready || !gazeState?.ready) {
+        setRtReadyWarning("Gerçek zamanlı analiz hazırlanıyor... (model yükleme)")
+      } else {
+        setRtReadyWarning(null)
+      }
+    } else {
+      setRtReadyWarning(null)
+    }
+  }, [currentStep, postureState?.ready, gazeState?.ready])
 
   // Sessizlik timer'ı yönet
   useEffect(() => {
@@ -826,6 +850,11 @@ export default function InterviewSimulationPage() {
 
         {currentStep === "interview" && (
           <div className="max-w-6xl mx-auto">
+            {rtReadyWarning && (
+              <div className="mb-4 p-3 rounded-lg border bg-amber-50 border-amber-200 text-amber-700 text-sm">
+                {rtReadyWarning}
+              </div>
+            )}
             {isLoading ? (
               // Loading Screen
               <div className="min-h-[600px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-xl relative overflow-hidden">
@@ -999,13 +1028,7 @@ export default function InterviewSimulationPage() {
                       <div className="absolute bottom-4 right-4 w-32 h-24 bg-background rounded-lg border-2 border-border overflow-hidden">
                         {cameraStream ? (
                           <div className="relative w-full h-full">
-                            <video
-                              ref={setUserVideoRef}
-                              autoPlay
-                              muted
-                              playsInline
-                              className="w-full h-full object-cover"
-                            />
+                            <video ref={(el) => { setUserVideoRef(el as any); userVideoLocalRef.current = el }} autoPlay muted playsInline className="w-full h-full object-cover" />
                           </div>
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -1103,6 +1126,38 @@ export default function InterviewSimulationPage() {
 
               {/* Progress & Info */}
               <div className="space-y-6">
+                {/* Real-time Panels */}
+                <div className="space-y-6">
+                  {postureState?.ready && (() => {
+                    const { PosturePanel } = require("@/components/PosturePanel")
+                    return (
+                      <PosturePanel
+                        uprightScore={postureState.metrics.uprightScore}
+                        headTiltDeg={postureState.metrics.headTiltDeg}
+                        shoulderTiltDeg={postureState.metrics.shoulderTiltDeg}
+                        faceVisibleRatio={postureState.metrics.faceVisibleRatio}
+                      />
+                    )
+                  })()}
+
+                  {gazeState?.ready && (() => {
+                    const { GazePanel } = require("@/components/GazePanel")
+                    return (
+                      <GazePanel
+                        eyeContactRatio={gazeState.metrics.eyeContactRatio}
+                        yawDeg={gazeState.metrics.yawDeg}
+                        pitchDeg={gazeState.metrics.pitchDeg}
+                      />
+                    )
+                  })()}
+
+                  {(() => {
+                    const { EmotionPanel } = require("@/components/EmotionPanel")
+                    return (
+                      <EmotionPanel probs={emotionState.probs} top={emotionState.top} error={emotionState.error} />
+                    )
+                  })()}
+                </div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">İlerleme</CardTitle>
