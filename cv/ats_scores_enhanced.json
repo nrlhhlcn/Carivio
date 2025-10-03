@@ -1,0 +1,2800 @@
+{
+  "results": [
+    {
+      "file": "data\\data\\ACCOUNTANT\\10554236.pdf",
+      "sector": "FINANCE",
+      "score": 97,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ACCOUNTANT\\10674770.pdf",
+      "sector": "ACCOUNTANT",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ACCOUNTANT\\11163645.pdf",
+      "sector": "ACCOUNTANT",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 14,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ADVOCATE\\10186968.pdf",
+      "sector": "ADVOCATE",
+      "score": 86,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ADVOCATE\\10344379.pdf",
+      "sector": "AVIATION",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ADVOCATE\\10659182.pdf",
+      "sector": "ADVOCATE",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AGRICULTURE\\10953078.pdf",
+      "sector": "FITNESS",
+      "score": 93,
+      "breakdown": {
+        "sections": 35,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AGRICULTURE\\11197262.pdf",
+      "sector": "AGRICULTURE",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AGRICULTURE\\11676151.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 94,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 2 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\APPAREL\\10182582.pdf",
+      "sector": "SALES",
+      "score": 83,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\APPAREL\\10562768.pdf",
+      "sector": "HEALTHCARE",
+      "score": 98,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 25,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\APPAREL\\10738095.pdf",
+      "sector": "APPAREL",
+      "score": 90,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ARTS\\10830646.pdf",
+      "sector": "TEACHER",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 11,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 7
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_bullet_points": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ARTS\\11187796.pdf",
+      "sector": "APPAREL",
+      "score": 83,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ARTS\\11360471.pdf",
+      "sector": "FITNESS",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AUTOMOBILE\\11152490.pdf",
+      "sector": "ADVOCATE",
+      "score": 91,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 11,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "optimize_length": 3,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AUTOMOBILE\\11257723.pdf",
+      "sector": "ADVOCATE",
+      "score": 85,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 19,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AUTOMOBILE\\11797122.pdf",
+      "sector": "AVIATION",
+      "score": 92,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AVIATION\\10176815.pdf",
+      "sector": "AVIATION",
+      "score": 92,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AVIATION\\10189110.pdf",
+      "sector": "APPAREL",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 17,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "optimize_length": 3,
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\AVIATION\\10395944.pdf",
+      "sector": "AGRICULTURE",
+      "score": 81,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 13,
+        "keywords": 25,
+        "actions": 8,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of action verbs",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "content",
+          "message": "Use more action verbs: led, developed, implemented, optimized, delivered",
+          "impact": "+8 points",
+          "priority": "medium"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_action_verbs": 8,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BANKING\\10329506.pdf",
+      "sector": "BANKING",
+      "score": 92,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BANKING\\10909673.pdf",
+      "sector": "BANKING",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 2 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BANKING\\11065180.pdf",
+      "sector": "BANKING",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BPO\\11183737.pdf",
+      "sector": "AGRICULTURE",
+      "score": 91,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 19,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 1 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BPO\\13964744.pdf",
+      "sector": "CONSULTANT",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BPO\\15145575.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 95,
+      "breakdown": {
+        "sections": 35,
+        "formatting": 20,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BUSINESS-DEVELOPMENT\\10228751.pdf",
+      "sector": "HR",
+      "score": 89,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 12,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BUSINESS-DEVELOPMENT\\10235211.pdf",
+      "sector": "ADVOCATE",
+      "score": 92,
+      "breakdown": {
+        "sections": 35,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\BUSINESS-DEVELOPMENT\\10289113.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CHEF\\10001727.pdf",
+      "sector": "CHEF",
+      "score": 93,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CHEF\\10276858.pdf",
+      "sector": "CHEF",
+      "score": 92,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CHEF\\10333299.pdf",
+      "sector": "SALES",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSTRUCTION\\10041713.pdf",
+      "sector": "CONSTRUCTION",
+      "score": 98,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 1 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSTRUCTION\\10100240.pdf",
+      "sector": "CONSTRUCTION",
+      "score": 97,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 19,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSTRUCTION\\10149490.pdf",
+      "sector": "CONSTRUCTION",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 17,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSULTANT\\10332998.pdf",
+      "sector": "PUBLIC-RELATIONS",
+      "score": 92,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSULTANT\\10984392.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\CONSULTANT\\11020140.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 91,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 1 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DESIGNER\\10466583.pdf",
+      "sector": "DESIGNER",
+      "score": 73,
+      "breakdown": {
+        "sections": 18,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing skills section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "section",
+          "message": "Add a Skills section with technical and soft skills",
+          "impact": "+7 points",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_skills_section": 7,
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DESIGNER\\10748989.pdf",
+      "sector": "DESIGNER",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 1 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DESIGNER\\10751444.pdf",
+      "sector": "ENGINEERING",
+      "score": 98,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DIGITAL-MEDIA\\10005171.pdf",
+      "sector": "PUBLIC-RELATIONS",
+      "score": 95,
+      "breakdown": {
+        "sections": 35,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DIGITAL-MEDIA\\10515955.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 92,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\DIGITAL-MEDIA\\11005406.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 90,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ENGINEERING\\10030015.pdf",
+      "sector": "ENGINEERING",
+      "score": 88,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 30,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ENGINEERING\\10219099.pdf",
+      "sector": "ENGINEERING",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\ENGINEERING\\10624813.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FINANCE\\10549585.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 93,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 12,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Found 1 semantic skill matches",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FINANCE\\11441764.pdf",
+      "sector": "ACCOUNTANT",
+      "score": 94,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FINANCE\\11490673.pdf",
+      "sector": "FINANCE",
+      "score": 94,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FITNESS\\10235429.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 98,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FITNESS\\10268614.pdf",
+      "sector": "FITNESS",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\FITNESS\\10333051.pdf",
+      "sector": "HEALTHCARE",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 17,
+        "keywords": 25,
+        "actions": 25,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HEALTHCARE\\10062724.pdf",
+      "sector": "ADVOCATE",
+      "score": 93,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 17,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 3
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+3 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_contact_info": 3
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HEALTHCARE\\10076271.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 93,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HEALTHCARE\\10251432.pdf",
+      "sector": "FINANCE",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 19,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 4
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+2 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 2
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HR\\10399912.pdf",
+      "sector": "AGRICULTURE",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HR\\10694288.pdf",
+      "sector": "HR",
+      "score": 73,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 13,
+        "keywords": 25,
+        "actions": 8,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of action verbs",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "content",
+          "message": "Use more action verbs: led, developed, implemented, optimized, delivered",
+          "impact": "+8 points",
+          "priority": "medium"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_action_verbs": 8,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\HR\\11480899.pdf",
+      "sector": "HR",
+      "score": 95,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\INFORMATION-TECHNOLOGY\\10089434.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 92,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\INFORMATION-TECHNOLOGY\\10247517.pdf",
+      "sector": "INFORMATION-TECHNOLOGY",
+      "score": 94,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 35,
+        "actions": 15,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\INFORMATION-TECHNOLOGY\\10265057.pdf",
+      "sector": "ENGINEERING",
+      "score": 92,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 30,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\PUBLIC-RELATIONS\\10070224.pdf",
+      "sector": "PUBLIC-RELATIONS",
+      "score": 95,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\PUBLIC-RELATIONS\\10554045.pdf",
+      "sector": "HEALTHCARE",
+      "score": 98,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 25,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\PUBLIC-RELATIONS\\10873344.pdf",
+      "sector": "PUBLIC-RELATIONS",
+      "score": 91,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\SALES\\10138632.pdf",
+      "sector": "APPAREL",
+      "score": 91,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 19,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\SALES\\10464113.pdf",
+      "sector": "BUSINESS-DEVELOPMENT",
+      "score": 94,
+      "breakdown": {
+        "sections": 30,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\SALES\\10603337.pdf",
+      "sector": "APPAREL",
+      "score": 78,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\TEACHER\\10504237.pdf",
+      "sector": "TEACHER",
+      "score": 93,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 20,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\TEACHER\\10527994.pdf",
+      "sector": "TEACHER",
+      "score": 73,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 9,
+        "keywords": 25,
+        "actions": 14,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "CV length outside ideal range (250-1200 words)",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "optimize_length": 3,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    },
+    {
+      "file": "data\\data\\TEACHER\\10909720.pdf",
+      "sector": "TEACHER",
+      "score": 89,
+      "breakdown": {
+        "sections": 25,
+        "formatting": 14,
+        "keywords": 25,
+        "actions": 20,
+        "completeness": 0
+      },
+      "recommendations": [
+        {
+          "type": "improvement",
+          "message": "Missing contact section",
+          "priority": "high"
+        },
+        {
+          "type": "improvement",
+          "message": "Limited use of bullet points",
+          "priority": "medium"
+        },
+        {
+          "type": "improvement",
+          "message": "Missing contact/portfolio links",
+          "priority": "high"
+        },
+        {
+          "type": "contact",
+          "message": "Add email, phone, and LinkedIn/GitHub links",
+          "impact": "+6 points",
+          "priority": "high"
+        }
+      ],
+      "impact_estimates": {
+        "add_contact_section": 5,
+        "add_bullet_points": 3,
+        "add_contact_info": 6
+      },
+      "config_version": "1.0.0-1.0.0",
+      "from_cache": true
+    }
+  ],
+  "config_version": "1.0.0"
+}

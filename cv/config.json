@@ -1,0 +1,45 @@
+{
+  "version": "1.0.0",
+  "rules_version": "1.0.0",
+  "lexicon_version": "1.0.0",
+  "data_root": "data/data",
+  "scoring_weights": {
+    "sections": 25,
+    "formatting": 15,
+    "keywords": 25,
+    "actions": 20,
+    "completeness": 10
+  },
+  "sector_weights": {
+    "INFORMATION-TECHNOLOGY": {
+      "keywords": 35,
+      "actions": 15
+    },
+    "FINANCE": {
+      "keywords": 30,
+      "actions": 20
+    },
+    "ENGINEERING": {
+      "keywords": 30,
+      "actions": 20
+    },
+    "HEALTHCARE": {
+      "keywords": 25,
+      "actions": 25
+    },
+    "ACCOUNTANT": {
+      "keywords": 30,
+      "actions": 20
+    }
+  },
+  "thresholds": {
+    "min_keywords": 5,
+    "min_actions": 2,
+    "min_sections": 2,
+    "min_completeness": 6
+  },
+  "cache_enabled": false,
+  "ocr_enabled": true,
+  "auto_sector_detection": true
+}
+

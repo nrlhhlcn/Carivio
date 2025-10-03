@@ -7,6 +7,7 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { saveCVAnalysisResult, saveUserStats, getUserStats } from "@/lib/firestore"
+import { uploadCVFile } from "@/lib/storage"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -28,32 +29,15 @@ import {
   Zap,
 } from "lucide-react"
 
-const mockAnalysisResult = {
-  overallScore: 78,
-  sections: {
-    personalInfo: { score: 85, status: "good", feedback: "İletişim bilgileri tam, ancak LinkedIn profili eklenebilir" },
-    experience: {
-      score: 72,
-      status: "needs-improvement",
-      feedback: "İş deneyimleri var ama başarılar daha net belirtilmeli",
-    },
-    education: { score: 88, status: "excellent", feedback: "Eğitim geçmişi güçlü ve uygun" },
-    skills: { score: 65, status: "needs-improvement", feedback: "Teknik beceriler güncellenip detaylandırılmalı" },
-    projects: { score: 70, status: "needs-improvement", feedback: "Proje örnekleri az, daha fazla detay gerekli" },
-  },
-  recommendations: [
-    "LinkedIn profilinizi CV'nize ekleyin",
-    "İş deneyimlerinizde sayısal başarılarınızı belirtin (örn: %20 artış sağladım)",
-    "Güncel teknolojileri beceriler kısmına ekleyin",
-    "En az 2-3 proje örneği detaylarıyla ekleyin",
-    "Referanslarınızı belirtin",
-  ],
-  templates: [
-    { name: "Basit & Temiz", price: "Ücretsiz", popular: true },
-    { name: "Modern Tasarım", price: "₺25", popular: false },
-    { name: "Kreatif", price: "₺35", popular: false },
-    { name: "Klasik", price: "₺15", popular: false },
-  ],
+type SectionKey = "personalInfo" | "experience" | "education" | "skills" | "projects"
+type Section = { score: number; status: "excellent" | "good" | "needs-improvement"; feedback: string }
+type RecItem = { type: string; message: string; priority?: string; impact?: string }
+type AnalysisResult = {
+  overallScore: number
+  sections: Record<SectionKey, Section>
+  recommendations: RecItem[]
+  templates: { name: string; price: string; popular?: boolean }[]
+  raw?: any
 }
 
 export default function CVAnalysisPage() {
@@ -65,6 +49,8 @@ export default function CVAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [savedFiles, setSavedFiles] = useState<Set<string>>(new Set())
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
   const { user } = useAuth()
   
   // Global çift kaydetme koruması - daha güçlü
@@ -89,7 +75,7 @@ export default function CVAnalysisPage() {
   }
 
   const saveAnalysisToFirebase = async () => {
-    if (!user || !uploadedFile) return
+    if (!user || !uploadedFile || !analysisResult) return
 
     // Zaman bazlı koruma - son 5 saniye içinde kaydetme yapıldıysa engelle
     const now = Date.now()
@@ -117,14 +103,21 @@ export default function CVAnalysisPage() {
 
     try {
       console.log(`[${fileKey}] CV analiz sonucu kaydediliyor...`)
-      
+
+      // Opsiyonel: Dosyayı Storage'a yükle (URL gerekirse Firestore şemasına eklenebilir)
+      try {
+        await uploadCVFile(uploadedFile, user.uid)
+      } catch (e) {
+        console.warn("CV dosyası yüklenemedi, analiz verisi yine de kaydedilecek.")
+      }
+
       // CV analiz sonucunu kaydet
       await saveCVAnalysisResult({
         userId: user.uid,
         fileName: uploadedFile.name,
-        overallScore: mockAnalysisResult.overallScore,
-        sections: mockAnalysisResult.sections,
-        recommendations: mockAnalysisResult.recommendations
+        overallScore: analysisResult.overallScore,
+        sections: analysisResult.sections,
+        recommendations: analysisResult.recommendations.map(r => r.message)
       })
 
       // Kullanıcı istatistiklerini güncelle
@@ -132,8 +125,8 @@ export default function CVAnalysisPage() {
       const newStats = {
         userId: user.uid,
         currentRank: currentStats?.currentRank || 12,
-        totalScore: (currentStats?.totalScore || 0) + mockAnalysisResult.overallScore,
-        cvScore: mockAnalysisResult.overallScore,
+        totalScore: (currentStats?.totalScore || 0) + analysisResult.overallScore,
+        cvScore: analysisResult.overallScore,
         interviewScore: currentStats?.interviewScore || 0,
         badge: currentStats?.badge || "Yeni Katılımcı",
         level: currentStats?.level || "Başlangıç",
@@ -150,7 +143,7 @@ export default function CVAnalysisPage() {
       console.log(`[${fileKey}] Kaydedilen CV analiz sonucu:`, {
         userId: user.uid,
         fileName: uploadedFile.name,
-        overallScore: mockAnalysisResult.overallScore
+        overallScore: analysisResult.overallScore
       })
       console.log(`[${fileKey}] Kaydedilen kullanıcı istatistikleri:`, newStats)
     } catch (error) {
@@ -169,28 +162,104 @@ export default function CVAnalysisPage() {
     }
   }
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!uploadedFile) return
 
-    // Loading ekranını başlat
     setIsLoading(true)
+    setApiError(null)
     setLoadingProgress(0)
-    
-    // 3 saniye boyunca progress animasyonu
-    const progressInterval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval)
-          setIsLoading(false)
-          // Loading bittiğinde analiz sonuçlarını Firebase'e kaydet
-          saveAnalysisToFirebase()
-          setAnalysisComplete(true)
-          setShowResults(true)
-          return 100
-        }
-        return prev + 2 // Her 100ms'de %2 artır (3 saniyede %100)
-      })
-    }, 60) // Her 60ms'de güncelle (3 saniyede %100)
+
+    // Başlat: sahte progress + paralelde API çağrısı
+    let done = false
+    const timer = setInterval(() => {
+      setLoadingProgress((p) => (p >= 95 || done ? p : p + 2))
+    }, 60)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', uploadedFile)
+      formData.append('sector', 'INFORMATION-TECHNOLOGY')
+
+      const res = await fetch('/api/cv/score', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok || !data?.result) {
+        throw new Error(data?.error || 'Analiz başarısız')
+      }
+
+      const result = data.result as any
+
+      const overall = Math.max(0, Math.min(100, Number(result.score) || 0))
+      const breakdown = result.breakdown || {}
+
+      // Section skorlarını yaklaşık dağıtım ile oluştur
+      const mapScoreToStatus = (s: number): Section["status"] => (s >= 80 ? 'excellent' : s >= 60 ? 'good' : 'needs-improvement')
+      const sections: AnalysisResult["sections"] = {
+        personalInfo: {
+          score: Math.round((breakdown.completeness || 0) * 10),
+          status: mapScoreToStatus(Math.round((breakdown.completeness || 0) * 10)),
+          feedback: "İletişim/link bilgilerini zenginleştirin (LinkedIn/GitHub vb.)",
+        },
+        experience: {
+          score: Math.min(100, Math.round(((breakdown.sections || 0) / 30) * 100)),
+          status: mapScoreToStatus(Math.min(100, Math.round(((breakdown.sections || 0) / 30) * 100))),
+          feedback: "İş deneyimlerinizde sayısal ve sonuç odaklı maddeler kullanın",
+        },
+        education: {
+          score: Math.min(100, Math.round(((breakdown.formatting || 0) / 20) * 100)),
+          status: mapScoreToStatus(Math.min(100, Math.round(((breakdown.formatting || 0) / 20) * 100))),
+          feedback: "Eğitim ve tarih formatlarını tek tipte sunun",
+        },
+        skills: {
+          score: Math.min(100, Math.round(((breakdown.keywords || 0) / 30) * 100)),
+          status: mapScoreToStatus(Math.min(100, Math.round(((breakdown.keywords || 0) / 30) * 100))),
+          feedback: "Sektöre özgü anahtar kelime ve becerileri artırın",
+        },
+        projects: {
+          score: Math.min(100, Math.round(((breakdown.actions || 0) / 20) * 100)),
+          status: mapScoreToStatus(Math.min(100, Math.round(((breakdown.actions || 0) / 20) * 100))),
+          feedback: "Aksiyon fiilleriyle somut başarılar ve çıktılar ekleyin",
+        },
+      }
+
+      const recsRaw = (result.recommendations || []) as RecItem[] | string[]
+      const recs: RecItem[] = Array.isArray(recsRaw) && typeof recsRaw[0] === 'object'
+        ? (recsRaw as RecItem[])
+        : (recsRaw as string[]).map(msg => ({ type: 'improvement', message: msg }))
+
+      const computed: AnalysisResult = {
+        overallScore: overall,
+        sections,
+        recommendations: (recs.length ? recs : [
+          { type: 'contact', message: "LinkedIn profilinizi ekleyin ve becerileri güncelleyin" },
+          { type: 'content', message: "İş deneyimlerinde sayısal başarıları vurgulayın" },
+        ]) as RecItem[],
+        templates: [
+          { name: "Basit & Temiz", price: "Ücretsiz", popular: true },
+          { name: "Modern Tasarım", price: "₺25" },
+          { name: "Kreatif", price: "₺35" },
+          { name: "Klasik", price: "₺15" },
+        ],
+        raw: result,
+      }
+
+      setAnalysisResult(computed)
+      done = true
+      setLoadingProgress(100)
+      clearInterval(timer)
+      setIsLoading(false)
+      setAnalysisComplete(true)
+      setShowResults(true)
+
+      // Firestore'a kaydet
+      await saveAnalysisToFirebase()
+    } catch (e) {
+      done = true
+      clearInterval(timer)
+      setIsLoading(false)
+      setLoadingProgress(0)
+      console.error(e)
+      setApiError("Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin.")
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -240,6 +309,11 @@ export default function CVAnalysisPage() {
           <p className="text-gray-600 text-xl max-w-2xl mx-auto">
             CV'nizi yükleyin, analiz edin ve nasıl geliştirebileceğinizi öğrenin
           </p>
+          {apiError && (
+            <div className="mt-4 text-red-600 text-sm">
+              {apiError}
+            </div>
+          )}
         </div>
 
         {isLoading ? (
@@ -529,7 +603,7 @@ export default function CVAnalysisPage() {
                           </div>
                           <div className="flex items-center space-x-3">
                             <span className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                              {mockAnalysisResult.overallScore}
+                              {analysisResult?.overallScore ?? 0}
                             </span>
                             <span className="text-gray-500 text-xl">/100</span>
                           </div>
@@ -539,55 +613,48 @@ export default function CVAnalysisPage() {
                         <div className="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
                           <div
                             className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-2000 ease-out"
-                            style={{ width: `${mockAnalysisResult.overallScore}%` }}
+                            style={{ width: `${analysisResult?.overallScore ?? 0}%` }}
                           />
                         </div>
-                        <p className="text-gray-600 text-lg">
-                          CV'niz iyi durumda, birkaç iyileştirme ile daha güçlü hale gelebilir.
-                        </p>
+                        {analysisResult && (
+                          <p className="text-gray-600 text-lg">
+                            {analysisResult.overallScore >= 80
+                              ? "Harika! Küçük dokunuşlarla mükemmel hale gelebilir."
+                              : analysisResult.overallScore >= 60
+                                ? "İyi bir başlangıç. Önerileri uygulayarak hızlıca güçlendirebilirsiniz."
+                                : "İyileştirme alanları fazla. Aşağıdaki önerileri önceliklendirin."}
+                          </p>
+                        )}
                       </CardContent>
                     </Card>
 
-                    <div className="space-y-4">
-                      {Object.entries(mockAnalysisResult.sections).map(([key, section], index) => (
-                        <Card
-                          key={key}
-                          className="border-0 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 group animate-in slide-in-from-left"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                          <CardContent className="pt-6">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center space-x-4">
-                                {getStatusIcon(section.status)}
-                                <h3 className="font-semibold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">
-                                  {key === "personalInfo" && "Kişisel Bilgiler"}
-                                  {key === "experience" && "İş Deneyimi"}
-                                  {key === "education" && "Eğitim"}
-                                  {key === "skills" && "Beceriler"}
-                                  {key === "projects" && "Projeler"}
-                                </h3>
+                    {/* Gerçek breakdown'u göster */}
+                    {analysisResult?.raw?.breakdown && (
+                      <Card className="border-0 shadow-xl transition-all duration-500">
+                        <CardHeader>
+                          <CardTitle className="text-gray-900">Skor Kırılımı</CardTitle>
+                          <CardDescription className="text-gray-600">Gelişmiş analiz modülünden gelen ham kırılım</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid md:grid-cols-5 gap-4">
+                            {[
+                              { label: 'Bölümler', key: 'sections' },
+                              { label: 'Biçimlendirme', key: 'formatting' },
+                              { label: 'Anahtar Kelimeler', key: 'keywords' },
+                              { label: 'Eylem Fiilleri', key: 'actions' },
+                              { label: 'Tamamlayıcılık', key: 'completeness' },
+                            ].map((item) => (
+                              <div key={item.key} className="p-4 bg-gray-50 rounded-xl border">
+                                <div className="text-sm text-gray-500">{item.label}</div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                  {analysisResult.raw.breakdown[item.key] ?? 0}
+                                </div>
                               </div>
-                              <span className={`font-bold text-xl ${getStatusColor(section.status)}`}>
-                                {section.score}/100
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3 mb-3 overflow-hidden">
-                              <div
-                                className={`h-3 rounded-full transition-all duration-1000 ease-out ${
-                                  section.status === "excellent"
-                                    ? "bg-gradient-to-r from-green-400 to-green-600"
-                                    : section.status === "good"
-                                      ? "bg-gradient-to-r from-blue-400 to-blue-600"
-                                      : "bg-gradient-to-r from-orange-400 to-orange-600"
-                                }`}
-                                style={{ width: `${section.score}%` }}
-                              />
-                            </div>
-                            <p className="text-gray-600 leading-relaxed">{section.feedback}</p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </TabsContent>
 
                   <TabsContent value="recommendations" className="space-y-4 mt-6">
@@ -597,20 +664,53 @@ export default function CVAnalysisPage() {
                           <TrendingUp className="w-5 h-5 text-blue-600" />
                           <span>Nasıl Geliştirebilirsiniz?</span>
                         </CardTitle>
-                        <CardDescription className="text-gray-600 text-lg">
-                          Bu önerileri uygulayarak CV'nizi güçlendirebilirsiniz
-                        </CardDescription>
+                    <CardDescription className="text-gray-600 text-lg">
+                      Bu önerileri uygulayarak CV'nizi güçlendirebilirsiniz
+                    </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-3">
-                        {mockAnalysisResult.recommendations.map((recommendation, index) => (
-                          <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <span className="text-xs font-medium text-blue-600">{index + 1}</span>
+                  <CardContent className="space-y-3">
+                    {/* Negatif (düzeltme) öğelerini üstte göster */}
+                    {analysisResult?.recommendations
+                      .filter(r => (r.type || '').toLowerCase() !== 'positive')
+                      .map((r, index) => (
+                        <div key={`neg-${index}`} className="flex items-start justify-between p-4 bg-red-50 rounded-xl border border-red-100">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-xs font-bold text-red-600">!</span>
                             </div>
-                            <p className="text-gray-700">{recommendation}</p>
+                            <div className="flex-1">
+                              <p className="text-gray-900 font-medium leading-snug">{r.message}</p>
+                              <div className="mt-1 flex items-center gap-2">
+                                {r.priority && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                    {r.priority}
+                                  </span>
+                                )}
+                                {r.impact && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700">
+                                    {r.impact}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        ))}
-                      </CardContent>
+                        </div>
+                      ))}
+
+                    {/* Pozitif öğeleri altta göster */}
+                    {analysisResult?.recommendations
+                      .filter(r => (r.type || '').toLowerCase() === 'positive')
+                      .map((r, index) => (
+                        <div key={`pos-${index}`} className="flex items-start p-4 bg-green-50 rounded-xl border border-green-100">
+                          <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
+                            <span className="text-xs font-bold text-green-600">✓</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-gray-900 font-medium leading-snug">{r.message}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </CardContent>
                     </Card>
                   </TabsContent>
 
@@ -627,7 +727,7 @@ export default function CVAnalysisPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="grid md:grid-cols-2 gap-4">
-                          {mockAnalysisResult.templates.map((template, index) => (
+                          {analysisResult?.templates.map((template, index) => (
                             <Card
                               key={index}
                               className="relative border-0 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 group"

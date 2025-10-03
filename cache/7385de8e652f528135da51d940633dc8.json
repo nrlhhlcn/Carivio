@@ -1,0 +1,61 @@
+{
+  "file": "text_input",
+  "sector": "INFORMATION-TECHNOLOGY",
+  "score": 50,
+  "breakdown": {
+    "sections": 30,
+    "formatting": 16,
+    "keywords": 12,
+    "actions": 8,
+    "completeness": 10
+  },
+  "recommendations": [
+    {
+      "type": "improvement",
+      "message": "İletişim (Contact) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Paragraflar çok uzun; kısa maddelere bölün",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Yeterli sayıda ayrı deneyim girdisi yok",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Özet/amaç bölümü çok uzun",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Maddelerde ölçülebilir sonuç oranı düşük (<%30)",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Maddelerin azı güçlü eylem fiiliyle başlıyor (<%50)",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Belirsiz buzzword’ler tespit edildi; somut çıktılarla değiştirin",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Avoid raw keyword stuffing; use keywords in natural sentences",
+      "priority": "medium"
+    }
+  ],
+  "impact_estimates": {
+    "add_contact_section": 5,
+    "add_sector_keywords": 10,
+    "add_action_verbs": 8
+  },
+  "config_version": "1.0.0-1.0.0",
+  "from_cache": false
+}

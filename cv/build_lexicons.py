@@ -114,26 +114,30 @@ def build_action_verbs(sector_keywords: Dict[str, List[str]]) -> List[str]:
 
 
 def main():
-    data_dir = "data"
+    # data/ veya data/data/ altındaki TÜM sektör klasörlerini otomatik tara
+    base = Path("data")
+    data_dir = str(base / "data" if (base / "data").exists() else base)
     out_dir = Path("lexicons")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print("🔧 Sektörel keyword'ler çıkarılıyor...")
+    print("Building sector keywords...")
     sector_kw = build_sector_keywords(data_dir)
     (out_dir / "sector_keywords.json").write_text(
         json.dumps(sector_kw, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-    print(f"✅ Kaydedildi: {out_dir / 'sector_keywords.json'}")
-
-    print("🔧 Action verbs çıkarılıyor...")
+    print(f"Saved: {out_dir / 'sector_keywords.json'}")
+    
+    print("Building action verbs...")
     action_verbs = build_action_verbs(sector_kw)
     (out_dir / "action_verbs.json").write_text(
         json.dumps(action_verbs, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-    print(f"✅ Kaydedildi: {out_dir / 'action_verbs.json'}")
+    print(f"Saved: {out_dir / 'action_verbs.json'}")
 
 
 if __name__ == "__main__":
     main()
+
+
 
 

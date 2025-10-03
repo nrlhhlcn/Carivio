@@ -82,6 +82,7 @@ export default function InterviewSimulationPage() {
   const [currentStep, setCurrentStep] = useState<"setup" | "interview" | "results">("setup")
   const [uploadedCV, setUploadedCV] = useState<File | null>(null)
   const [jobDescription, setJobDescription] = useState("")
+  const [jdFit, setJdFit] = useState<any | null>(null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
   const [isCameraOn, setIsCameraOn] = useState(false)
@@ -421,6 +422,21 @@ export default function InterviewSimulationPage() {
         return prev + 2 // Her 100ms'de %2 artır (5 saniyede %100)
       })
     }, 100) // Her 100ms'de güncelle
+
+    // JD uyum skorunu önceden hesapla (API'ye CV+JD gönder)
+    try {
+      const formData = new FormData()
+      formData.append('file', uploadedCV)
+      formData.append('sector', 'INFORMATION-TECHNOLOGY')
+      formData.append('jd_text', jobDescription)
+      const res = await fetch('/api/cv/score', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (res.ok && data?.result?.jd_fit) {
+        setJdFit(data.result.jd_fit)
+      }
+    } catch (e) {
+      console.error('JD fit hesaplanamadı', e)
+    }
   }
 
   const nextQuestion = () => {
