@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  GithubAuthProvider,
   signOut,
   onAuthStateChanged,
   updateProfile
@@ -19,6 +20,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
+  signInWithGithub: () => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -65,6 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const signInWithGithub = async () => {
+    try {
+      const provider = new GithubAuthProvider()
+      await signInWithPopup(auth, provider)
+    } catch (error) {
+      throw error
+    }
+  }
+
   const logout = async () => {
     try {
       await signOut(auth)
@@ -79,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signInWithGoogle,
+    signInWithGithub,
     logout
   }
 
