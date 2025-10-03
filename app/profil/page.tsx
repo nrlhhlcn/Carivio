@@ -41,18 +41,18 @@ import {
   Zap,
 } from "lucide-react"
 
-// Mock stats data - sadece istatistikler için
-const mockStats = {
-  currentRank: 12,
-  totalScore: 1980,
-  cvScore: 72,
-  interviewScore: 76,
+// Varsayılan istatistikler (Firestore yoksa 0'dan başla)
+const defaultStats = {
+  currentRank: 0,
+  totalScore: 0,
+  cvScore: 0,
+  interviewScore: 0,
   badge: "Yeni Katılımcı",
   level: "Başlangıç",
-  completedAnalyses: 4,
-  completedInterviews: 3,
-  totalActiveDays: 12,
-  streak: 3,
+  completedAnalyses: 0,
+  completedInterviews: 0,
+  totalActiveDays: 0,
+  streak: 0,
 }
 
 // Dinamik aktivite listesi oluştur - sadece gerçek verilerden
@@ -148,15 +148,11 @@ export default function ProfilePage() {
     bio: 'Profil bilgilerinizi güncelleyin.',
     avatar: '',
     isVerified: false,
-    ...mockStats,
+    ...defaultStats,
   })
 
   // Kullanıcı bilgileri veya istatistikler değiştiğinde formData'yı güncelle
   useEffect(() => {
-    // En son CV analizi ve mülakat skorlarını al
-    const latestCvScore = cvResults.length > 0 ? cvResults[0].overallScore : 0
-    const latestInterviewScore = interviewResults.length > 0 ? interviewResults[0].overallScore : 0
-    
     const updatedUserData = {
       id: user?.uid || '',
       firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
@@ -168,14 +164,11 @@ export default function ProfilePage() {
       bio: 'Profil bilgilerinizi güncelleyin.',
       avatar: user?.photoURL || '',
       isVerified: user?.emailVerified || false,
-      // Firebase'den gelen istatistikleri kullan, yoksa mock verileri kullan
-      ...(userStats || mockStats),
-      // En son skorları kullan
-      cvScore: latestCvScore,
-      interviewScore: latestInterviewScore,
+      // Firebase'den gelen istatistikleri kullan, yoksa varsayılanları kullan
+      ...(userStats || defaultStats),
     }
     setFormData(updatedUserData)
-  }, [user, userStats, cvResults, interviewResults])
+  }, [user, userStats])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -212,10 +205,6 @@ export default function ProfilePage() {
   }
 
   const handleCancel = () => {
-    // En son CV analizi ve mülakat skorlarını al
-    const latestCvScore = cvResults.length > 0 ? cvResults[0].overallScore : 0
-    const latestInterviewScore = interviewResults.length > 0 ? interviewResults[0].overallScore : 0
-    
     const updatedUserData = {
       id: user?.uid || '',
       firstName: user?.displayName?.split(' ')[0] || 'Kullanıcı',
@@ -227,11 +216,8 @@ export default function ProfilePage() {
       bio: 'Profil bilgilerinizi güncelleyin.',
       avatar: user?.photoURL || '',
       isVerified: user?.emailVerified || false,
-      // Firebase'den gelen istatistikleri kullan, yoksa mock verileri kullan
-      ...(userStats || mockStats),
-      // En son skorları kullan
-      cvScore: latestCvScore,
-      interviewScore: latestInterviewScore,
+      // Firebase'den gelen istatistikleri kullan, yoksa varsayılanları kullan
+      ...(userStats || defaultStats),
     }
     setFormData(updatedUserData)
     setIsEditing(false)

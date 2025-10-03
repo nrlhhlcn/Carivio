@@ -1,0 +1,66 @@
+{
+  "file": "text_input",
+  "sector": "INFORMATION-TECHNOLOGY",
+  "score": 5,
+  "breakdown": {
+    "sections": 5,
+    "formatting": 14,
+    "keywords": 4,
+    "actions": 0,
+    "completeness": 3
+  },
+  "recommendations": [
+    {
+      "type": "improvement",
+      "message": "Deneyim (Experience) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Eğitim (Education) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Beceri (Skills) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "İletişim (Contact) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "CV uzunluğu ideal aralıkta değil (250–1200 kelime)",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Paragraflar çok uzun; kısa maddelere bölün",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Maddelerde ölçülebilir sonuç oranı düşük (<%30)",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Maddelerin azı güçlü eylem fiiliyle başlıyor (<%50)",
+      "priority": "medium"
+    }
+  ],
+  "impact_estimates": {
+    "add_experience_section": 10,
+    "add_education_section": 8,
+    "add_skills_section": 7,
+    "add_contact_section": 5,
+    "optimize_length": 3,
+    "add_sector_keywords": 10,
+    "add_action_verbs": 8,
+    "add_contact_info": 3
+  },
+  "config_version": "1.0.0-1.0.0",
+  "from_cache": false
+}

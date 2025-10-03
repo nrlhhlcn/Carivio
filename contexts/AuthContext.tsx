@@ -13,6 +13,7 @@ import {
   updateProfile
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { saveUserStats, getUserStats, upsertUserDoc } from '@/lib/firestore'
 
 interface AuthContextType {
   user: User | null
@@ -53,6 +54,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await updateProfile(userCredential.user, {
         displayName: `${firstName} ${lastName}`
       })
+
+      // Initialize user stats document with defaults
+      try {
+        // users koleksiyonuna yaz
+        await upsertUserDoc({
+          userId: userCredential.user.uid,
+          email,
+          firstName,
+          lastName,
+          displayName: `${firstName} ${lastName}`,
+          photoURL: userCredential.user.photoURL || undefined,
+        })
+
+        await saveUserStats({
+          userId: userCredential.user.uid,
+          displayName: `${firstName} ${lastName}`,
+          photoURL: userCredential.user.photoURL || undefined,
+          currentRank: 0,
+          totalScore: 0,
+          cvScore: 0,
+          interviewScore: 0,
+          badge: 'Yeni Katılımcı',
+          level: 'Başlangıç',
+          completedAnalyses: 0,
+          completedInterviews: 0,
+          totalActiveDays: 0,
+          streak: 0,
+          lastActivityDate: new Date(),
+        })
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Initial userStats could not be created:', e)
+      }
     } catch (error) {
       throw error
     }
@@ -61,7 +95,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
+      const cred = await signInWithPopup(auth, provider)
+      // Ensure initial stats exist for OAuth users
+      try {
+        const existing = await getUserStats(cred.user.uid)
+        if (!existing) {
+          // users koleksiyonuna da yaz
+          const email = cred.user.email || ''
+          const base = email.split('@')[0] || 'Kullanıcı'
+          const guessName = cred.user.displayName || base.replace(/\./g, ' ')
+          await upsertUserDoc({
+            userId: cred.user.uid,
+            email,
+            displayName: guessName,
+            photoURL: cred.user.photoURL || undefined,
+          })
+
+          await saveUserStats({
+            userId: cred.user.uid,
+            displayName: cred.user.displayName || 'Kullanıcı',
+            photoURL: cred.user.photoURL || undefined,
+            currentRank: 0,
+            totalScore: 0,
+            cvScore: 0,
+            interviewScore: 0,
+            badge: 'Yeni Katılımcı',
+            level: 'Başlangıç',
+            completedAnalyses: 0,
+            completedInterviews: 0,
+            totalActiveDays: 0,
+            streak: 0,
+            lastActivityDate: new Date(),
+          })
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Init userStats (Google) skipped:', e)
+      }
     } catch (error) {
       throw error
     }
@@ -70,7 +140,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGithub = async () => {
     try {
       const provider = new GithubAuthProvider()
-      await signInWithPopup(auth, provider)
+      const cred = await signInWithPopup(auth, provider)
+      // Ensure initial stats exist for OAuth users
+      try {
+        const existing = await getUserStats(cred.user.uid)
+        if (!existing) {
+          const email = cred.user.email || ''
+          const base = email.split('@')[0] || 'Kullanıcı'
+          const guessName = cred.user.displayName || base.replace(/\./g, ' ')
+          await upsertUserDoc({
+            userId: cred.user.uid,
+            email,
+            displayName: guessName,
+            photoURL: cred.user.photoURL || undefined,
+          })
+
+          await saveUserStats({
+            userId: cred.user.uid,
+            displayName: cred.user.displayName || 'Kullanıcı',
+            photoURL: cred.user.photoURL || undefined,
+            currentRank: 0,
+            totalScore: 0,
+            cvScore: 0,
+            interviewScore: 0,
+            badge: 'Yeni Katılımcı',
+            level: 'Başlangıç',
+            completedAnalyses: 0,
+            completedInterviews: 0,
+            totalActiveDays: 0,
+            streak: 0,
+            lastActivityDate: new Date(),
+          })
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Init userStats (GitHub) skipped:', e)
+      }
     } catch (error) {
       throw error
     }

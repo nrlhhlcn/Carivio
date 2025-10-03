@@ -7,7 +7,6 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { saveCVAnalysisResult, saveUserStats, getUserStats } from "@/lib/firestore"
-import { uploadCVFile } from "@/lib/storage"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -74,8 +73,20 @@ export default function CVAnalysisPage() {
     }
   }
 
-  const saveAnalysisToFirebase = async () => {
-    if (!user || !uploadedFile || !analysisResult) return
+  const saveAnalysisToFirebase = async (resultOverride?: AnalysisResult) => {
+    if (!user) {
+      console.warn('[saveAnalysisToFirebase] user yok, kayıt atlandı')
+      return
+    }
+    if (!uploadedFile) {
+      console.warn('[saveAnalysisToFirebase] uploadedFile yok, kayıt atlandı')
+      return
+    }
+    const resultToSave = resultOverride ?? analysisResult
+    if (!resultToSave) {
+      console.warn('[saveAnalysisToFirebase] analysisResult yok (ve override gelmedi), kayıt atlandı')
+      return
+    }
 
     // Zaman bazlı koruma - son 5 saniye içinde kaydetme yapıldıysa engelle
     const now = Date.now()
@@ -104,32 +115,34 @@ export default function CVAnalysisPage() {
     try {
       console.log(`[${fileKey}] CV analiz sonucu kaydediliyor...`)
 
-      // Opsiyonel: Dosyayı Storage'a yükle (URL gerekirse Firestore şemasına eklenebilir)
-      try {
-        await uploadCVFile(uploadedFile, user.uid)
-      } catch (e) {
-        console.warn("CV dosyası yüklenemedi, analiz verisi yine de kaydedilecek.")
-      }
+      // Not: Dosya Storage'a yüklenmiyor; yalnızca analiz sonucu kaydedilir
 
       // CV analiz sonucunu kaydet
+      console.info(`[${fileKey}] Firestore cvAnalysisResults kaydı başlıyor`)
       await saveCVAnalysisResult({
         userId: user.uid,
         fileName: uploadedFile.name,
-        overallScore: analysisResult.overallScore,
-        sections: analysisResult.sections,
-        recommendations: analysisResult.recommendations.map(r => r.message)
+        overallScore: resultToSave.overallScore,
+        sections: resultToSave.sections,
+        recommendations: resultToSave.recommendations.map(r => r.message)
       })
+      console.info(`[${fileKey}] Firestore cvAnalysisResults kaydı tamamlandı`)
 
       // Kullanıcı istatistiklerini güncelle
+      console.info(`[${fileKey}] userStats okunuyor`)
       const currentStats = await getUserStats(user.uid)
       const newStats = {
         userId: user.uid,
+        displayName: user.displayName || 'Kullanıcı',
+        photoURL: user.photoURL || undefined,
         currentRank: currentStats?.currentRank || 12,
-        totalScore: (currentStats?.totalScore || 0) + analysisResult.overallScore,
-        cvScore: analysisResult.overallScore,
+        totalScore: (currentStats?.totalScore || 0) + resultToSave.overallScore,
+        // En yüksek CV puanını tut
+        cvScore: Math.max(currentStats?.cvScore || 0, resultToSave.overallScore),
         interviewScore: currentStats?.interviewScore || 0,
         badge: currentStats?.badge || "Yeni Katılımcı",
         level: currentStats?.level || "Başlangıç",
+        // Yeni analiz sayısını +1
         completedAnalyses: (currentStats?.completedAnalyses || 0) + 1,
         completedInterviews: currentStats?.completedInterviews || 0,
         totalActiveDays: currentStats?.totalActiveDays || 1,
@@ -137,13 +150,15 @@ export default function CVAnalysisPage() {
         lastActivityDate: new Date()
       }
 
+      console.info(`[${fileKey}] userStats kaydı/güncellemesi başlıyor`)
       await saveUserStats(newStats)
+      console.info(`[${fileKey}] userStats kaydı/güncellemesi tamamlandı`)
       
       console.log(`[${fileKey}] CV analiz sonucu ve istatistikler Firebase'e kaydedildi`)
       console.log(`[${fileKey}] Kaydedilen CV analiz sonucu:`, {
         userId: user.uid,
         fileName: uploadedFile.name,
-        overallScore: analysisResult.overallScore
+        overallScore: resultToSave.overallScore
       })
       console.log(`[${fileKey}] Kaydedilen kullanıcı istatistikleri:`, newStats)
     } catch (error) {
@@ -250,8 +265,8 @@ export default function CVAnalysisPage() {
       setAnalysisComplete(true)
       setShowResults(true)
 
-      // Firestore'a kaydet
-      await saveAnalysisToFirebase()
+      // Firestore'a kaydet (state güncellenmesini beklemeden, taze sonuçla)
+      await saveAnalysisToFirebase(computed)
     } catch (e) {
       done = true
       clearInterval(timer)

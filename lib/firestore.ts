@@ -64,6 +64,19 @@ export interface UserStats {
   updatedAt?: Timestamp
 }
 
+// Basit kullanıcı profili (users koleksiyonu)
+export interface BasicUserDoc {
+  id?: string
+  userId: string
+  email: string
+  firstName?: string
+  lastName?: string
+  displayName?: string
+  photoURL?: string
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
+}
+
 // Mülakat Sonuçları için interface
 export interface InterviewResult {
   id?: string
@@ -209,11 +222,16 @@ export const saveUserStats = async (stats: Omit<UserStats, 'id'>): Promise<strin
       where('userId', '==', stats.userId)
     )
     const querySnapshot = await getDocs(q)
-    
+    // Remove undefined fields to satisfy Firestore constraints
+    const cleaned: Record<string, any> = {}
+    Object.entries(stats as any).forEach(([k, v]) => {
+      if (v !== undefined) cleaned[k] = v
+    })
+
     if (querySnapshot.empty) {
       // Yeni istatistik oluştur
       const docRef = await addDoc(collection(db, 'userStats'), {
-        ...stats,
+        ...cleaned,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       })
@@ -223,7 +241,7 @@ export const saveUserStats = async (stats: Omit<UserStats, 'id'>): Promise<strin
       // Mevcut istatistikleri güncelle
       const docRef = querySnapshot.docs[0].ref
       await updateDoc(docRef, {
-        ...stats,
+        ...cleaned,
         updatedAt: Timestamp.now()
       })
       console.log('Kullanıcı istatistikleri güncellendi, ID:', docRef.id)
@@ -326,17 +344,14 @@ export const saveCVAnalysisResult = async (result: {
 }
 
 // Kullanıcının CV Analiz Sonuçlarını Getirme
-export const getUserCVAnalysisResults = async (userId: string) => {
+export const getUserCVAnalysisResults = async (userId: string): Promise<Array<{ id: string; analysisDate?: any } & Record<string, any>>> => {
   try {
     const q = query(
       collection(db, 'cvAnalysisResults'),
       where('userId', '==', userId)
     )
     const querySnapshot = await getDocs(q)
-    const results = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
+    const results: Array<{ id: string; analysisDate?: any } & Record<string, any>> = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }))
     // Client-side sorting
     return results.sort((a, b) => {
       const dateA = a.analysisDate?.toDate?.() || new Date(0)
@@ -346,6 +361,82 @@ export const getUserCVAnalysisResults = async (userId: string) => {
   } catch (error) {
     console.error('CV analiz sonuçları getirilirken hata:', error)
     throw error
+  }
+}
+
+// Leaderboard - en yüksek toplam puana göre sıralı kullanıcı istatistikleri
+export const getLeaderboard = async (limitCount = 50): Promise<UserStats[]> => {
+  try {
+    const q = query(
+      collection(db, 'userStats'),
+      orderBy('totalScore', 'desc'),
+      limit(limitCount)
+    )
+    const snap = await getDocs(q)
+    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as UserStats[]
+  } catch (error) {
+    console.error('Leaderboard çekilirken hata:', error)
+    throw error
+  }
+}
+
+// CV skoruna göre liderlik tablosu (en yüksek cvScore)
+export const getCvLeaderboard = async (limitCount = 50): Promise<UserStats[]> => {
+  try {
+    const q = query(
+      collection(db, 'userStats'),
+      orderBy('cvScore', 'desc'),
+      limit(limitCount)
+    )
+    const snap = await getDocs(q)
+    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as UserStats[]
+  } catch (error) {
+    console.error('CV Leaderboard çekilirken hata:', error)
+    throw error
+  }
+}
+
+// USERS collection helpers
+export const upsertUserDoc = async (user: Omit<BasicUserDoc, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  try {
+    const q = query(collection(db, 'users'), where('userId', '==', user.userId))
+    const snap = await getDocs(q)
+    // Remove undefined fields (Firestore doesn't allow undefined)
+    const cleaned: Record<string, any> = {}
+    Object.entries(user).forEach(([k, v]) => {
+      if (v !== undefined) cleaned[k] = v
+    })
+    const payload = {
+      ...cleaned,
+      updatedAt: Timestamp.now(),
+    }
+    if (snap.empty) {
+      const docRef = await addDoc(collection(db, 'users'), {
+        ...payload,
+        createdAt: Timestamp.now(),
+      })
+      return docRef.id
+    } else {
+      const ref = snap.docs[0].ref
+      await updateDoc(ref, payload)
+      return ref.id
+    }
+  } catch (e) {
+    console.error('users upsert error:', e)
+    throw e
+  }
+}
+
+export const getUserById = async (userId: string): Promise<BasicUserDoc | null> => {
+  try {
+    const q = query(collection(db, 'users'), where('userId', '==', userId))
+    const snap = await getDocs(q)
+    if (snap.empty) return null
+    const d = snap.docs[0]
+    return { id: d.id, ...(d.data() as any) } as BasicUserDoc
+  } catch (e) {
+    console.error('users get error:', e)
+    throw e
   }
 }
 

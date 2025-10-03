@@ -36,6 +36,14 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 // Firebase servislerini export et
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-export const storage = getStorage(app)
+
+// Normalize storage bucket (avoid *.firebasestorage.app CORS issues)
+const rawBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || ''
+const normalizedBucket = rawBucket.endsWith('firebasestorage.app')
+  ? rawBucket.replace('firebasestorage.app', 'appspot.com')
+  : rawBucket
+const bucketUrl = normalizedBucket.startsWith('gs://') ? normalizedBucket : (normalizedBucket ? `gs://${normalizedBucket}` : undefined)
+
+export const storage = bucketUrl ? getStorage(app, bucketUrl) : getStorage(app)
 export default app
 

@@ -17,11 +17,13 @@ async function saveTempFile(file: File): Promise<string> {
 }
 
 function resolvePythonBin(): string[] {
-  const bin = process.env.PYTHON_BIN || 'python'
-  // Try provided bin; optionally a fallback list
-  const candidates = [bin]
-  if (bin !== 'py') candidates.push('py')
-  return candidates
+  const envBin = process.env.PYTHON_BIN?.trim()
+  const candidates: string[] = []
+  if (envBin) candidates.push(envBin)
+  // Prefer python3 on macOS/Linux environments
+  candidates.push('python3', 'python', 'py')
+  // De-duplicate while preserving order
+  return Array.from(new Set(candidates))
 }
 
 function runPythonScore(pdfPath: string, sector: string, jdText?: string, jdFilePath?: string): Promise<any> {
@@ -62,12 +64,15 @@ function runPythonScore(pdfPath: string, sector: string, jdText?: string, jdFile
         stderr += data.toString()
       })
 
-      proc.on('error', (_) => {
+      proc.on('error', (err) => {
         // Try fallback bin
         if (fallbacks.length) {
           tryStart(fallbacks)
         } else {
-          reject(new Error(stderr || 'Failed to start Python process'))
+          const message = stderr && stderr.trim().length > 0
+            ? stderr
+            : `Failed to start Python process${err?.message ? `: ${err.message}` : ''}. Tried: ${resolvePythonBin().join(', ')}`
+          reject(new Error(message))
         }
       })
 
