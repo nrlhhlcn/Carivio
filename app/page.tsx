@@ -465,146 +465,542 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Unique CTA Section - Card-Based Design */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* User Testimonials Section */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse" style={{background: 'radial-gradient(circle, rgba(0, 202, 255, 0.1) 0%, rgba(0, 101, 248, 0.05) 100%)'}} />
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{background: 'radial-gradient(circle, rgba(0, 255, 222, 0.1) 0%, rgba(67, 0, 255, 0.05) 100%)', animationDelay: "2s"}} />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Kariyerinizde{" "}
-              <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Fark Yaratmaya</span>{" "}
-              Hazır mısınız?
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center px-8 py-4 rounded-full text-lg font-bold mb-8 shadow-2xl animate-pulse" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)', color: '#FFFFFF'}}>
+              <Star className="w-5 h-5 mr-3 animate-spin" style={{ animationDuration: "3s" }} />
+              Kullanıcı Deneyimleri
+            </div>
+            <h2 className="text-5xl lg:text-7xl font-black text-gray-900 mb-8 leading-tight">
+              Binlerce Kişi{" "}
+              <span className="bg-clip-text text-transparent animate-pulse" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Başarıya Ulaştı</span>
             </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{color: '#0065F8'}}>
-              Binlerce kişi bu platformla hedeflerine ulaştı. Siz de onlardan biri olun.
+            <p className="text-2xl max-w-4xl mx-auto text-black leading-relaxed">
+              Gerçek kullanıcılarımızın deneyimlerini keşfedin ve siz de onlardan biri olun.
             </p>
-          </div>
-
-          {/* Main CTA Cards */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-16">
-            {/* Primary CTA Card */}
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}} />
-              <Card className="relative border-0 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
-                <div className="p-12 text-center">
-                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}}>
-                    <Target className="w-10 h-10 text-white" />
-                  </div>
-                  
-                  <h3 className="text-3xl font-black mb-4" style={{color: '#4300FF'}}>
-                    Ücretsiz Başlayın
-                  </h3>
-                  
-                  <p className="text-lg mb-8 leading-relaxed" style={{color: '#0065F8'}}>
-                    İlk CV analiziniz tamamen ücretsiz. Hemen başlayın ve sonuçları görün.
-                  </p>
-                  
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span style={{color: '#0065F8'}}>Anında analiz sonucu</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span style={{color: '#0065F8'}}>Detaylı iyileştirme önerileri</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span style={{color: '#0065F8'}}>Kredi kartı gerektirmez</span>
-                    </div>
-                  </div>
-                  
-                  <Link href="/register" className="block">
-                    <Button
-                      size="lg"
-                      className="w-full text-white px-8 py-4 text-xl font-bold rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300"
-                      style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)', boxShadow: '0 10px 25px -5px rgba(67, 0, 255, 0.3)'}}
-                    >
-                      <Users className="w-6 h-6 mr-3" />
-                      Hemen Hesap Oluştur
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            </div>
-
-            {/* Secondary CTA Card */}
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)'}} />
-              <Card className="relative border-2 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden" style={{borderColor: '#00CAFF'}}>
-                <div className="p-12 text-center">
-                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)'}}>
-                    <Award className="w-10 h-10 text-white" />
-                  </div>
-                  
-                  <h3 className="text-3xl font-black mb-4" style={{color: '#4300FF'}}>
-                    Önce Deneyin
-                  </h3>
-                  
-                  <p className="text-lg mb-8 leading-relaxed" style={{color: '#0065F8'}}>
-                    Demo versiyonunu inceleyin ve platformun gücünü keşfedin.
-                  </p>
-                  
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5" style={{color: '#0065F8'}} />
-                      <span style={{color: '#0065F8'}}>Canlı demo deneyimi</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5" style={{color: '#0065F8'}} />
-                      <span style={{color: '#0065F8'}}>Örnek analiz raporu</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-3">
-                      <CheckCircle className="w-5 h-5" style={{color: '#0065F8'}} />
-                      <span style={{color: '#0065F8'}}>Kayıt gerektirmez</span>
-                    </div>
-                  </div>
-                  
-                  <Link href="/cv-analiz" className="block">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full border-2 px-8 py-4 text-xl font-bold rounded-2xl transition-all duration-300 hover:scale-105"
-                      style={{borderColor: '#00CAFF', color: '#0065F8', backgroundColor: 'transparent'}}
-                    >
-                      <FileText className="w-6 h-6 mr-3" />
-                      Demo İzle
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          {/* Social Proof Section */}
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                Binlerce Kullanıcı Bize Güveniyor
-              </h3>
-              <p className="text-gray-600">
-                Gerçek kullanıcı deneyimleri ve başarı hikayeleri
-              </p>
-            </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            {/* Live Stats */}
+            <div className="flex justify-center items-center space-x-12 mt-12">
               <div className="text-center">
-                <div className="text-4xl font-black mb-2" style={{color: '#4300FF'}}>8,247</div>
-                <div className="font-semibold" style={{color: '#0065F8'}}>CV Analizi</div>
-                <div className="text-sm text-gray-500 mt-1">Bu ay tamamlandı</div>
+                <div className="text-3xl font-black text-blue-600">8,247+</div>
+                <div className="text-sm text-gray-600">Mutlu Kullanıcı</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black mb-2" style={{color: '#4300FF'}}>92%</div>
-                <div className="font-semibold" style={{color: '#0065F8'}}>Memnuniyet</div>
-                <div className="text-sm text-gray-500 mt-1">Kullanıcı oranı</div>
+                <div className="text-3xl font-black text-green-600">92%</div>
+                <div className="text-sm text-gray-600">Başarı Oranı</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black mb-2" style={{color: '#4300FF'}}>2,156</div>
-                <div className="font-semibold" style={{color: '#0065F8'}}>Aktif Üye</div>
-                <div className="text-sm text-gray-500 mt-1">Platformda</div>
+                <div className="text-3xl font-black text-purple-600">2,156+</div>
+                <div className="text-sm text-gray-600">Aktif Üye</div>
               </div>
             </div>
           </div>
+
+          {/* Enhanced Animated Testimonials Carousel */}
+          <div className="mt-16 mb-20 overflow-hidden relative px-6 sm:px-8 lg:px-12 py-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl bg-white/5 backdrop-blur-sm">
+            {/* Floating particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`absolute bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-pulse ${
+                    i % 4 === 0 ? 'w-2 h-2' : i % 3 === 0 ? 'w-1 h-1' : 'w-3 h-3'
+                  }`}
+                  style={{
+                    left: Math.random() * 100 + "%",
+                    top: Math.random() * 100 + "%",
+                    animationDelay: Math.random() * 4 + "s",
+                    animationDuration: 3 + Math.random() * 4 + "s",
+                    opacity: 0.3
+                  }}
+                />
+              ))}
+            </div>
+            {/* First Row - Moving Right to Left */}
+            <div className="flex animate-scroll-right hover:pause-animation mb-8">
+              <div className="flex space-x-8 min-w-max">
+                {/* Testimonial 1 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-30 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-3 hover:scale-105 bg-white rounded-3xl overflow-hidden group-hover:border-2 group-hover:border-blue-200">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          A
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Ahmet Yılmaz</h4>
+                          <p className="text-sm text-gray-600">Yazılım Geliştirici</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "CV analizi sayesinde eksiklerimi fark ettim. 2 hafta sonra hayalimdeki işe kabul edildim!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 2 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          E
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Elif Demir</h4>
+                          <p className="text-sm text-gray-600">Pazarlama Uzmanı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat simülasyonu gerçekten çok faydalıydı. Kendime güvenim arttı ve başarılı oldum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 3 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00FFDE 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          M
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Mehmet Kaya</h4>
+                          <p className="text-sm text-gray-600">Proje Yöneticisi</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform sayesinde CV'mi profesyonel hale getirdim. 3 farklı şirketten teklif aldım!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 4 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          S
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Selin Özkan</h4>
+                          <p className="text-sm text-gray-600">UX Tasarımcı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "AI destekli analiz gerçekten etkili. CV'mdeki zayıf noktaları net bir şekilde gördüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 5 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          C
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Can Arslan</h4>
+                          <p className="text-sm text-gray-600">Veri Analisti</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat pratiği sayesinde stresimi yendim. Artık kendimden emin bir şekilde görüşmelere giriyorum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 6 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          Z
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Zeynep Çelik</h4>
+                          <p className="text-sm text-gray-600">İnsan Kaynakları</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform gerçekten kullanışlı. Hem CV analizi hem de mülakat hazırlığı için mükemmel bir çözüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Duplicate for seamless loop */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-30 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-3 hover:scale-105 bg-white rounded-3xl overflow-hidden group-hover:border-2 group-hover:border-blue-200">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          A
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Ahmet Yılmaz</h4>
+                          <p className="text-sm text-gray-600">Yazılım Geliştirici</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "CV analizi sayesinde eksiklerimi fark ettim. 2 hafta sonra hayalimdeki işe kabul edildim!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          E
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Elif Demir</h4>
+                          <p className="text-sm text-gray-600">Pazarlama Uzmanı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat simülasyonu gerçekten çok faydalıydı. Kendime güvenim arttı ve başarılı oldum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00FFDE 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          M
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Mehmet Kaya</h4>
+                          <p className="text-sm text-gray-600">Proje Yöneticisi</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform sayesinde CV'mi profesyonel hale getirdim. 3 farklı şirketten teklif aldım!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            {/* Second Row - Moving Left to Right */}
+            <div className="flex animate-scroll-left hover:pause-animation">
+              <div className="flex space-x-8 min-w-max">
+                {/* Testimonial 4 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          S
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Selin Özkan</h4>
+                          <p className="text-sm text-gray-600">UX Tasarımcı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "AI destekli analiz gerçekten etkili. CV'mdeki zayıf noktaları net bir şekilde gördüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 5 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          C
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Can Arslan</h4>
+                          <p className="text-sm text-gray-600">Veri Analisti</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat pratiği sayesinde stresimi yendim. Artık kendimden emin bir şekilde görüşmelere giriyorum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 6 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          Z
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Zeynep Çelik</h4>
+                          <p className="text-sm text-gray-600">İnsan Kaynakları</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform gerçekten kullanışlı. Hem CV analizi hem de mülakat hazırlığı için mükemmel bir çözüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 1 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-30 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-3 hover:scale-105 bg-white rounded-3xl overflow-hidden group-hover:border-2 group-hover:border-blue-200">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          A
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Ahmet Yılmaz</h4>
+                          <p className="text-sm text-gray-600">Yazılım Geliştirici</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "CV analizi sayesinde eksiklerimi fark ettim. 2 hafta sonra hayalimdeki işe kabul edildim!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 2 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          E
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Elif Demir</h4>
+                          <p className="text-sm text-gray-600">Pazarlama Uzmanı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat simülasyonu gerçekten çok faydalıydı. Kendime güvenim arttı ve başarılı oldum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Testimonial 3 */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #00FFDE 0%, #0065F8 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          M
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Mehmet Kaya</h4>
+                          <p className="text-sm text-gray-600">Proje Yöneticisi</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform sayesinde CV'mi profesyonel hale getirdim. 3 farklı şirketten teklif aldım!"
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Duplicate for seamless loop */}
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          S
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Selin Özkan</h4>
+                          <p className="text-sm text-gray-600">UX Tasarımcı</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "AI destekli analiz gerçekten etkili. CV'mdeki zayıf noktaları net bir şekilde gördüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          C
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Can Arslan</h4>
+                          <p className="text-sm text-gray-600">Veri Analisti</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Mülakat pratiği sayesinde stresimi yendim. Artık kendimden emin bir şekilde görüşmelere giriyorum."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="group relative flex-shrink-0 w-80">
+                  <div className="absolute inset-0 rounded-3xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity duration-500" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}} />
+                  <Card className="relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 bg-white rounded-3xl overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold text-lg mr-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                          Z
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">Zeynep Çelik</h4>
+                          <p className="text-sm text-gray-600">İnsan Kaynakları</p>
+                        </div>
+                      </div>
+                      <div className="flex mb-6">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        "Platform gerçekten kullanışlı. Hem CV analizi hem de mülakat hazırlığı için mükemmel bir çözüm."
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </section>
 

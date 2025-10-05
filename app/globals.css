@@ -322,3 +322,34 @@
 .animate-fade-in-down {
   animation: fadeInDown 0.8s ease-out;
 }
+
+/* Testimonials carousel animations */
+@keyframes scrollRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-right {
+  animation: scrollRight 25s linear infinite;
+}
+
+.animate-scroll-left {
+  animation: scrollLeft 25s linear infinite;
+}
+
+.hover\:pause-animation:hover {
+  animation-play-state: paused;
+}
