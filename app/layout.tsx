@@ -1,10 +1,16 @@
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
+import { Roboto } from 'next/font/google'
 import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700', '900'],
+  variable: '--font-roboto',
+})
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -19,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans ${roboto.variable} ${GeistMono.variable}`}>
         <AuthProvider>
           {children}
           <Analytics />

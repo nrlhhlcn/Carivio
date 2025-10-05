@@ -48,16 +48,16 @@ export default function HomePage() {
       icon: MessageSquare,
       title: "Mülakat Pratiği",
       description: "Gerçek mülakat ortamını simüle eden sistemle pratik yapın.",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
       size: "medium",
     },
     {
       icon: Trophy,
       title: "Sıralama",
       description: "Diğer kullanıcılarla kıyaslayın ve ilerlemenizi takip edin.",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
       size: "small",
     },
   ]
@@ -252,7 +252,7 @@ export default function HomePage() {
                     <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black bg-clip-text text-transparent mb-2 sm:mb-3 transition-all duration-300" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                       {stat.number}
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold uppercase tracking-wider group-hover:text-white transition-colors duration-300" style={{color: '#00CAFF'}}>
+                    <div className="text-xs sm:text-sm font-semibold uppercase tracking-wider group-hover:text-white transition-colors duration-300 text-black">
                       {stat.label}
                     </div>
                   </div>
@@ -285,7 +285,7 @@ export default function HomePage() {
                 Dönüştürün
               </span>
             </h2>
-            <p className="text-xl max-w-3xl mx-auto leading-relaxed" style={{color: '#0065F8'}}>
+            <p className="text-xl max-w-3xl mx-auto leading-relaxed text-black">
               Gelişmiş AI teknolojisi ile CV'nizi analiz edin, gerçekçi mülakat simülasyonları ile kendinizi test edin ve kariyerinizde bir adım öne geçin.
             </p>
           </div>
@@ -306,7 +306,7 @@ export default function HomePage() {
                         <feature.icon className={`w-8 h-8 ${feature.color}`} />
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-black text-gray-900 transition-colors" style={{color: '#4300FF'}}>
+                        <div className="text-2xl font-black text-black transition-colors">
                           {index + 1}
                         </div>
                         <div className="text-xs text-gray-500 uppercase tracking-wider">Adım</div>
@@ -316,7 +316,7 @@ export default function HomePage() {
                     <CardTitle className="text-2xl font-bold text-gray-900 mb-4 transition-colors" style={{color: '#4300FF'}}>
                       {feature.title}
                     </CardTitle>
-                    <CardDescription className="text-lg leading-relaxed mb-6" style={{color: '#0065F8'}}>
+                    <CardDescription className="text-lg leading-relaxed mb-6 text-black">
                       {feature.description}
                     </CardDescription>
                     
@@ -340,7 +340,7 @@ export default function HomePage() {
                   <div className="text-4xl lg:text-5xl font-black bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                     {stat.number}
                   </div>
-                  <div className="font-semibold text-sm uppercase tracking-wider group-hover:text-gray-900 transition-colors" style={{color: '#0065F8'}}>
+                  <div className="font-semibold text-sm uppercase tracking-wider group-hover:text-gray-900 transition-colors text-black">
                     {stat.label}
                   </div>
                 </div>
