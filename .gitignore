@@ -53,3 +53,26 @@ lerna-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python venv & large model caches
+.venv/
+__pycache__/
+*.pyc
+cv/.venv/
+cv/__pycache__/
+cv/.cache/
+cv/.mypy_cache/
+cv/.pytest_cache/
+cv/*/cache/
+
+# huggingface/torch caches
+~/.cache/
+~/.cache/huggingface/
+~/.cache/torch/
+~/.local/share/torch/
+
+# generated temp and uploads
+tmp/
+*.tmp
+/uploads
+cv/tmp/

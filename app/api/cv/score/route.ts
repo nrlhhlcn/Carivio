@@ -20,8 +20,13 @@ function resolvePythonBin(): string[] {
   const envBin = process.env.PYTHON_BIN?.trim()
   const candidates: string[] = []
   if (envBin) candidates.push(envBin)
+  // Prefer local project venv if available
+  try {
+    const venvPython = path.join(process.cwd(), '.venv', 'bin', 'python3')
+    candidates.push(venvPython)
+  } catch {}
   // Prefer python3 on macOS/Linux environments
-  candidates.push('python3', 'python', 'py')
+  candidates.push('python3', 'python3.11', 'python3.10', 'python', 'py')
   // De-duplicate while preserving order
   return Array.from(new Set(candidates))
 }
