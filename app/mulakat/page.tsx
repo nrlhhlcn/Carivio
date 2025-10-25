@@ -158,26 +158,30 @@ export default function InterviewSimulationPage() {
   }, [userVideoRef, cameraStream])
 
   // Posture detection hook (uses local ref to avoid ref setter conflicts)
-  const postureVideoRef = userVideoLocalRef
-  const { usePosture } = require("@/hooks/use-posture")
-  const postureState = usePosture(postureVideoRef)
-  const { useGaze } = require("@/hooks/use-gaze")
-  const gazeState = useGaze(postureVideoRef)
-  const { useEmotion } = require("@/hooks/use-emotion")
-  const emotionState = useEmotion(postureVideoRef, { intervalMs: 500 })
+  // PYTHON VIDEO ANALYSIS - Çok daha güçlü ve stabil!
+  const { usePythonVideoAnalysis } = require("@/hooks/use-python-video-analysis")
+  const pythonAnalysis = usePythonVideoAnalysis(userVideoLocalRef)
+  
+  // Python video analysis durumu izle
+  useEffect(() => {
+    console.log("🔄🔄🔄 [Main] Video ref değişti:", userVideoLocalRef.current)
+    if (userVideoLocalRef.current) {
+      console.log("✅✅✅ [Main] Video element HAZIR - Python analysis başlayacak!")
+    }
+  }, [userVideoLocalRef.current])
 
   useEffect(() => {
-    // Readiness banner
+    // Readiness banner - Python analysis
     if (currentStep === "interview") {
-      if (!postureState?.ready || !gazeState?.ready) {
-        setRtReadyWarning("Gerçek zamanlı analiz hazırlanıyor... (model yükleme)")
+      if (!pythonAnalysis?.ready) {
+        setRtReadyWarning("Python video analysis sistemi bağlanıyor...")
       } else {
         setRtReadyWarning(null)
       }
     } else {
       setRtReadyWarning(null)
     }
-  }, [currentStep, postureState?.ready, gazeState?.ready])
+  }, [currentStep, pythonAnalysis?.ready])
 
   // Sessizlik timer'ı yönet
   useEffect(() => {
@@ -959,6 +963,69 @@ export default function InterviewSimulationPage() {
               </div>
             ) : (
               <div className="grid lg:grid-cols-3 gap-8">
+              {/* User Video - KOCAMAN KAMERA */}
+              <div className="lg:col-span-3">
+                <Card className="h-full">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Video className="w-8 h-8 text-red-500" />
+                      <span className="text-2xl font-bold text-red-600">🎥 KOCAMAN KAMERA - MediaPipe Debug</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative bg-gradient-to-br from-slate-100 via-blue-50 to-purple-50 dark:from-slate-800 dark:via-blue-900/20 dark:to-purple-900/20 rounded-xl flex items-center justify-center border-4 border-red-500 shadow-2xl" style={{height: '700px'}}>
+                      {cameraStream ? (
+                        <div className="relative w-full h-full">
+                          <video 
+                            ref={(el) => { 
+                              if (el && el !== userVideoLocalRef.current) {
+                                console.log("🎥🎥🎥 [Main] VIDEO REF SET:", el);
+                                console.log("🎥🎥🎥 [Main] Video element type:", typeof el, el.constructor.name);
+                                console.log("🎥🎥🎥 [Main] Is HTMLVideoElement:", el instanceof HTMLVideoElement);
+                                userVideoLocalRef.current = el;
+                                setUserVideoRef(el);
+                              }
+                            }} 
+                            autoPlay 
+                            muted 
+                            playsInline 
+                            className="w-full h-full object-cover rounded-xl border-4 border-yellow-400" 
+                            onLoadedData={() => {
+                              console.log("📹📹📹 [Main] VIDEO LOADED!");
+                              console.log("📊📊📊 [Main] Video dimensions:", userVideoLocalRef.current?.videoWidth, "x", userVideoLocalRef.current?.videoHeight);
+                            }}
+                            onPlay={() => {
+                              console.log("▶️▶️▶️ [Main] VIDEO PLAYING!");
+                              console.log("🎯🎯🎯 [Main] Ready for MediaPipe!");
+                            }}
+                          />
+                          {/* Overlay info */}
+                          <div className="absolute top-4 left-4 bg-red-600 text-white px-6 py-3 rounded text-xl font-bold">
+                            🔴 MediaPipe AKTIF - DEBUG MODE
+                          </div>
+                          <div className="absolute top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded text-xl font-bold">
+                            📊 NOKTA ARAMA MODU
+                          </div>
+                          <div className="absolute bottom-4 left-4 bg-green-600 text-white px-6 py-3 rounded text-xl font-bold">
+                            🎯 F12 Console'u Aç!
+                          </div>
+                          <div className="absolute bottom-4 right-4 bg-purple-600 text-white px-6 py-3 rounded text-xl font-bold">
+                            👀 NOKTA VAR MI?
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="text-center">
+                            <Video className="w-32 h-32 text-red-500 mx-auto mb-8" />
+                            <p className="text-4xl text-red-500 font-bold">KAMERA BEKLENİYOR!</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
               {/* Video Section */}
               <div className="lg:col-span-2">
                 <Card>
@@ -1024,21 +1091,6 @@ export default function InterviewSimulationPage() {
                         </div>
                       )}
 
-                      {/* User Video */}
-                      <div className="absolute bottom-4 right-4 w-32 h-24 bg-background rounded-lg border-2 border-border overflow-hidden">
-                        {cameraStream ? (
-                          <div className="relative w-full h-full">
-                            <video ref={(el) => { setUserVideoRef(el as any); userVideoLocalRef.current = el }} autoPlay muted playsInline className="w-full h-full object-cover" />
-                          </div>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <div className="text-center">
-                              <Video className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
-                              <p className="text-xs text-muted-foreground">Siz</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
 
                       {/* Speaking Indicators */}
                       {(aiSpeaking || userSpeaking || isSilent) && (
@@ -1128,25 +1180,25 @@ export default function InterviewSimulationPage() {
               <div className="space-y-6">
                 {/* Real-time Panels */}
                 <div className="space-y-6">
-                  {postureState?.ready && (() => {
+                  {pythonAnalysis?.ready && (() => {
                     const { PosturePanel } = require("@/components/PosturePanel")
                     return (
                       <PosturePanel
-                        uprightScore={postureState.metrics.uprightScore}
-                        headTiltDeg={postureState.metrics.headTiltDeg}
-                        shoulderTiltDeg={postureState.metrics.shoulderTiltDeg}
-                        faceVisibleRatio={postureState.metrics.faceVisibleRatio}
+                        uprightScore={pythonAnalysis.postureMetrics.uprightScore}
+                        headTiltDeg={pythonAnalysis.postureMetrics.headTiltDeg}
+                        shoulderTiltDeg={pythonAnalysis.postureMetrics.shoulderTiltDeg}
+                        faceVisibleRatio={pythonAnalysis.postureMetrics.faceVisibleRatio}
                       />
                     )
                   })()}
 
-                  {gazeState?.ready && (() => {
+                  {pythonAnalysis?.ready && (() => {
                     const { GazePanel } = require("@/components/GazePanel")
                     return (
                       <GazePanel
-                        eyeContactRatio={gazeState.metrics.eyeContactRatio}
-                        yawDeg={gazeState.metrics.yawDeg}
-                        pitchDeg={gazeState.metrics.pitchDeg}
+                        eyeContactRatio={pythonAnalysis.gazeMetrics.eyeContactRatio}
+                        yawDeg={pythonAnalysis.gazeMetrics.yawDeg}
+                        pitchDeg={pythonAnalysis.gazeMetrics.pitchDeg}
                       />
                     )
                   })()}
@@ -1154,7 +1206,11 @@ export default function InterviewSimulationPage() {
                   {(() => {
                     const { EmotionPanel } = require("@/components/EmotionPanel")
                     return (
-                      <EmotionPanel probs={emotionState.probs} top={emotionState.top} error={emotionState.error} />
+                      <EmotionPanel 
+                        probs={pythonAnalysis?.emotionMetrics.allEmotions || null} 
+                        top={pythonAnalysis?.emotionMetrics.dominantEmotion || "neutral"} 
+                        error={pythonAnalysis?.ready ? null : "Python server bağlantısı bekleniyor..."} 
+                      />
                     )
                   })()}
                 </div>

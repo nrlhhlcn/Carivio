@@ -26,11 +26,22 @@ export function useEmotion(
   }, [])
 
   useEffect(() => {
-    if (!videoRef.current) return
+    if (!videoRef.current) {
+      console.log("[Emotion] Video ref not ready")
+      return
+    }
+    
+    console.log("[Emotion] Starting emotion analysis, endpoint:", endpoint)
+    
     if (timerRef.current) window.clearInterval(timerRef.current)
     timerRef.current = window.setInterval(async () => {
       try {
         const v = videoRef.current!
+        if (v.videoWidth === 0 || v.videoHeight === 0) {
+          console.log("[Emotion] Video not loaded yet")
+          return
+        }
+        
         const w = 48
         const h = 48
         const c = canvasRef.current!
@@ -50,17 +61,26 @@ export function useEmotion(
         ctx.putImageData(imgData, 0, 0)
         const b64 = c.toDataURL("image/png").split(",")[1]
 
+        console.log("[Emotion] Sending request to:", endpoint, "Image size:", b64.length)
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image: b64 }),
         })
-        if (!res.ok) throw new Error(await res.text())
+        
+        if (!res.ok) {
+          const errorText = await res.text()
+          console.error("[Emotion] API Error:", res.status, errorText)
+          throw new Error(`API Error ${res.status}: ${errorText}`)
+        }
+        
         const json = await res.json()
+        console.log("[Emotion] Success:", json)
         setProbs(json.probs || null)
         setTop(json.top || null)
         setError(null)
       } catch (e: any) {
+        console.error("[Emotion] Error:", e)
         setError(e?.message || "Emotion API error")
       }
     }, intervalMs) as unknown as number

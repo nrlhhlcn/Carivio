@@ -5,3 +5,8 @@ numpy==2.1.0
 pillow==10.4.0
 python-multipart==0.0.9
 
+# Video Analysis Dependencies - Python 3.13 compatible 
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+websockets>=11.0
+

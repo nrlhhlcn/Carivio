@@ -25,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+     <head>
+        <meta httpEquiv="Content-Security-Policy" content="" />
+      </head>
       <body className={`font-sans ${roboto.variable} ${GeistMono.variable}`}>
         <AuthProvider>
           {children}

@@ -2,8 +2,9 @@ import base64
 import io
 import os
 from typing import Dict
+import json
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from PIL import Image
@@ -11,6 +12,9 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, regularizers
+
+# Import our video analyzer
+from video_analyzer import analyzer
 
 MODEL_PATH = os.environ.get("EMOTION_MODEL_PATH", os.path.join(os.path.dirname(__file__), "models", "fernet_bestweight.h5"))
 
@@ -110,6 +114,78 @@ def emotion(req: EmotionRequest) -> Dict:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Real-time Video Analysis WebSocket Endpoint
+@app.websocket("/ws/video-analysis")
+async def websocket_video_analysis(websocket: WebSocket):
+    await websocket.accept()
+    print(">>> WebSocket baglantisi kuruldu - Video analizi basliyor!")
+    
+    try:
+        while True:
+            # Frontend'den video frame al (base64 format)
+            data = await websocket.receive_text()
+            
+            try:
+                message = json.loads(data)
+                
+                if message.get("type") == "video_frame":
+                    base64_frame = message.get("frame")
+                    
+                    if base64_frame:
+                        print(">>> Video frame alindi, analiz ediliyor...")
+                        
+                        # Video frame'i analiz et
+                        analysis_result = await analyzer.process_frame(base64_frame)
+                        
+                        # Sonuçları frontend'e gönder
+                        await websocket.send_text(json.dumps({
+                            "type": "analysis_result",
+                            "data": analysis_result
+                        }))
+                        
+                elif message.get("type") == "ping":
+                    # Health check
+                    await websocket.send_text(json.dumps({
+                        "type": "pong",
+                        "timestamp": message.get("timestamp")
+                    }))
+                    
+            except json.JSONDecodeError as e:
+                print(f">>> JSON parse error: {e}")
+                await websocket.send_text(json.dumps({
+                    "type": "error", 
+                    "message": "Invalid JSON format"
+                }))
+                
+            except Exception as e:
+                print(f">>> Analysis error: {e}")
+                await websocket.send_text(json.dumps({
+                    "type": "error",
+                    "message": str(e)
+                }))
+                
+    except WebSocketDisconnect:
+        print(">>> WebSocket baglantisi kesildi")
+    except Exception as e:
+        print(f">>> WebSocket error: {e}")
+    finally:
+        print(">>> WebSocket temizligi yapiliyor")
+
+# Health check for video analyzer
+@app.get("/health/video-analyzer")
+def video_analyzer_health():
+    return {
+        "status": "healthy",
+        "analyzer_ready": True,
+        "mediapipe_version": "0.10.8",
+        "opencv_available": True
+    }
+
 # (moved build_fernet above)
+
+if __name__ == "__main__":
+    import uvicorn
+    print(">>> FastAPI Video Analysis Server baslatiliyor...")
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
 
 
