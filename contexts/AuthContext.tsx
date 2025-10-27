@@ -19,7 +19,7 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
+  signUp: (email: string, password: string, firstName: string, lastName: string, tag: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signInWithGithub: () => Promise<void>
   logout: () => Promise<void>
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string, tag: string) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, {
@@ -65,12 +65,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           lastName,
           displayName: `${firstName} ${lastName}`,
           photoURL: userCredential.user.photoURL || undefined,
+          tag,
         })
 
         await saveUserStats({
           userId: userCredential.user.uid,
           displayName: `${firstName} ${lastName}`,
           photoURL: userCredential.user.photoURL || undefined,
+          tag,
           currentRank: 0,
           totalScore: 0,
           cvScore: 0,
@@ -213,4 +215,3 @@ export function useAuth() {
   }
   return context
 }
-

@@ -1,13 +1,13 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
@@ -21,6 +21,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    tag: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const { signUp, signInWithGoogle, signInWithGithub } = useAuth()
@@ -33,6 +34,10 @@ export default function RegisterPage() {
       [e.target.name]: e.target.value,
     }))
   }
+  
+  const handleTagChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, tag: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +54,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await signUp(formData.email, formData.password, formData.firstName, formData.lastName)
+      await signUp(formData.email, formData.password, formData.firstName, formData.lastName, formData.tag)
       toast({
         title: "Başarılı!",
         description: "Hesabınız oluşturuldu, giriş yapabilirsiniz.",
@@ -85,6 +90,13 @@ export default function RegisterPage() {
       setIsLoading(false)
     }
   }
+  
+  const professionalFields = [
+    "ACCOUNTANT", "ADVOCATE", "AGRICULTURE", "APPAREL", "ARTS", "AUTOMOBILE",
+    "AVIATION", "BANKING", "BPO", "BUSINESS-DEVELOPMENT", "CHEF", "CONSTRUCTION",
+    "CONSULTANT", "DESIGNER", "DIGITAL-MEDIA", "ENGINEERING", "FINANCE", "FITNESS",
+    "HEALTHCARE", "HR", "INFORMATION-TECHNOLOGY", "PUBLIC-RELATIONS", "SALES", "TEACHER"
+  ];
 
   return (
     <div className="min-h-screen w-full flex overflow-hidden">
@@ -187,6 +199,19 @@ export default function RegisterPage() {
                 required
                 className="h-12 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
+            </div>
+            
+            <div>
+              <Select onValueChange={handleTagChange} defaultValue={formData.tag}>
+                <SelectTrigger className="h-12 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectValue placeholder="Alanınız" />
+                </SelectTrigger>
+                <SelectContent>
+                  {professionalFields.map(field => (
+                    <SelectItem key={field} value={field}>{field}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button

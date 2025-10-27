@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Menu, X, FileText, MessageSquare, Trophy, User, Sparkles, LogOut, Plus } from "lucide-react"
+import { Menu, X, FileText, MessageSquare, Trophy, User, Sparkles, LogOut, Plus, Users } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
@@ -46,6 +46,7 @@ export default function Navbar() {
     { href: "/cv-analiz", label: "CV Analizi", icon: FileText },
     { href: "/mulakat", label: "Mülakat", icon: MessageSquare },
     { href: "/siralama", label: "Sıralama", icon: Trophy },
+    { href: "/topluluk", label: "Topluluk", icon: Users },
     ...(user ? [{ href: "/profil", label: "Profil", icon: User }] : []),
   ]
 
