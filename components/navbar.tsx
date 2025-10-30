@@ -5,12 +5,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Menu, X, FileText, MessageSquare, Trophy, User, Sparkles, LogOut, Plus, Users } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, logout } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
@@ -41,7 +43,6 @@ export default function Navbar() {
   }
 
   const navItems = [
-    { href: "/", label: "Ana Sayfa" },
     { href: "/cv-olustur", label: "CV Oluştur", icon: Plus },
     { href: "/cv-analiz", label: "CV Analizi", icon: FileText },
     { href: "/mulakat", label: "Mülakat", icon: MessageSquare },
@@ -89,19 +90,31 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-3">
             {user ? (
               <>
-                <span className="text-sm text-gray-600">
-                  Merhaba, {user.displayName || user.email}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="transition-all duration-300 hover:scale-105 hover:bg-opacity-10"
-                  style={{color: '#0065F8', backgroundColor: 'transparent'}}
-                >
-                  <LogOut className="w-4 h-4 mr-1" />
-                  Çıkış
-                </Button>
+                <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-blue-50/70"
+                      style={{ backgroundColor: 'transparent', color: '#0065F8' }}
+                      onMouseEnter={() => setUserMenuOpen(true)}
+                      onMouseLeave={() => setUserMenuOpen(false)}
+                    >
+                      Merhaba, {user.displayName || user.email}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={8}
+                    className="min-w-[160px] z-[60]"
+                    onMouseEnter={() => setUserMenuOpen(true)}
+                    onMouseLeave={() => setUserMenuOpen(false)}
+                  >
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-700">
+                      <LogOut className="w-4 h-4 mr-2" /> Çıkış Yap
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>

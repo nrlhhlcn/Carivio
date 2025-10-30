@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { MessageCircle, Heart, Bookmark, Send, Maximize2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -146,9 +146,10 @@ const ReplySection = ({ post, user }: { post: Post, user: any }) => {
     };
 
     return (
-        <DialogContent className="sm:max-w-[625px]">
+        <DialogContent className="sm|max-w-[625px]" aria-describedby="replies-desc">
             <DialogHeader>
                 <DialogTitle>Yanıtlar</DialogTitle>
+                <DialogDescription id="replies-desc">Gönderiye yapılan yanıtları görüntüleyin ve yeni yanıt ekleyin.</DialogDescription>
             </DialogHeader>
             <div className="max-h-[60vh] overflow-y-auto p-4 space-y-4">
                 {isLoading && <p>Yükleniyor...</p>}

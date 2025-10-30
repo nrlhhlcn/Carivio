@@ -8,7 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats, getUserLikes, getUserBookmarks, getPostsByUser, getPostsByIds, updatePostContent, deletePostWithRelations, unlikePost, unbookmarkPost } from "@/lib/firestore"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -1378,9 +1379,10 @@ export default function ProfilePage() {
 
           {/* Post Modal */}
           <Dialog open={!!openPost} onOpenChange={(o)=>{ if(!o){ setOpenPost(null); setEditMode(false);} }}>
-            <DialogContent className="sm:max-w-[700px]">
+            <DialogContent className="sm:max-w-[700px]" aria-describedby="post-dialog-desc">
               <DialogHeader>
                 <DialogTitle>Gönderi</DialogTitle>
+                <DialogDescription id="post-dialog-desc">Gönderiyi görüntüleyin, düzenleyin veya silin.</DialogDescription>
               </DialogHeader>
               {openPost && (
                 <div className="space-y-4">
@@ -1405,7 +1407,23 @@ export default function ProfilePage() {
                     {communityTab==='mine' ? (
                       <>
                         {!editMode && <Button variant="outline" onClick={()=>setEditMode(true)}>Düzenle</Button>}
-                        <Button variant="destructive" disabled={isProcessing} onClick={async ()=>{ setIsProcessing(true); try { await deletePostWithRelations(openPost.id); setMyPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Sil</Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" disabled={isProcessing}>Sil</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent aria-describedby="delete-post-desc">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Gönderiyi silmek istediğinize emin misiniz?</AlertDialogTitle>
+                              <AlertDialogDescription id="delete-post-desc">
+                                Bu işlem geri alınamaz. Gönderi ile birlikte beğeniler, yer imleri ve yanıtlar da silinir.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>İptal</AlertDialogCancel>
+                              <AlertDialogAction onClick={async ()=>{ setIsProcessing(true); try { await deletePostWithRelations(openPost.id); setMyPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Evet, sil</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </>
                     ) : communityTab==='liked' ? (
                       <Button variant="outline" disabled={isProcessing || !user} onClick={async ()=>{ if(!user) return; setIsProcessing(true); try { await unlikePost(openPost.id, user.uid); setLikedPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Beğeniyi Geri Al</Button>

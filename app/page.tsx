@@ -43,6 +43,7 @@ export default function HomePage() {
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       size: "large",
+      href: "/cv-analiz",
     },
     {
       icon: MessageSquare,
@@ -51,6 +52,7 @@ export default function HomePage() {
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       size: "medium",
+      href: "/mulakat",
     },
     {
       icon: Trophy,
@@ -59,6 +61,25 @@ export default function HomePage() {
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       size: "small",
+      href: "/siralama",
+    },
+    {
+      icon: Sparkles,
+      title: "CV Oluştur",
+      description: "Profesyonel görünümlü bir CV'yi adım adım kolayca oluşturun.",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      size: "medium",
+      href: "/cv-olustur",
+    },
+    {
+      icon: Users,
+      title: "Topluluk",
+      description: "Soru sorun, tecrübelerinizi paylaşın ve diğer adaylarla etkileşime geçin.",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      size: "small",
+      href: "/topluluk",
     },
   ]
 
@@ -298,7 +319,8 @@ export default function HomePage() {
                 className="group relative"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <Card className="relative border-0 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 bg-white/80 backdrop-blur-sm group-hover:bg-white/90 rounded-3xl overflow-hidden">
+                <Link href={feature.href}>
+                <Card className="relative border-0 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-4 hover:rotate-1 bg-white/80 backdrop-blur-sm group-hover:bg-white/90 rounded-3xl overflow-hidden cursor-pointer">
                   
                   <CardHeader className="p-8 relative z-10">
                     <div className="flex items-center justify-between mb-6">
@@ -328,6 +350,7 @@ export default function HomePage() {
                   
                   {/* Hover Effect Overlay */}
                 </Card>
+                </Link>
               </div>
             ))}
           </div>
@@ -1051,6 +1074,8 @@ export default function HomePage() {
                   { name: "CV Analizi", href: "/cv-analiz", icon: FileText },
                   { name: "Mülakat Pratiği", href: "/mulakat", icon: MessageSquare },
                   { name: "Sıralama", href: "/siralama", icon: Trophy },
+                  { name: "CV Oluştur", href: "/cv-olustur", icon: Sparkles },
+                  { name: "Topluluk", href: "/topluluk", icon: Users },
                 ].map((item, index) => (
                   <li key={index}>
                     <Link 

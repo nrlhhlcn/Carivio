@@ -963,69 +963,6 @@ export default function InterviewSimulationPage() {
               </div>
             ) : (
               <div className="grid lg:grid-cols-3 gap-8">
-              {/* User Video - KOCAMAN KAMERA */}
-              <div className="lg:col-span-3">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Video className="w-8 h-8 text-red-500" />
-                      <span className="text-2xl font-bold text-red-600">🎥 KOCAMAN KAMERA - MediaPipe Debug</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative bg-gradient-to-br from-slate-100 via-blue-50 to-purple-50 dark:from-slate-800 dark:via-blue-900/20 dark:to-purple-900/20 rounded-xl flex items-center justify-center border-4 border-red-500 shadow-2xl" style={{height: '700px'}}>
-                      {cameraStream ? (
-                        <div className="relative w-full h-full">
-                          <video 
-                            ref={(el) => { 
-                              if (el && el !== userVideoLocalRef.current) {
-                                console.log("🎥🎥🎥 [Main] VIDEO REF SET:", el);
-                                console.log("🎥🎥🎥 [Main] Video element type:", typeof el, el.constructor.name);
-                                console.log("🎥🎥🎥 [Main] Is HTMLVideoElement:", el instanceof HTMLVideoElement);
-                                userVideoLocalRef.current = el;
-                                setUserVideoRef(el);
-                              }
-                            }} 
-                            autoPlay 
-                            muted 
-                            playsInline 
-                            className="w-full h-full object-cover rounded-xl border-4 border-yellow-400" 
-                            onLoadedData={() => {
-                              console.log("📹📹📹 [Main] VIDEO LOADED!");
-                              console.log("📊📊📊 [Main] Video dimensions:", userVideoLocalRef.current?.videoWidth, "x", userVideoLocalRef.current?.videoHeight);
-                            }}
-                            onPlay={() => {
-                              console.log("▶️▶️▶️ [Main] VIDEO PLAYING!");
-                              console.log("🎯🎯🎯 [Main] Ready for MediaPipe!");
-                            }}
-                          />
-                          {/* Overlay info */}
-                          <div className="absolute top-4 left-4 bg-red-600 text-white px-6 py-3 rounded text-xl font-bold">
-                            🔴 MediaPipe AKTIF - DEBUG MODE
-                          </div>
-                          <div className="absolute top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded text-xl font-bold">
-                            📊 NOKTA ARAMA MODU
-                          </div>
-                          <div className="absolute bottom-4 left-4 bg-green-600 text-white px-6 py-3 rounded text-xl font-bold">
-                            🎯 F12 Console'u Aç!
-                          </div>
-                          <div className="absolute bottom-4 right-4 bg-purple-600 text-white px-6 py-3 rounded text-xl font-bold">
-                            👀 NOKTA VAR MI?
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-center">
-                            <Video className="w-32 h-32 text-red-500 mx-auto mb-8" />
-                            <p className="text-4xl text-red-500 font-bold">KAMERA BEKLENİYOR!</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
               {/* Video Section */}
               <div className="lg:col-span-2">
                 <Card>
@@ -1066,6 +1003,27 @@ export default function InterviewSimulationPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="relative bg-gradient-to-br from-slate-100 via-blue-50 to-purple-50 dark:from-slate-800 dark:via-blue-900/20 dark:to-purple-900/20 rounded-xl aspect-video flex items-center justify-center mb-4 border border-slate-200 dark:border-slate-700 shadow-inner">
+                      {/* Mini Camera Preview - Sağ Üst */}
+                      <div className="absolute top-4 right-4 w-56 h-40 rounded-lg overflow-hidden border-2 border-yellow-400 shadow-lg bg-black">
+                        {cameraStream ? (
+                          <video
+                            ref={(el) => {
+                              if (el && el !== userVideoLocalRef.current) {
+                                userVideoLocalRef.current = el;
+                                setUserVideoRef(el);
+                              }
+                            }}
+                            autoPlay
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-white/80">
+                            Kamera bekleniyor...
+                          </div>
+                        )}
+                      </div>
                       {/* AI Avatar */}
                       <div className="absolute top-4 left-4">
                         <div

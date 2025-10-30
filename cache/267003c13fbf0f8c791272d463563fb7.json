@@ -1,0 +1,67 @@
+{
+  "file": "text_input",
+  "sector": "INFORMATION-TECHNOLOGY",
+  "score": 4,
+  "breakdown": {
+    "sections": 5,
+    "formatting": 8,
+    "keywords": 6,
+    "actions": 0,
+    "completeness": 3
+  },
+  "recommendations": [
+    {
+      "type": "improvement",
+      "message": "Deneyim (Experience) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Eğitim (Education) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Beceri (Skills) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "İletişim (Contact) bölümü eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Tarih formatları tutarsız veya eksik",
+      "priority": "high"
+    },
+    {
+      "type": "improvement",
+      "message": "Madde işareti kullanımı yetersiz",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Avoid placing contact info solely in header/footer; move into body",
+      "priority": "medium"
+    },
+    {
+      "type": "improvement",
+      "message": "Paragraflar çok uzun; kısa maddelere bölün",
+      "priority": "medium"
+    }
+  ],
+  "impact_estimates": {
+    "add_experience_section": 10,
+    "add_education_section": 8,
+    "add_skills_section": 7,
+    "add_contact_section": 5,
+    "fix_date_formats": 4,
+    "add_bullet_points": 3,
+    "add_sector_keywords": 10,
+    "add_action_verbs": 8,
+    "add_contact_info": 3
+  },
+  "config_version": "1.0.0-1.0.0",
+  "from_cache": false
+}

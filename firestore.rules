@@ -38,6 +38,12 @@ service cloud.firestore {
     function notTooFrequent(lastTime) {
       return request.time > lastTime + duration.value(1, 's');
     }
+
+    // Bir post'un sahibi mi?
+    function isPostOwner(postId) {
+      return isSignedIn() &&
+             get(/databases/$(database)/documents/posts/$(postId)).data.userId == request.auth.uid;
+    }
     
     // ============================================
     // USER MANAGEMENT (Kullanıcı Yönetimi)
@@ -255,9 +261,11 @@ service cloud.firestore {
       // Yorumlar güncellenemez (silip yeniden oluşturulmalı)
       allow update: if false;
       
-      // Sadece kendi yorumlarını silebilir
-      allow delete: if isSignedIn() && 
-                       resource.data.userId == request.auth.uid;
+      // Kendi yorumlarını silebilir veya ilgili post'un sahibi silebilir
+      allow delete: if isSignedIn() && (
+                       resource.data.userId == request.auth.uid ||
+                       isPostOwner(resource.data.postId)
+                     );
     }
     
     // Beğeniler (Likes)
@@ -274,16 +282,20 @@ service cloud.firestore {
       // Beğeniler güncellenemez
       allow update: if false;
       
-      // Sadece kendi beğenilerini silebilir
-      allow delete: if isSignedIn() && 
-                       resource.data.userId == request.auth.uid;
+      // Kendi beğenisini silebilir veya ilgili post'un sahibi silebilir
+      allow delete: if isSignedIn() && (
+                       resource.data.userId == request.auth.uid ||
+                       isPostOwner(resource.data.postId)
+                     );
     }
     
     // Kaydedilenler (Bookmarks)
     match /bookmarks/{bookmarkId} {
-      // Sadece kendi kaydettiklerini okuyabilir
-      allow read: if isSignedIn() && 
-                     resource.data.userId == request.auth.uid;
+      // Kendi kaydettiklerini okuyabilir veya ilgili post'un sahibi, postuna ait bookmark'ları okuyabilir
+      allow read: if isSignedIn() && (
+                     resource.data.userId == request.auth.uid ||
+                     isPostOwner(resource.data.postId)
+                   );
       
       // Bookmark oluştururken validasyon
       allow create: if isSignedIn() && 
@@ -294,9 +306,11 @@ service cloud.firestore {
       // Bookmarklar güncellenemez
       allow update: if false;
       
-      // Sadece kendi kaydettiklerini silebilir
-      allow delete: if isSignedIn() && 
-                       resource.data.userId == request.auth.uid;
+      // Kendi kaydını silebilir veya ilgili post'un sahibi silebilir
+      allow delete: if isSignedIn() && (
+                       resource.data.userId == request.auth.uid ||
+                       isPostOwner(resource.data.postId)
+                     );
     }
     
     // ============================================
