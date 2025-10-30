@@ -23,7 +23,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Heart, Bookmark, Send } from 'lucide-react';
+import { MessageCircle, Heart, Bookmark, Send, Maximize2 } from 'lucide-react';
+import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/navbar';
 
@@ -176,20 +177,99 @@ const ReplySection = ({ post, user }: { post: Post, user: any }) => {
     );
 };
 
+// Detay modalı içeriği (gönderi + yanıtlar)
+const PostDetailModalContent = ({ post, user }: { post: Post, user: any }) => {
+    const [replies, setReplies] = useState<Reply[]>([]);
+    const [newReply, setNewReply] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        const fetchReplies = async () => {
+            setIsLoading(true);
+            try {
+                const replyData = await getRepliesByPost(post.id!);
+                setReplies(replyData);
+            } catch (error) {
+                toast({ title: 'Hata', description: 'Yanıtlar yüklenemedi.', variant: 'destructive' });
+            }
+            setIsLoading(false);
+        };
+        fetchReplies();
+    }, [post.id, toast]);
+
+    const handleReplySubmit = async () => {
+        if (!newReply.trim() || !user) return;
+        setIsLoading(true);
+        try {
+            await createReply({
+                postId: post.id!,
+                userId: user.uid,
+                userDisplayName: user.displayName || 'Anonim',
+                userPhotoURL: user.photoURL || '/placeholder-user.jpg',
+                content: newReply
+            });
+            setNewReply('');
+            const updatedReplies = await getRepliesByPost(post.id!);
+            setReplies(updatedReplies);
+        } catch (error) {
+            toast({ title: 'Hata', description: 'Yanıt gönderilemedi.', variant: 'destructive' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                {post.content}
+            </div>
+            <Separator />
+            <div className="max-h-[50vh] overflow-y-auto space-y-3">
+                {isLoading && <p>Yükleniyor...</p>}
+                {!isLoading && replies.length === 0 && <p className="text-gray-500">Henüz yanıt yok.</p>}
+                {replies.map(reply => (
+                    <div key={reply.id} className="flex items-start space-x-3">
+                        <Avatar>
+                            <AvatarImage src={reply.userPhotoURL} />
+                            <AvatarFallback>{reply.userDisplayName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 bg-gray-100 rounded-lg p-3">
+                            <p className="font-semibold text-sm">{reply.userDisplayName}</p>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{reply.content}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="p-2 border-t rounded-lg bg-white">
+                <div className="flex items-start space-x-3">
+                    <Avatar>
+                        <AvatarImage src={user?.photoURL || '/placeholder-user.jpg'} />
+                        <AvatarFallback>{user?.displayName?.charAt(0) || 'Y'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                        <Textarea placeholder="Yanıtınızı yazın..." value={newReply} onChange={e => setNewReply(e.target.value)} className="min-h-[64px]" />
+                        <Button onClick={handleReplySubmit} disabled={isLoading} className="mt-2 bg-indigo-600 hover:bg-indigo-700">
+                            Yanıtla
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // Gönderi Kartı
 const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle, onReplyCreated, user }: { post: Post, isLiked: boolean, isBookmarked: boolean, onLikeToggle: (postId: string) => void, onBookmarkToggle: (postId: string) => void, onReplyCreated: (postId: string) => void, user: any }) => {
     return (
         <>
-            {/* Detail Dialog for full content */}
-            <Dialog>
+            {/* Card + top-right detail link to dedicated page */}
                 <div className="group relative mb-6">
                     <div className="absolute inset-0 -z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{background: 'linear-gradient(120deg, rgba(67,0,255,0.10), rgba(0,101,248,0.10))'}} />
                     <div className="rounded-2xl p-[1px] bg-[linear-gradient(135deg,rgba(67,0,255,0.22),rgba(0,101,248,0.22))] transition-transform">
                         <Card className="shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-0 hover:-translate-y-1 hover:ring-1 hover:ring-blue-200/70 rounded-2xl">
-                            <DialogTrigger asChild>
-                                <div>
-                                    <CardHeader className="p-4 bg-gray-50/60 cursor-pointer">
-                                        <div className="flex items-center space-x-4">
+                            <CardHeader className="p-4 bg-gray-50/60 relative">
+                                <div className="flex items-center space-x-4">
                                             <Avatar>
                                                 <AvatarImage src={post.userPhotoURL || '/placeholder-user.jpg'} />
                                                 <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
@@ -198,27 +278,24 @@ const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle,
                                                 <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
                                                 <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}</p>
                                             </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="p-4 cursor-pointer">
-                                        <p className="mb-4 text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                            {post.content}
-                                        </p>
-                                    </CardContent>
                                 </div>
-                            </DialogTrigger>
+                                <Link href={`/topluluk/${post.id}`} className="absolute top-2 right-2">
+                                    <Button size="icon" variant="ghost" className="rounded-full hover:bg-blue-50/70 hover:text-blue-600" aria-label="Detayları aç">
+                                        <Maximize2 size={18} />
+                                    </Button>
+                                </Link>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <p className="mb-4 text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {post.content}
+                                </p>
+                            </CardContent>
                             <CardFooter className="p-4 border-t bg-white/40 backdrop-blur">
                                 <div className="flex justify-between items-center w-full text-gray-600">
-                                    {/* Replies Dialog trigger - separate dialog so stop propagation isn't needed */}
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="ghost" className="flex items-center space-x-2 hover:text-blue-600 hover:bg-blue-50/70 rounded-lg transition-all active:scale-[0.98]">
-                                                <MessageCircle size={18} />
-                                                <span className="text-sm font-medium">{post.replyCount || 0} Yanıt</span>
-                                            </Button>
-                                        </DialogTrigger>
-                                        <ReplySection post={post} user={user} />
-                                    </Dialog>
+                                    <Button variant="ghost" className="flex items-center space-x-2 hover:text-blue-600 hover:bg-blue-50/70 rounded-lg transition-all active:scale-[0.98]" onClick={(e) => e.stopPropagation()}>
+                                        <MessageCircle size={18} />
+                                        <span className="text-sm font-medium">{post.replyCount || 0} Yanıt</span>
+                                    </Button>
                                     <Button variant="ghost" className={`flex items-center space-x-2 hover:text-red-600 hover:bg-red-50/70 rounded-lg transition-all active:scale-[0.98] ${isLiked ? 'text-red-600' : ''}`} onClick={(e) => { e.stopPropagation(); onLikeToggle(post.id!); }}>
                                         <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
                                         <span className="text-sm font-medium">{post.likeCount || 0} Beğen</span>
@@ -232,28 +309,6 @@ const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle,
                         </Card>
                     </div>
                 </div>
-                {/* Content detail modal */}
-                <DialogContent className="sm:max-w-[700px]">
-                    <DialogHeader>
-                        <DialogTitle>Gönderi</DialogTitle>
-                    </DialogHeader>
-                    <div className="p-1 space-y-4">
-                        <div className="flex items-center space-x-3">
-                            <Avatar>
-                                <AvatarImage src={post.userPhotoURL || '/placeholder-user.jpg'} />
-                                <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
-                                <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div className="text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                            {post.content}
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </>
     );
 };

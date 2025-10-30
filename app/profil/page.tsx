@@ -7,7 +7,8 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats } from "@/lib/firestore"
+import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats, getUserLikes, getUserBookmarks, getPostsByUser, getPostsByIds } from "@/lib/firestore"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -145,6 +146,10 @@ export default function ProfilePage() {
   const [cvResults, setCvResults] = useState<any[]>([])
   const [interviewResults, setInterviewResults] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCommunity, setShowCommunity] = useState(false)
+  const [myPosts, setMyPosts] = useState<any[]>([])
+  const [likedPosts, setLikedPosts] = useState<any[]>([])
+  const [savedPosts, setSavedPosts] = useState<any[]>([])
   const { user } = useAuth()
   const { toast } = useToast()
 
@@ -167,6 +172,16 @@ export default function ProfilePage() {
         // Mülakat sonuçlarını yükle
         const interviewResults = await getUserInterviewResults(user.uid)
         setInterviewResults(interviewResults)
+
+        // Topluluk: kullanıcının gönderileri
+        const mine = await getPostsByUser(user.uid)
+        setMyPosts(mine)
+
+        // Beğenilen ve kaydedilenler
+        const [likedIds, savedIds] = await Promise.all([getUserLikes(user.uid), getUserBookmarks(user.uid)])
+        const [likedList, savedList] = await Promise.all([getPostsByIds(likedIds), getPostsByIds(savedIds)])
+        setLikedPosts(likedList)
+        setSavedPosts(savedList)
 
       } catch (error) {
         console.error('Kullanıcı verileri yüklenirken hata:', error)
@@ -468,7 +483,7 @@ export default function ProfilePage() {
           </Alert>
         )}
         
-        <div className="grid lg:grid-cols-4 gap-8">
+        <div className="grid lg:grid-cols-5 gap-8">
           {/* Left Sidebar - Unique Design */}
           <div className="lg:col-span-1 space-y-6">
             {/* Action Hub */}
@@ -495,11 +510,19 @@ export default function ProfilePage() {
                   <MessageSquare className="w-4 h-4 text-green-600 group-hover:scale-110 transition-transform" />
                   <span className="text-green-700 font-medium">Mülakat Simülasyonu</span>
                 </button>
+                <button 
+                  onClick={() => setShowCommunity(prev => !prev)}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl hover:from-indigo-100 hover:to-blue-100 transition-all duration-300 group"
+                >
+                  <MessageSquare className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+                  <span className="text-indigo-700 font-medium">Topluluk</span>
+                </button>
                 <button className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-yellow-100 transition-all duration-300 group">
                   <Trophy className="w-4 h-4 text-orange-600 group-hover:scale-110 transition-transform" />
                   <span className="text-orange-700 font-medium">Başarımları Gör</span>
                 </button>
               </div>
+              {/* Topluluk listeleri sağ panelde gösteriliyor */}
             </div>
 
             {/* Performance Ring */}
@@ -1106,6 +1129,8 @@ export default function ProfilePage() {
                 </div>
               </TabsContent>
 
+              
+
               <TabsContent value="settings" className="space-y-6 mt-6">
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8">
                   <div className="flex items-center space-x-4 mb-8">
@@ -1281,6 +1306,52 @@ export default function ProfilePage() {
               </TabsContent>
             </Tabs>
           </div>
+
+          {showCommunity && (
+            <aside className="hidden lg:block lg:col-span-1">
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 p-6 shadow-lg sticky top-28 max-h-[70vh] overflow-y-auto">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Topluluk</h3>
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Oluşturduğum Gönderiler {myPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({myPosts.length})</span>)}</h4>
+                    <div className="space-y-2">
+                      {myPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz gönderiniz yok.</p>}
+                      {myPosts.slice(0,6).map((p) => (
+                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/40 transition-colors">
+                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
+                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Beğendiklerim {likedPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({likedPosts.length})</span>)}</h4>
+                    <div className="space-y-2">
+                      {likedPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz beğeni yok.</p>}
+                      {likedPosts.slice(0,6).map((p) => (
+                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-rose-300 hover:bg-rose-50/40 transition-colors">
+                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
+                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Kaydettiklerim {savedPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({savedPosts.length})</span>)}</h4>
+                    <div className="space-y-2">
+                      {savedPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz kayıt yok.</p>}
+                      {savedPosts.slice(0,8).map((p) => (
+                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-amber-300 hover:bg-amber-50/40 transition-colors">
+                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
+                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          )}
         </div>
       </div>
       </div>

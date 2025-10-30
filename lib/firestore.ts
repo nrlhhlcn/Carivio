@@ -620,3 +620,41 @@ export const getUserBookmarks = async (userId: string): Promise<string[]> => {
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => doc.data().postId as string);
 };
+
+// Tek bir gönderiyi ID ile getir
+export const getPostById = async (postId: string): Promise<Post | null> => {
+  try {
+    const ref = doc(db, "posts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...(snap.data() as any) } as Post;
+  } catch (e) {
+    console.error("getPostById error:", e);
+    throw e;
+  }
+};
+
+// Kullanıcının oluşturduğu gönderiler
+export const getPostsByUser = async (userId: string): Promise<Post[]> => {
+  // Avoid composite index requirement by sorting client-side
+  const q = query(collection(db, "posts"), where("userId", "==", userId));
+  const snap = await getDocs(q);
+  const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Post[];
+  return items.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+};
+
+// Belirli ID'lerdeki gönderiler (10'luk gruplar halinde)
+export const getPostsByIds = async (ids: string[]): Promise<Post[]> => {
+  if (ids.length === 0) return [];
+  const chunks: string[][] = [];
+  for (let i = 0; i < ids.length; i += 10) chunks.push(ids.slice(i, i + 10));
+  const results: Post[] = [];
+  for (const ch of chunks) {
+    const q = query(collection(db, "posts"), where("__name__", "in", ch));
+    const snap = await getDocs(q);
+    results.push(...(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Post[]));
+  }
+  // Orijinal id sırasını korumak için sıralama
+  const order = new Map(ids.map((id, idx) => [id, idx] as const));
+  return results.sort((a, b) => (order.get(a.id!)! - order.get(b.id!)!));
+};
