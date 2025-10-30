@@ -547,6 +547,16 @@ export const getPostsByTag = async (tag: string) => {
   })) as Post[];
 };
 
+// Tüm gönderileri getir (etiket fark etmeksizin)
+export const getAllPosts = async (): Promise<Post[]> => {
+  const q = query(
+    collection(db, "posts"),
+    orderBy("createdAt", "desc"),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Post[];
+};
+
 export const likePost = async (postId: string, userId: string) => {
   await runTransaction(db, async (transaction) => {
     const postRef = doc(db, "posts", postId);
@@ -657,4 +667,28 @@ export const getPostsByIds = async (ids: string[]): Promise<Post[]> => {
   // Orijinal id sırasını korumak için sıralama
   const order = new Map(ids.map((id, idx) => [id, idx] as const));
   return results.sort((a, b) => (order.get(a.id!)! - order.get(b.id!)!));
+};
+
+// Gönderi içeriğini güncelle
+export const updatePostContent = async (postId: string, content: string) => {
+  const ref = doc(db, "posts", postId);
+  await updateDoc(ref, { content });
+};
+
+// Gönderiyi ve ilişkili like/bookmark/reply kayıtlarını sil
+export const deletePostWithRelations = async (postId: string) => {
+  // delete likes
+  const likesQ = query(collection(db, "likes"), where("postId", "==", postId));
+  const likesSnap = await getDocs(likesQ);
+  await Promise.all(likesSnap.docs.map((d) => deleteDoc(d.ref)));
+  // delete bookmarks
+  const bmQ = query(collection(db, "bookmarks"), where("postId", "==", postId));
+  const bmSnap = await getDocs(bmQ);
+  await Promise.all(bmSnap.docs.map((d) => deleteDoc(d.ref)));
+  // delete replies
+  const rpQ = query(collection(db, "replies"), where("postId", "==", postId));
+  const rpSnap = await getDocs(rpQ);
+  await Promise.all(rpSnap.docs.map((d) => deleteDoc(d.ref)));
+  // finally delete post
+  await deleteDoc(doc(db, "posts", postId));
 };

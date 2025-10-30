@@ -7,7 +7,8 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats, getUserLikes, getUserBookmarks, getPostsByUser, getPostsByIds } from "@/lib/firestore"
+import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats, getUserLikes, getUserBookmarks, getPostsByUser, getPostsByIds, updatePostContent, deletePostWithRelations, unlikePost, unbookmarkPost } from "@/lib/firestore"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -147,6 +148,11 @@ export default function ProfilePage() {
   const [interviewResults, setInterviewResults] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCommunity, setShowCommunity] = useState(false)
+  const [communityTab, setCommunityTab] = useState<'mine' | 'liked' | 'saved'>('mine')
+  const [openPost, setOpenPost] = useState<any | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [editText, setEditText] = useState('')
+  const [isProcessing, setIsProcessing] = useState(false)
   const [myPosts, setMyPosts] = useState<any[]>([])
   const [likedPosts, setLikedPosts] = useState<any[]>([])
   const [savedPosts, setSavedPosts] = useState<any[]>([])
@@ -483,7 +489,7 @@ export default function ProfilePage() {
           </Alert>
         )}
         
-        <div className="grid lg:grid-cols-5 gap-8">
+        <div className="grid lg:grid-cols-4 gap-8">
           {/* Left Sidebar - Unique Design */}
           <div className="lg:col-span-1 space-y-6">
             {/* Action Hub */}
@@ -496,11 +502,18 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-3">
                 <button 
-                  onClick={() => setIsEditing(!isEditing)}
+                  onClick={() => {
+                    if (showCommunity) {
+                      setShowCommunity(false)
+                      setActiveTab('overview')
+                    } else {
+                      setIsEditing(!isEditing)
+                    }
+                  }}
                   className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 rounded-xl hover:from-cyan-100 hover:to-blue-100 transition-all duration-300 group"
                 >
                   <Edit className="w-4 h-4 text-cyan-600 group-hover:rotate-12 transition-transform" />
-                  <span className="text-cyan-700 font-medium">{isEditing ? "Düzenlemeyi Bitir" : "Profili Düzenle"}</span>
+                  <span className="text-cyan-700 font-medium">{showCommunity ? "Profil" : (isEditing ? "Düzenlemeyi Bitir" : "Profili Düzenle")}</span>
                 </button>
                 <button className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all duration-300 group">
                   <FileText className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
@@ -512,10 +525,11 @@ export default function ProfilePage() {
                 </button>
                 <button 
                   onClick={() => setShowCommunity(prev => !prev)}
-                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl hover:from-indigo-100 hover:to-blue-100 transition-all duration-300 group"
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group border ${showCommunity ? 'bg-gradient-to-r from-indigo-500 to-blue-500 text-white border-indigo-500 shadow-md' : 'bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 border-indigo-200 hover:from-indigo-100 hover:to-blue-100'}`}
                 >
-                  <MessageSquare className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
-                  <span className="text-indigo-700 font-medium">Topluluk</span>
+                  <MessageSquare className={`w-4 h-4 transition-transform ${showCommunity ? 'text-white' : 'text-indigo-600'} group-hover:scale-110`} />
+                  <span className={`${showCommunity ? 'text-white' : 'text-indigo-700'} font-medium`}>Topluluk</span>
+                  {showCommunity && <span className="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-[10px] rounded-full bg-white/20 text-white border border-white/30">Açık</span>}
                 </button>
                 <button className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-yellow-100 transition-all duration-300 group">
                   <Trophy className="w-4 h-4 text-orange-600 group-hover:scale-110 transition-transform" />
@@ -615,6 +629,7 @@ export default function ProfilePage() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-3">
+            {!showCommunity && (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-1 shadow-lg">
                 <TabsTrigger 
@@ -1305,53 +1320,104 @@ export default function ProfilePage() {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
+            )}
 
-          {showCommunity && (
-            <aside className="hidden lg:block lg:col-span-1">
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 p-6 shadow-lg sticky top-28 max-h-[70vh] overflow-y-auto">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Topluluk</h3>
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Oluşturduğum Gönderiler {myPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({myPosts.length})</span>)}</h4>
-                    <div className="space-y-2">
-                      {myPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz gönderiniz yok.</p>}
-                      {myPosts.slice(0,6).map((p) => (
-                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/40 transition-colors">
-                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
-                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Beğendiklerim {likedPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({likedPosts.length})</span>)}</h4>
-                    <div className="space-y-2">
-                      {likedPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz beğeni yok.</p>}
-                      {likedPosts.slice(0,6).map((p) => (
-                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-rose-300 hover:bg-rose-50/40 transition-colors">
-                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
-                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Kaydettiklerim {savedPosts.length > 0 && (<span className="ml-1 text-xs text-gray-500">({savedPosts.length})</span>)}</h4>
-                    <div className="space-y-2">
-                      {savedPosts.length === 0 && <p className="text-gray-500 text-sm">Henüz kayıt yok.</p>}
-                      {savedPosts.slice(0,8).map((p) => (
-                        <a key={p.id} href={`/topluluk/${p.id}`} className="block p-3 rounded-lg border border-gray-200 hover:border-amber-300 hover:bg-amber-50/40 transition-colors">
-                          <div className="text-xs text-gray-900 line-clamp-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
-                          <div className="mt-1 text-[10px] text-gray-500">{new Date(p.createdAt.seconds * 1000).toLocaleString()}</div>
-                        </a>
-                      ))}
-                    </div>
+            {showCommunity && (
+              <div className="w-full">
+                {/* Segmented control */}
+                <div className="relative rounded-2xl p-1 bg-white/80 backdrop-blur-xl border border-gray-200/60 shadow-lg">
+                  <div className="grid grid-cols-3">
+                    {(
+                      [
+                        {key:'mine', label:'Oluşturduğum', count: myPosts.length},
+                        {key:'liked', label:'Beğendiğim', count: likedPosts.length},
+                        {key:'saved', label:'Kaydettiklerim', count: savedPosts.length},
+                      ] as Array<{key:'mine'|'liked'|'saved';label:string;count:number}>
+                    ).map(t => (
+                      <button
+                        key={t.key}
+                        onClick={() => setCommunityTab(t.key)}
+                        className={`relative flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${communityTab===t.key ? 'text-white' : 'text-gray-600 hover:text-gray-900'}`}
+                      >
+                        <span>{t.label}</span>
+                        {t.count > 0 && (
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${communityTab===t.key ? 'bg-white/20 text-white border-white/30' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>{t.count}</span>
+                        )}
+                        {communityTab===t.key && (
+                          <span className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 shadow" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
+
+                {/* Items */}
+                <div className="mt-6 space-y-4">
+                  {(
+                    communityTab==='mine' ? myPosts : communityTab==='liked' ? likedPosts : savedPosts
+                  ).map((p:any)=> (
+                    <button key={p.id} onClick={()=>{ setOpenPost(p); setEditMode(false); setEditText(p.content || ''); }} className="w-full text-left block group rounded-2xl p-[1px] bg-gradient-to-r from-gray-200/60 to-gray-100/40 hover:from-blue-200/60 hover:to-blue-100/40 transition-colors">
+                      <div className="rounded-2xl bg-white/80 backdrop-blur p-4">
+                        <div className="text-gray-900 text-[15px] line-clamp-3" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.content}</div>
+                        <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-blue-400" />
+                          {new Date(p.createdAt.seconds * 1000).toLocaleString()}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                  {(
+                    (communityTab==='mine' ? myPosts : communityTab==='liked' ? likedPosts : savedPosts).length === 0
+                  ) && (
+                    <div className="p-8 text-center text-gray-500 bg-white/70 rounded-2xl border border-dashed border-gray-300">Liste boş.</div>
+                  )}
+                </div>
               </div>
-            </aside>
-          )}
+            )}
+          </div>
+
+          {/* Post Modal */}
+          <Dialog open={!!openPost} onOpenChange={(o)=>{ if(!o){ setOpenPost(null); setEditMode(false);} }}>
+            <DialogContent className="sm:max-w-[700px]">
+              <DialogHeader>
+                <DialogTitle>Gönderi</DialogTitle>
+              </DialogHeader>
+              {openPost && (
+                <div className="space-y-4">
+                  {communityTab==='mine' && editMode ? (
+                    <div>
+                      <Textarea value={editText} onChange={(e)=>setEditText(e.target.value)} rows={6} wrap="soft" className="w-full whitespace-pre-wrap break-all overflow-x-hidden resize-y" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }} />
+                      <div className="mt-3 flex gap-2">
+                        <Button disabled={isProcessing} onClick={async ()=>{ setIsProcessing(true); try { await updatePostContent(openPost.id, editText); setOpenPost({...openPost, content: editText}); setMyPosts(prev=>prev.map(p=>p.id===openPost.id?{...p, content: editText}:p)); setEditMode(false);} finally { setIsProcessing(false);} }}>Kaydet</Button>
+                        <Button variant="outline" onClick={()=>{ setEditMode(false); setEditText(openPost.content||''); }}>İptal</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-gray-800 whitespace-pre-wrap" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{openPost.content}</div>
+                  )}
+
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{new Date(openPost.createdAt.seconds * 1000).toLocaleString()}</span>
+                    <span>{openPost.likeCount || 0} beğeni · {openPost.replyCount || 0} yanıt</span>
+                  </div>
+
+                  <div className="pt-3 border-t flex flex-wrap gap-2">
+                    {communityTab==='mine' ? (
+                      <>
+                        {!editMode && <Button variant="outline" onClick={()=>setEditMode(true)}>Düzenle</Button>}
+                        <Button variant="destructive" disabled={isProcessing} onClick={async ()=>{ setIsProcessing(true); try { await deletePostWithRelations(openPost.id); setMyPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Sil</Button>
+                      </>
+                    ) : communityTab==='liked' ? (
+                      <Button variant="outline" disabled={isProcessing || !user} onClick={async ()=>{ if(!user) return; setIsProcessing(true); try { await unlikePost(openPost.id, user.uid); setLikedPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Beğeniyi Geri Al</Button>
+                    ) : (
+                      <Button variant="outline" disabled={isProcessing || !user} onClick={async ()=>{ if(!user) return; setIsProcessing(true); try { await unbookmarkPost(openPost.id, user.uid); setSavedPosts(prev=>prev.filter(p=>p.id!==openPost.id)); setOpenPost(null);} finally { setIsProcessing(false);} }}>Kaydı Kaldır</Button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
         </div>
       </div>
       </div>

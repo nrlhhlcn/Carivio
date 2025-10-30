@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
     getUserStats,
     getPostsByTag,
+    getAllPosts,
     createPost,
     likePost,
     unlikePost,
@@ -23,10 +24,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Heart, Bookmark, Send, Maximize2 } from 'lucide-react';
+import { MessageCircle, Heart, Bookmark, Send, Maximize2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/navbar';
+
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Gönderi Oluşturma Formu
 const CreatePostForm = ({ userTag, onPostCreated }: { userTag: string, onPostCreated: () => void }) => {
@@ -264,10 +271,10 @@ const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle,
     return (
         <>
             {/* Card + top-right detail link to dedicated page */}
-                <div className="group relative mb-6">
+                <div className="group relative mb-6 h-full">
                     <div className="absolute inset-0 -z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{background: 'linear-gradient(120deg, rgba(67,0,255,0.10), rgba(0,101,248,0.10))'}} />
-                    <div className="rounded-2xl p-[1px] bg-[linear-gradient(135deg,rgba(67,0,255,0.22),rgba(0,101,248,0.22))] transition-transform">
-                        <Card className="shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-0 hover:-translate-y-1 hover:ring-1 hover:ring-blue-200/70 rounded-2xl">
+                    <div className="rounded-2xl p-[1px] bg-[linear-gradient(135deg,rgba(67,0,255,0.22),rgba(0,101,248,0.22))] transition-transform h-full">
+                        <Card className="h-full flex flex-col shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-0 hover:-translate-y-1 hover:ring-1 hover:ring-blue-200/70 rounded-2xl">
                             <CardHeader className="p-4 bg-gray-50/60 relative">
                                 <div className="flex items-center space-x-4">
                                             <Avatar>
@@ -285,12 +292,12 @@ const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle,
                                     </Button>
                                 </Link>
                             </CardHeader>
-                            <CardContent className="p-4">
-                                <p className="mb-4 text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            <CardContent className="p-4 flex-1">
+                                <p className="mb-4 text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: '88px' }}>
                                     {post.content}
                                 </p>
                             </CardContent>
-                            <CardFooter className="p-4 border-t bg-white/40 backdrop-blur">
+                            <CardFooter className="mt-auto p-4 border-t bg-white/40 backdrop-blur">
                                 <div className="flex justify-between items-center w-full text-gray-600">
                                     <Button variant="ghost" className="flex items-center space-x-2 hover:text-blue-600 hover:bg-blue-50/70 rounded-lg transition-all active:scale-[0.98]" onClick={(e) => e.stopPropagation()}>
                                         <MessageCircle size={18} />
@@ -322,12 +329,15 @@ const ToplulukPage = () => {
     const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
     const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<'all' | 'popular' | 'recent' | 'saved'>('all');
+    const [query, setQuery] = useState('');
+    const [showAll, setShowAll] = useState(false);
     const { toast } = useToast();
 
     const fetchFeedData = useCallback(async (tag: string, uid: string) => {
         try {
             const [postData, likedData, bookmarkedData] = await Promise.all([
-                getPostsByTag(tag),
+                showAll ? getAllPosts() : getPostsByTag(tag),
                 getUserLikes(uid),
                 getUserBookmarks(uid)
             ]);
@@ -338,7 +348,7 @@ const ToplulukPage = () => {
             console.error("Error fetching feed data: ", error);
             toast({ title: 'Hata', description: 'Akış verileri yüklenirken bir sorun oluştu.', variant: 'destructive' });
         }
-    }, [toast]);
+    }, [toast, showAll]);
 
     const onReplyCreated = (postId: string) => {
         const updatedPosts = posts.map(p => p.id === postId ? { ...p, replyCount: p.replyCount + 1 } : p);
@@ -401,8 +411,77 @@ const ToplulukPage = () => {
         }
     };
 
+    const filteredPosts = posts
+        .filter(p => {
+            if (filter === 'saved') return bookmarkedPosts.has(p.id!);
+            return true;
+        })
+        .filter(p => {
+            if (!query.trim()) return true;
+            const q = query.toLowerCase();
+            return (
+                (p.content || '').toLowerCase().includes(q) ||
+                (p.userDisplayName || '').toLowerCase().includes(q)
+            );
+        })
+        .sort((a, b) => {
+            if (filter === 'popular') return (b.likeCount || 0) - (a.likeCount || 0);
+            if (filter === 'recent') return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+            return 0;
+        });
+
+    const LoadingSkeleton = (
+        <>
+            <Navbar />
+            <div className="min-h-screen pt-20" style={{background: 'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)'}}>
+                <div className="container mx-auto max-w-6xl py-10 px-4 sm:px-6 lg:px-8">
+                    <div className="mb-8">
+                        <div className="h-9 w-48 rounded-lg bg-gray-200 dark:bg-gray-800" />
+                        <div className="mt-2 h-5 w-80 rounded bg-gray-200 dark:bg-gray-800" />
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 space-y-4">
+                            {[...Array(4)].map((_, i) => (
+                                <Card key={i} className="overflow-hidden">
+                                    <CardHeader className="bg-gray-50/60">
+                                        <div className="flex items-center gap-3">
+                                            <Skeleton className="h-10 w-10 rounded-full" />
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-40" />
+                                                <Skeleton className="h-3 w-24" />
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-5/6" />
+                                        <Skeleton className="h-4 w-3/5" />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                        <div className="space-y-4">
+                            <Card className="p-4">
+                                <Skeleton className="h-4 w-32 mb-3" />
+                                <Skeleton className="h-10 w-full" />
+                            </Card>
+                            <Card className="p-4">
+                                <Skeleton className="h-4 w-40 mb-3" />
+                                <div className="space-y-2">
+                                    {[...Array(5)].map((_, j) => (
+                                        <Skeleton key={j} className="h-3 w-2/3" />
+                                    ))}
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+
     if (loading) {
-        return <div className="container mx-auto py-12 text-center">Topluluk akışı yükleniyor...</div>;
+        return LoadingSkeleton;
     }
 
     if (!user) {
@@ -428,41 +507,133 @@ const ToplulukPage = () => {
             <Navbar />
             <div className="min-h-screen pt-20 relative" style={{background: 'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)'}}>
                 <div className="pointer-events-none absolute inset-x-0 top-16 mx-auto h-64 max-w-6xl opacity-60 blur-3xl" style={{background: 'radial-gradient(320px 180px at 15% 30%, rgba(67,0,255,.12), transparent 60%), radial-gradient(360px 200px at 85% 20%, rgba(0,101,248,.12), transparent 60%)'}} />
-                <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6 lg:px-8 relative">
-                    <header className={`mb-10 text-center transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} animate-fade-in-up`}>
-                        <h1 className="text-5xl font-extrabold tracking-tight drop-shadow-sm">
-                            <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
-                                {userTag}
-                            </span>{' '}
-                            Topluluğu
-                        </h1>
-                        <p className="mt-3 text-lg text-gray-600">Alanınızdaki profesyonellerle bağlantı kurun, paylaşın ve öğrenin.</p>
+                <div className="container mx-auto max-w-6xl py-10 px-4 sm:px-6 lg:px-8 relative">
+                    <header className={`mb-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} animate-fade-in-up`}>
+                        <div className="flex flex-col gap-2">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm">
+                                <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                                    {userTag}
+                                </span>{' '}
+                                Topluluğu
+                            </h1>
+                            <p className="text-base md:text-lg text-gray-600">Alanınızdaki profesyonellerle bağlantı kurun, paylaşın ve öğrenin.</p>
+                        </div>
+                        <div className="mt-6 flex flex-col md:flex-row gap-3">
+                            <div className="relative md:flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                <Input
+                                    placeholder="Gönderilerde ara..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    className="pl-9 h-10"
+                                    aria-label="Gönderilerde ara"
+                                />
+                            </div>
+                            <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="md:w-auto">
+                                <TabsList className="grid grid-cols-4">
+                                    <TabsTrigger value="all">Tümü</TabsTrigger>
+                                    <TabsTrigger value="popular">Popüler</TabsTrigger>
+                                    <TabsTrigger value="recent">En Yeni</TabsTrigger>
+                                    <TabsTrigger value="saved">Kaydedilenler</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                            <Button
+                                variant={showAll ? 'default' : 'outline'}
+                                className="h-10"
+                                onClick={() => {
+                                    if (!user || !userTag) return;
+                                    setShowAll((prev) => !prev);
+                                    // fetch immediately with new mode
+                                    fetchFeedData(userTag, user.uid);
+                                }}
+                                aria-pressed={showAll}
+                                aria-label="Tüm alanlardaki gönderileri göster"
+                            >
+                                {showAll ? 'Sadece Alanım' : 'Tüm Alanlar'}
+                            </Button>
+                        </div>
                     </header>
 
                     <main className={`transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
-                        <CreatePostForm userTag={userTag} onPostCreated={handlePostCreated} />
-                        <Separator className="my-8"/>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {posts.length > 0 ? (
-                                posts.map((post, idx) => (
-                                    <div key={post.id} style={{transitionDelay: `${Math.min(idx, 6) * 60}ms`}} className={`transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} animate-fade-in-up`}>
-                                        <PostCard
-                                            post={post}
-                                            isLiked={likedPosts.has(post.id!)}
-                                            isBookmarked={bookmarkedPosts.has(post.id!)}
-                                            onLikeToggle={handleLikeToggle}
-                                            onBookmarkToggle={handleBookmarkToggle}
-                                            onReplyCreated={onReplyCreated}
-                                            user={user}
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="col-span-full text-center py-16 px-6 bg-white/70 backdrop-blur rounded-2xl shadow-lg border border-gray-200">
-                                    <h3 className="text-lg font-semibold text-gray-800">Henüz gönderi yok.</h3>
-                                    <p className="text-gray-500 mt-1">Bu topluluktaki ilk gönderiyi paylaşan siz olun!</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2">
+                                <CreatePostForm userTag={userTag} onPostCreated={handlePostCreated} />
+                                <Separator className="my-6"/>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {filteredPosts.length > 0 ? (
+                                        filteredPosts.map((post, idx) => (
+                                            <div key={post.id} style={{transitionDelay: `${Math.min(idx, 6) * 60}ms`}} className={`h-full transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} animate-fade-in-up`}>
+                                                <PostCard
+                                                    post={post}
+                                                    isLiked={likedPosts.has(post.id!)}
+                                                    isBookmarked={bookmarkedPosts.has(post.id!)}
+                                                    onLikeToggle={handleLikeToggle}
+                                                    onBookmarkToggle={handleBookmarkToggle}
+                                                    onReplyCreated={onReplyCreated}
+                                                    user={user}
+                                                />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-full">
+                                            <Card className="bg-white/70 backdrop-blur border border-gray-200">
+                                                <CardContent className="py-12 text-center">
+                                                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">✨</div>
+                                                    <h3 className="text-lg font-semibold text-gray-800">Sonuç bulunamadı</h3>
+                                                    <p className="text-gray-500 mt-1">Filtreleri değiştirin veya farklı bir arama deneyin.</p>
+                                                </CardContent>
+                                            </Card>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
+                            <aside className="lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] space-y-6">
+                                <Card className="overflow-hidden">
+                                    <CardHeader className="bg-gray-50/60">
+                                        <p className="font-semibold">Profiliniz</p>
+                                    </CardHeader>
+                                    <CardContent className="pt-4">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar>
+                                                <AvatarImage src={user?.photoURL || '/placeholder-user.jpg'} />
+                                                <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="font-medium">{user?.displayName || 'Anonim'}</p>
+                                                <p className="text-xs text-gray-500">@{userTag}</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-4 flex items-center gap-2">
+                                            <Badge variant="secondary">{posts.length} gönderi</Badge>
+                                            <Badge variant="outline">{bookmarkedPosts.size} kaydedilen</Badge>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <p className="font-semibold">İpuçları</p>
+                                    </CardHeader>
+                                    <CardContent className="text-sm text-gray-600 space-y-2">
+                                        <p>• Daha fazla etkileşim için net başlıklar ve kısa içerikler yazın.</p>
+                                        <p>• Uzmanlık alanınıza uygun etiketler kullanın.</p>
+                                        <p>• Faydalı yanıtları beğenmeyi ve kaydetmeyi unutmayın.</p>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <p className="font-semibold">Topluluk kuralları</p>
+                                    </CardHeader>
+                                    <CardContent className="text-sm text-gray-600">
+                                        <ul className="list-disc pl-5 space-y-1">
+                                            <li>Saygılı ve yapıcı olun.</li>
+                                            <li>Spam ve reklam paylaşmayın.</li>
+                                            <li>Gizlilik ve telif haklarına uyun.</li>
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            </aside>
                         </div>
                     </main>
                 </div>
