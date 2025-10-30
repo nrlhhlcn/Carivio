@@ -1,0 +1,376 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // HELPER FUNCTIONS (Yardımcı Fonksiyonlar)
+    // ============================================
+    
+    // Kullanıcı giriş yapmış mı?
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Kullanıcı kendi verisine mi erişiyor?
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // İçerik boş mu değil mi kontrol et
+    function hasValidContent(content) {
+      return content != null && 
+             content.size() > 0 && 
+             content.size() < 5000; // Max 5000 karakter
+    }
+    
+    // Email doğrulanmış mı?
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+    
+    // Veri doğrulama - zorunlu alanlar var mı?
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // Rate limiting - aynı anda çok fazla işlem yapılıyor mu?
+    function notTooFrequent(lastTime) {
+      return request.time > lastTime + duration.value(1, 's');
+    }
+    
+    // ============================================
+    // USER MANAGEMENT (Kullanıcı Yönetimi)
+    // ============================================
+    
+    // Kullanıcı Profilleri
+    match /userProfiles/{profileId} {
+      // Herkes giriş yapmış kullanıcı profillerini okuyabilir
+      allow read: if isSignedIn();
+      
+      // Yeni profil oluştururken zorunlu alanları kontrol et
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'email', 'createdAt']);
+      
+      // Sadece kendi profilini güncelleyebilir
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId; // userId değiştirilemez
+      
+      // Sadece kendi profilini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Kullanıcı İstatistikleri (Leaderboard için public)
+    match /userStats/{statId} {
+      // Herkes okuyabilir - Leaderboard ve sıralama için
+      allow read: if isSignedIn();
+      
+      // Yeni istatistik oluştururken zorunlu alanları kontrol et
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'totalScore', 'currentRank']) &&
+                       request.resource.data.totalScore is number &&
+                       request.resource.data.currentRank is number;
+      
+      // Sadece kendi istatistiğini güncelleyebilir
+      // Ancak totalScore ve currentRank negatif olamaz
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.totalScore >= 0 &&
+                       request.resource.data.currentRank >= 0 &&
+                       request.resource.data.userId == resource.data.userId; // userId değiştirilemez
+      
+      // İstatistik silme - sadece admin (şimdilik disable)
+      allow delete: if false;
+    }
+    
+    // Basit Kullanıcı Bilgileri (users collection)
+    match /users/{userId} {
+      // Herkes okuyabilir
+      allow read: if isSignedIn();
+      
+      // Sadece kendi user doc'unu oluşturabilir
+      allow create: if isSignedIn() && 
+                       userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Sadece kendi bilgilerini güncelleyebilir
+      allow update: if isOwner(userId) &&
+                       request.resource.data.userId == resource.data.userId; // userId değiştirilemez
+      
+      // Kullanıcı silme - admin only (şimdilik disable)
+      allow delete: if false;
+    }
+    
+    // ============================================
+    // CV ANALYSIS (CV Analizi)
+    // ============================================
+    
+    // CV Analizleri - Özel Veriler
+    match /cvAnalyses/{analysisId} {
+      // Sadece kendi CV analizlerini okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Yeni CV analizi oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'fileName', 'analysisDate']) &&
+                       request.resource.data.atsScore >= 0 &&
+                       request.resource.data.atsScore <= 100;
+      
+      // Kendi CV analizlerini güncelleyebilir
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      // Kendi CV analizlerini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // CV Analiz Sonuçları - Detaylı Skorlar
+    match /cvAnalysisResults/{resultId} {
+      // Sadece kendi sonuçlarını okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Yeni sonuç oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'fileName', 'overallScore', 'analysisDate']) &&
+                       request.resource.data.overallScore >= 0 &&
+                       request.resource.data.overallScore <= 100;
+      
+      // Sonuçları güncelleme - sadece öneriler güncellenebilir
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      // Kendi sonuçlarını silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // ============================================
+    // INTERVIEW SYSTEM (Mülakat Sistemi)
+    // ============================================
+    
+    // Mülakat Sonuçları - Video Analiz Verileri
+    match /interviewResults/{resultId} {
+      // Sadece kendi mülakat sonuçlarını okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Yeni mülakat sonucu oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'overallScore', 'interviewDate']) &&
+                       request.resource.data.overallScore >= 0 &&
+                       request.resource.data.overallScore <= 100 &&
+                       request.resource.data.cvCompatibility >= 0 &&
+                       request.resource.data.cvCompatibility <= 100;
+      
+      // Mülakat sonuçlarını güncelleme
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      // Kendi mülakat sonuçlarını silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Mülakat Video Kayıtları (metadata)
+    match /interviewVideos/{videoId} {
+      // Sadece kendi videolarını okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Video metadata oluşturma
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'uploadDate', 'duration']);
+      
+      // Sadece status güncellenebilir
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      // Video metadata silme
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // ============================================
+    // COMMUNITY SYSTEM (Topluluk Sistemi)
+    // ============================================
+    
+    // Gönderiler (Posts)
+    match /posts/{postId} {
+      // Giriş yapmış herkes okuyabilir
+      allow read: if isSignedIn();
+      
+      // Gönderi oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['userId', 'userDisplayName', 'userTag', 'content', 'createdAt']) &&
+                       hasValidContent(request.resource.data.content) &&
+                       request.resource.data.userTag != null &&
+                       request.resource.data.userTag.size() > 0 &&
+                       request.resource.data.likeCount == 0 &&
+                       request.resource.data.replyCount == 0;
+      
+      // Sadece likeCount ve replyCount güncellenebilir (sistem tarafından)
+      // veya kendi gönderisinin içeriğini güncelleyebilir
+      allow update: if isSignedIn() && (
+                         // Like/Reply count güncelleme (herkes yapabilir)
+                         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'replyCount'])) ||
+                         // Kendi gönderisinin içeriğini güncelleme
+                         (resource.data.userId == request.auth.uid && 
+                          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content']) &&
+                          hasValidContent(request.resource.data.content))
+                       );
+      
+      // Sadece kendi gönderilerini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Yanıtlar (Replies)
+    match /replies/{replyId} {
+      // Herkes okuyabilir
+      allow read: if isSignedIn();
+      
+      // Yorum oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['postId', 'userId', 'userDisplayName', 'content', 'createdAt']) &&
+                       hasValidContent(request.resource.data.content) &&
+                       request.resource.data.postId != null;
+      
+      // Yorumlar güncellenemez (silip yeniden oluşturulmalı)
+      allow update: if false;
+      
+      // Sadece kendi yorumlarını silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Beğeniler (Likes)
+    match /likes/{likeId} {
+      // Herkes okuyabilir (sayı için)
+      allow read: if isSignedIn();
+      
+      // Beğeni oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['postId', 'userId']) &&
+                       request.resource.data.postId != null;
+      
+      // Beğeniler güncellenemez
+      allow update: if false;
+      
+      // Sadece kendi beğenilerini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Kaydedilenler (Bookmarks)
+    match /bookmarks/{bookmarkId} {
+      // Sadece kendi kaydettiklerini okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Bookmark oluştururken validasyon
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(['postId', 'userId']) &&
+                       request.resource.data.postId != null;
+      
+      // Bookmarklar güncellenemez
+      allow update: if false;
+      
+      // Sadece kendi kaydettiklerini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // ============================================
+    // NOTIFICATIONS (Bildirimler)
+    // ============================================
+    
+    match /notifications/{notificationId} {
+      // Sadece kendi bildirimlerini okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Sistem bildirimleri oluşturabilir (şimdilik herkes)
+      allow create: if isSignedIn() && 
+                       hasRequiredFields(['userId', 'type', 'message', 'createdAt']);
+      
+      // Sadece 'read' status'u güncellenebilir
+      allow update: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      
+      // Kendi bildirimlerini silebilir
+      allow delete: if isSignedIn() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // ============================================
+    // ADMIN COLLECTIONS (Admin Panel)
+    // ============================================
+    
+    // Admin Logs - Sadece okuma (şimdilik)
+    match /adminLogs/{logId} {
+      allow read: if false; // Admin panel eklendiğinde açılacak
+      allow write: if false;
+    }
+    
+    // Raporlar - Kötüye kullanım bildirimleri
+    match /reports/{reportId} {
+      // Sadece kendi raporlarını okuyabilir
+      allow read: if isSignedIn() && 
+                     resource.data.reportedBy == request.auth.uid;
+      
+      // Rapor oluşturma
+      allow create: if isSignedIn() && 
+                       request.resource.data.reportedBy == request.auth.uid &&
+                       hasRequiredFields(['reportedBy', 'targetType', 'targetId', 'reason', 'createdAt']);
+      
+      // Raporlar güncellenemez/silinemez
+      allow update, delete: if false;
+    }
+    
+    // ============================================
+    // SYSTEM COLLECTIONS (Sistem)
+    // ============================================
+    
+    // Sistem Ayarları - Sadece okuma
+    match /systemSettings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Sadece backend'den değiştirilebilir
+    }
+    
+    // Uygulama Versiyonu Kontrolü
+    match /appVersion/{versionId} {
+      allow read: if true; // Herkes okuyabilir
+      allow write: if false;
+    }
+    
+    // ============================================
+    // DEFAULT DENY ALL
+    // ============================================
+    
+    // Tanımlanmamış tüm collection'lar için erişim ENGELLENDI
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

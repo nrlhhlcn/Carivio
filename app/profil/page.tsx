@@ -7,7 +7,7 @@ import Navbar from "@/components/navbar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults } from "@/lib/firestore"
+import { getUserStats, getUserCVAnalysisResults, getUserInterviewResults, saveUserStats } from "@/lib/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -41,6 +42,34 @@ import {
   Zap,
 } from "lucide-react"
 
+// Mevcut sektör/alan seçenekleri
+const TAG_OPTIONS = [
+  { value: "ACCOUNTANT", label: "Muhasebe" },
+  { value: "ADVOCATE", label: "Avukatlık" },
+  { value: "AGRICULTURE", label: "Tarım" },
+  { value: "APPAREL", label: "Tekstil & Giyim" },
+  { value: "ARTS", label: "Sanat" },
+  { value: "AUTOMOBILE", label: "Otomotiv" },
+  { value: "AVIATION", label: "Havacılık" },
+  { value: "BANKING", label: "Bankacılık" },
+  { value: "BPO", label: "İş Süreçleri" },
+  { value: "BUSINESS-DEVELOPMENT", label: "İş Geliştirme" },
+  { value: "CHEF", label: "Aşçılık" },
+  { value: "CONSTRUCTION", label: "İnşaat" },
+  { value: "CONSULTANT", label: "Danışmanlık" },
+  { value: "DESIGNER", label: "Tasarım" },
+  { value: "DIGITAL-MEDIA", label: "Dijital Medya" },
+  { value: "ENGINEERING", label: "Mühendislik" },
+  { value: "FINANCE", label: "Finans" },
+  { value: "FITNESS", label: "Fitness & Spor" },
+  { value: "HEALTHCARE", label: "Sağlık" },
+  { value: "HR", label: "İnsan Kaynakları" },
+  { value: "INFORMATION-TECHNOLOGY", label: "Bilgi Teknolojileri" },
+  { value: "PUBLIC-RELATIONS", label: "Halkla İlişkiler" },
+  { value: "SALES", label: "Satış" },
+  { value: "TEACHER", label: "Eğitim" },
+]
+
 // Varsayılan istatistikler (Firestore yoksa 0'dan başla)
 const defaultStats = {
   currentRank: 0,
@@ -53,11 +82,23 @@ const defaultStats = {
   completedInterviews: 0,
   totalActiveDays: 0,
   streak: 0,
+  tag: undefined,
+}
+
+// Aktivite tipi
+interface Activity {
+  id: string
+  type: string
+  title: string
+  description: string
+  date: string
+  icon: any
+  color: string
 }
 
 // Dinamik aktivite listesi oluştur - sadece gerçek verilerden
-const getRecentActivity = (cvResults: any[], interviewResults: any[]) => {
-  const activities = []
+const getRecentActivity = (cvResults: any[], interviewResults: any[]): Activity[] => {
+  const activities: Activity[] = []
 
   // CV analiz sonuçlarından aktiviteler oluştur
   cvResults.forEach((result, index) => {
@@ -137,7 +178,29 @@ export default function ProfilePage() {
     loadUserData()
   }, [user])
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    location: string
+    joinDate: string
+    bio: string
+    avatar: string
+    isVerified: boolean
+    currentRank: number
+    totalScore: number
+    cvScore: number
+    interviewScore: number
+    badge: string
+    level: string
+    completedAnalyses: number
+    completedInterviews: number
+    totalActiveDays: number
+    streak: number
+    tag?: string
+  }>({
     id: '',
     firstName: 'Kullanıcı',
     lastName: '',
@@ -188,12 +251,37 @@ export default function ProfilePage() {
           displayName: `${formData.firstName} ${formData.lastName}`.trim()
         })
         
+        // Tag bilgisini userStats'a kaydet
+        if (formData.tag) {
+          await saveUserStats({
+            userId: user.uid,
+            tag: formData.tag,
+            displayName: `${formData.firstName} ${formData.lastName}`.trim(),
+            photoURL: user.photoURL || '',
+            currentRank: formData.currentRank,
+            totalScore: formData.totalScore,
+            cvScore: formData.cvScore,
+            interviewScore: formData.interviewScore,
+            badge: formData.badge,
+            level: formData.level,
+            completedAnalyses: formData.completedAnalyses,
+            completedInterviews: formData.completedInterviews,
+            totalActiveDays: formData.totalActiveDays,
+            streak: formData.streak,
+            lastActivityDate: new Date(),
+          })
+        }
+        
         toast({
           title: "Başarılı!",
           description: "Profil bilgileriniz güncellendi.",
         })
+        
+        // Sayfayı yenile
+        window.location.reload()
       }
     } catch (error) {
+      console.error('Profil güncellenirken hata:', error)
       toast({
         title: "Hata!",
         description: "Profil güncellenirken bir hata oluştu.",
@@ -324,6 +412,11 @@ export default function ProfilePage() {
                       <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-200 rounded-full text-cyan-700 text-sm font-medium">
                         {formData.level}
                       </span>
+                      {formData.tag && (
+                        <span className="px-4 py-2 bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-200 rounded-full text-orange-700 text-sm font-medium">
+                          {TAG_OPTIONS.find(opt => opt.value === formData.tag)?.label || formData.tag}
+                        </span>
+                      )}
                       {formData.isVerified && (
                         <Badge className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 text-green-700 text-sm font-medium">
                           <CheckCircle className="w-3 h-3 mr-1" />
@@ -364,6 +457,17 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* Tag Uyarısı */}
+        {!formData.tag && (
+          <Alert className="mb-6 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
+            <Target className="h-5 w-5 text-orange-600" />
+            <AlertDescription className="text-orange-800 font-medium">
+              <strong>Önemli:</strong> Topluluk özelliğini kullanabilmek için lütfen profilinizden meslek alanınızı seçin. 
+              "Kişisel Bilgiler" sekmesinden alanınızı seçip kaydedin.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Left Sidebar - Unique Design */}
           <div className="lg:col-span-1 space-y-6">
@@ -767,6 +871,29 @@ export default function ProfilePage() {
                               disabled={!isEditing}
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white"
                             />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="tag" className="text-sm font-medium text-gray-700">Meslek Alanı / Sektör</Label>
+                            <Select 
+                              value={formData.tag || ""} 
+                              onValueChange={(value) => setFormData(prev => ({ ...prev, tag: value }))}
+                              disabled={!isEditing}
+                            >
+                              <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                                <SelectValue placeholder="Alanınızı seçin" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TAG_OPTIONS.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-gray-500">
+                              Topluluk sayfasında bu alana ait gönderileri göreceksiniz
+                            </p>
                           </div>
                         </div>
                       </div>

@@ -1,0 +1,178 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Kullanıcı giriş yapmış mı?
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Kullanıcı bu dosyanın sahibi mi?
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Dosya boyutu geçerli mi?
+    function isValidFileSize(maxSizeMB) {
+      return request.resource.size < maxSizeMB * 1024 * 1024;
+    }
+    
+    // Dosya tipi geçerli mi?
+    function isValidFileType(allowedTypes) {
+      return request.resource.contentType in allowedTypes;
+    }
+    
+    // ============================================
+    // CV DOSYALARI
+    // ============================================
+    
+    // CV dosyaları: /cv-files/{userId}/{fileName}
+    match /cv-files/{userId}/{fileName} {
+      // Sadece kendi CV'lerini okuyabilir
+      allow read: if isSignedIn() && isOwner(userId);
+      
+      // CV yüklerken validasyon:
+      // - Sadece kendi klasörüne yükleyebilir
+      // - Maksimum 10MB
+      // - Sadece PDF dosyaları
+      allow write: if isSignedIn() && 
+                      isOwner(userId) &&
+                      isValidFileSize(10) &&
+                      isValidFileType(['application/pdf']);
+      
+      // Sadece kendi CV'lerini silebilir
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // ============================================
+    // MÜLAKAT VİDEOLARI
+    // ============================================
+    
+    // Mülakat videoları: /interview-videos/{userId}/{videoId}
+    match /interview-videos/{userId}/{videoId} {
+      // Sadece kendi videolarını okuyabilir
+      allow read: if isSignedIn() && isOwner(userId);
+      
+      // Video yüklerken validasyon:
+      // - Sadece kendi klasörüne yükleyebilir
+      // - Maksimum 100MB
+      // - Sadece video formatları
+      allow write: if isSignedIn() && 
+                      isOwner(userId) &&
+                      isValidFileSize(100) &&
+                      isValidFileType([
+                        'video/mp4',
+                        'video/webm',
+                        'video/quicktime',
+                        'video/x-msvideo'
+                      ]);
+      
+      // Sadece kendi videolarını silebilir
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // Mülakat video chunk'ları (büyük dosyalar için parçalı upload)
+    match /interview-videos/{userId}/chunks/{chunkId} {
+      allow read: if isSignedIn() && isOwner(userId);
+      allow write: if isSignedIn() && isOwner(userId) && isValidFileSize(10);
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // ============================================
+    // PROFIL RESİMLERİ
+    // ============================================
+    
+    // Profil resimleri: /profile-pictures/{userId}/{fileName}
+    match /profile-pictures/{userId}/{fileName} {
+      // Herkes profil resimlerini görebilir
+      allow read: if true;
+      
+      // Profil resmi yüklerken validasyon:
+      // - Sadece kendi profil resmini yükleyebilir
+      // - Maksimum 5MB
+      // - Sadece resim formatları
+      allow write: if isSignedIn() && 
+                      isOwner(userId) &&
+                      isValidFileSize(5) &&
+                      isValidFileType([
+                        'image/jpeg',
+                        'image/jpg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp'
+                      ]);
+      
+      // Sadece kendi profil resmini silebilir
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // ============================================
+    // TOPLULUK GÖRSELLERİ
+    // ============================================
+    
+    // Gönderi görselleri: /post-images/{userId}/{postId}/{fileName}
+    match /post-images/{userId}/{postId}/{fileName} {
+      // Herkes gönderi görsellerini görebilir
+      allow read: if isSignedIn();
+      
+      // Görsel yüklerken validasyon:
+      // - Sadece kendi gönderilerine görsel ekleyebilir
+      // - Maksimum 5MB
+      // - Sadece resim formatları
+      allow write: if isSignedIn() && 
+                      isOwner(userId) &&
+                      isValidFileSize(5) &&
+                      isValidFileType([
+                        'image/jpeg',
+                        'image/jpg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp'
+                      ]);
+      
+      // Sadece kendi görsellerini silebilir
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // ============================================
+    // GEÇICI DOSYALAR
+    // ============================================
+    
+    // Geçici dosyalar: /temp/{userId}/{fileName}
+    // (Upload sırasında önizleme için)
+    match /temp/{userId}/{fileName} {
+      allow read: if isSignedIn() && isOwner(userId);
+      allow write: if isSignedIn() && 
+                      isOwner(userId) &&
+                      isValidFileSize(20);
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+    
+    // ============================================
+    // SİSTEM DOSYALARI (Public Assets)
+    // ============================================
+    
+    // Public assets: /public/{fileName}
+    match /public/{fileName} {
+      // Herkes okuyabilir
+      allow read: if true;
+      // Kimse yazamaz/silemez (sadece admin console'dan)
+      allow write, delete: if false;
+    }
+    
+    // ============================================
+    // DEFAULT DENY ALL
+    // ============================================
+    
+    // Tanımlanmamış tüm path'ler için erişim ENGELLENDI
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

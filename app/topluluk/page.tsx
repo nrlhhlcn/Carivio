@@ -25,6 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MessageCircle, Heart, Bookmark, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import Navbar from '@/components/navbar';
 
 // Gönderi Oluşturma Formu
 const CreatePostForm = ({ userTag, onPostCreated }: { userTag: string, onPostCreated: () => void }) => {
@@ -60,28 +61,36 @@ const CreatePostForm = ({ userTag, onPostCreated }: { userTag: string, onPostCre
     };
 
     return (
-        <Card className="mb-8 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-start space-x-4 p-4">
+        <div className="relative group mb-8">
+            <div className="absolute inset-0 -z-10 rounded-2xl blur-2xl opacity-30 transition-opacity duration-500 group-hover:opacity-60" style={{background: 'radial-gradient(120px 120px at 20% 20%, rgba(67,0,255,.25), transparent 60%), radial-gradient(140px 140px at 80% 30%, rgba(0,101,248,.25), transparent 60%)'}} />
+            <div className="rounded-2xl p-[1px] bg-[linear-gradient(135deg,rgba(67,0,255,0.25),rgba(0,101,248,0.25))]">
+            <Card className="shadow-md hover:shadow-xl transition-all duration-300 border-0 hover:-translate-y-0.5 focus-within:ring-1 focus-within:ring-blue-300/60 rounded-2xl">
+                <CardHeader className="flex flex-row items-start space-x-4 p-4">
                 <Avatar>
                     <AvatarImage src={user.photoURL || '/placeholder-user.jpg'} />
                     <AvatarFallback>{user.displayName?.charAt(0) || 'T'}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                     <Textarea
+                    <Textarea
                         placeholder="Alanınızla ilgili bir tartışma başlatın..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full bg-gray-50/50 border-gray-200 rounded-lg p-3 text-sm focus:ring-blue-500 focus:border-blue-500 min-h-[80px]"
+                        wrap="soft"
+                        rows={4}
+                        className="w-full bg-gray-50/60 border-gray-200 rounded-lg p-3 text-sm focus:ring-blue-500 focus:border-blue-500 min-h-[80px] max-h-64 transition-colors resize-y overflow-y-auto overflow-x-hidden break-all whitespace-pre-wrap"
+                        style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     />
                 </div>
-            </CardHeader>
-            <CardContent className="flex justify-end p-4 pt-0">
-                <Button onClick={handleSubmit} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700">
+                </CardHeader>
+                <CardContent className="flex justify-end p-4 pt-0">
+                <Button onClick={handleSubmit} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all active:scale-[0.98]">
                     <Send size={16} className="mr-2"/>
                     {isLoading ? 'Gönderiliyor...' : 'Gönder'}
                 </Button>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+            </div>
+        </div>
     );
 };
 
@@ -170,52 +179,89 @@ const ReplySection = ({ post, user }: { post: Post, user: any }) => {
 // Gönderi Kartı
 const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle, onReplyCreated, user }: { post: Post, isLiked: boolean, isBookmarked: boolean, onLikeToggle: (postId: string) => void, onBookmarkToggle: (postId: string) => void, onReplyCreated: (postId: string) => void, user: any }) => {
     return (
-        <Dialog>
-            <Card className="mb-6 shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                <CardHeader className="p-4 bg-gray-50/50">
-                    <div className="flex items-center space-x-4">
-                        <Avatar>
-                            <AvatarImage src={post.userPhotoURL || '/placeholder-user.jpg'} />
-                            <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
-                            <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}</p>
+        <>
+            {/* Detail Dialog for full content */}
+            <Dialog>
+                <div className="group relative mb-6">
+                    <div className="absolute inset-0 -z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{background: 'linear-gradient(120deg, rgba(67,0,255,0.10), rgba(0,101,248,0.10))'}} />
+                    <div className="rounded-2xl p-[1px] bg-[linear-gradient(135deg,rgba(67,0,255,0.22),rgba(0,101,248,0.22))] transition-transform">
+                        <Card className="shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-0 hover:-translate-y-1 hover:ring-1 hover:ring-blue-200/70 rounded-2xl">
+                            <DialogTrigger asChild>
+                                <div>
+                                    <CardHeader className="p-4 bg-gray-50/60 cursor-pointer">
+                                        <div className="flex items-center space-x-4">
+                                            <Avatar>
+                                                <AvatarImage src={post.userPhotoURL || '/placeholder-user.jpg'} />
+                                                <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
+                                                <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4 cursor-pointer">
+                                        <p className="mb-4 text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                            {post.content}
+                                        </p>
+                                    </CardContent>
+                                </div>
+                            </DialogTrigger>
+                            <CardFooter className="p-4 border-t bg-white/40 backdrop-blur">
+                                <div className="flex justify-between items-center w-full text-gray-600">
+                                    {/* Replies Dialog trigger - separate dialog so stop propagation isn't needed */}
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="ghost" className="flex items-center space-x-2 hover:text-blue-600 hover:bg-blue-50/70 rounded-lg transition-all active:scale-[0.98]">
+                                                <MessageCircle size={18} />
+                                                <span className="text-sm font-medium">{post.replyCount || 0} Yanıt</span>
+                                            </Button>
+                                        </DialogTrigger>
+                                        <ReplySection post={post} user={user} />
+                                    </Dialog>
+                                    <Button variant="ghost" className={`flex items-center space-x-2 hover:text-red-600 hover:bg-red-50/70 rounded-lg transition-all active:scale-[0.98] ${isLiked ? 'text-red-600' : ''}`} onClick={(e) => { e.stopPropagation(); onLikeToggle(post.id!); }}>
+                                        <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
+                                        <span className="text-sm font-medium">{post.likeCount || 0} Beğen</span>
+                                    </Button>
+                                    <Button variant="ghost" className={`flex items-center space-x-2 hover:text-yellow-600 hover:bg-yellow-50/70 rounded-lg transition-all active:scale-[0.98] ${isBookmarked ? 'text-yellow-600' : ''}`} onClick={(e) => { e.stopPropagation(); onBookmarkToggle(post.id!); }}>
+                                        <Bookmark size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
+                                        <span className="text-sm font-medium">Kaydet</span>
+                                    </Button>
+                                </div>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                </div>
+                {/* Content detail modal */}
+                <DialogContent className="sm:max-w-[700px]">
+                    <DialogHeader>
+                        <DialogTitle>Gönderi</DialogTitle>
+                    </DialogHeader>
+                    <div className="p-1 space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <Avatar>
+                                <AvatarImage src={post.userPhotoURL || '/placeholder-user.jpg'} />
+                                <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
+                                <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div className="text-gray-700 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            {post.content}
                         </div>
                     </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                    <p className="mb-4 text-gray-700 whitespace-pre-wrap">
-                        {post.content}
-                    </p>
-                </CardContent>
-                 <CardFooter className="p-4 border-t">
-                    <div className="flex justify-between items-center w-full text-gray-600">
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" className="flex items-center space-x-2 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                                <MessageCircle size={18} />
-                                <span className="text-sm font-medium">{post.replyCount || 0} Yanıt</span>
-                            </Button>
-                        </DialogTrigger>
-                        <Button variant="ghost" className={`flex items-center space-x-2 hover:text-red-500 hover:bg-red-50 rounded-lg ${isLiked ? 'text-red-500' : ''}`} onClick={() => onLikeToggle(post.id!)}>
-                            <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
-                            <span className="text-sm font-medium">{post.likeCount || 0} Beğen</span>
-                        </Button>
-                        <Button variant="ghost" className={`flex items-center space-x-2 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg ${isBookmarked ? 'text-yellow-500' : ''}`} onClick={() => onBookmarkToggle(post.id!)}>
-                            <Bookmark size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
-                            <span className="text-sm font-medium">Kaydet</span>
-                        </Button>
-                    </div>
-                </CardFooter>
-            </Card>
-            <ReplySection post={post} user={user} />
-        </Dialog>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
 
 // Ana Sayfa Bileşeni
 const ToplulukPage = () => {
     const { user } = useAuth();
+    const [mounted, setMounted] = useState(false);
     const [userTag, setUserTag] = useState<string | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -245,6 +291,7 @@ const ToplulukPage = () => {
     };
 
     useEffect(() => {
+        setMounted(true);
         const init = async () => {
             if (user) {
                 setLoading(true);
@@ -322,42 +369,50 @@ const ToplulukPage = () => {
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <div className="container mx-auto max-w-3xl py-12 px-4 sm:px-6 lg:px-8">
-                <header className="mb-10 text-center">
-                    <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
-                        <span className="text-indigo-600">{userTag}</span> Topluluğu
-                    </h1>
-                    <p className="mt-2 text-xl text-gray-500 dark:text-gray-400">Alanınızdaki diğer profesyonellerle bağlantı kurun ve etkileşimde bulunun.</p>
-                </header>
+        <>
+            <Navbar />
+            <div className="min-h-screen pt-20 relative" style={{background: 'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)'}}>
+                <div className="pointer-events-none absolute inset-x-0 top-16 mx-auto h-64 max-w-6xl opacity-60 blur-3xl" style={{background: 'radial-gradient(320px 180px at 15% 30%, rgba(67,0,255,.12), transparent 60%), radial-gradient(360px 200px at 85% 20%, rgba(0,101,248,.12), transparent 60%)'}} />
+                <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6 lg:px-8 relative">
+                    <header className={`mb-10 text-center transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} animate-fade-in-up`}>
+                        <h1 className="text-5xl font-extrabold tracking-tight drop-shadow-sm">
+                            <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                                {userTag}
+                            </span>{' '}
+                            Topluluğu
+                        </h1>
+                        <p className="mt-3 text-lg text-gray-600">Alanınızdaki profesyonellerle bağlantı kurun, paylaşın ve öğrenin.</p>
+                    </header>
 
-                <main>
-                    <CreatePostForm userTag={userTag} onPostCreated={handlePostCreated} />
-                    <Separator className="my-8"/>
-                    <div className="flow-y-6">
-                        {posts.length > 0 ? (
-                            posts.map(post => (
-                                <PostCard 
-                                    key={post.id} 
-                                    post={post} 
-                                    isLiked={likedPosts.has(post.id!)}
-                                    isBookmarked={bookmarkedPosts.has(post.id!)}
-                                    onLikeToggle={handleLikeToggle}
-                                    onBookmarkToggle={handleBookmarkToggle}
-                                    onReplyCreated={onReplyCreated} // Pass the function here
-                                    user={user}
-                                />
-                            ))
-                        ) : (
-                            <div className="text-center py-16 px-4 bg-white rounded-lg shadow-md">
-                                <h3 className="text-lg font-medium text-gray-800">Henüz gönderi yok.</h3>
-                                <p className="text-gray-500 mt-1">Bu topluluktaki ilk gönderiyi paylaşan siz olun!</p>
-                            </div>
-                        )}
-                    </div>
-                </main>
+                    <main className={`transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+                        <CreatePostForm userTag={userTag} onPostCreated={handlePostCreated} />
+                        <Separator className="my-8"/>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {posts.length > 0 ? (
+                                posts.map((post, idx) => (
+                                    <div key={post.id} style={{transitionDelay: `${Math.min(idx, 6) * 60}ms`}} className={`transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} animate-fade-in-up`}>
+                                        <PostCard
+                                            post={post}
+                                            isLiked={likedPosts.has(post.id!)}
+                                            isBookmarked={bookmarkedPosts.has(post.id!)}
+                                            onLikeToggle={handleLikeToggle}
+                                            onBookmarkToggle={handleBookmarkToggle}
+                                            onReplyCreated={onReplyCreated}
+                                            user={user}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-full text-center py-16 px-6 bg-white/70 backdrop-blur rounded-2xl shadow-lg border border-gray-200">
+                                    <h3 className="text-lg font-semibold text-gray-800">Henüz gönderi yok.</h3>
+                                    <p className="text-gray-500 mt-1">Bu topluluktaki ilk gönderiyi paylaşan siz olun!</p>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
