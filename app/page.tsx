@@ -166,16 +166,18 @@ export default function HomePage() {
           }} />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-          <div className="text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Text Content */}
+            <div className="text-center lg:text-left">
             {/* Enhanced animated badge */}
             <div
-              className={`inline-flex items-center backdrop-blur-md border border-white/20 text-white px-6 py-3 rounded-full text-sm font-semibold mb-8 transform transition-all duration-1000 shadow-lg hover:scale-105 ${
+              className={`inline-flex items-center backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-xs md:text-sm font-semibold mb-4 md:mb-6 transform transition-all duration-1000 shadow-lg hover:scale-105 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
               style={{background: 'linear-gradient(135deg, rgba(67, 0, 255, 0.3) 0%, rgba(0, 202, 255, 0.2) 50%, rgba(0, 255, 222, 0.3) 100%)'}}
             >
-              <Sparkles className="w-5 h-5 mr-3 animate-spin" style={{ animationDuration: "3s", color: '#00FFDE' }} />
+              <Sparkles className="w-4 h-4 mr-2 animate-spin" style={{ animationDuration: "3s", color: '#00FFDE' }} />
               <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                 Kariyerinizin geleceği burada başlıyor
               </span>
@@ -183,64 +185,64 @@ export default function HomePage() {
 
             {/* Enhanced main heading with advanced animations */}
             <h1
-              className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 md:mb-8 text-white leading-tight transform transition-all duration-1000 delay-200 ${
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 md:mb-6 text-white leading-tight transform transition-all duration-1000 delay-200 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
             >
-              <span className="block mb-2 md:mb-4">
+              <span className="block mb-2">
                 CV'nizi{" "}
                 <span className="bg-clip-text text-transparent animate-pulse hover:animate-none transition-all duration-300 cursor-default" style={{background: 'linear-gradient(90deg, #4300FF 0%, #00CAFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                   analiz edin
                 </span>
               </span>
-              <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #00CAFF 0%, #FFFFFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+              <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #00CAFF 0%, #FFFFFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                 mülakatlara hazırlanın
               </span>
             </h1>
 
             <p
-              className={`text-lg sm:text-xl lg:text-2xl mb-8 md:mb-12 max-w-5xl mx-auto leading-relaxed transform transition-all duration-1000 delay-400 px-4 ${
+              className={`text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed transform transition-all duration-1000 delay-400 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
               style={{color: '#00CAFF'}}
             >
-              <span className="text-xl sm:text-2xl lg:text-3xl font-semibold bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+              <span className="text-lg sm:text-xl md:text-2xl font-semibold bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                 Yapay zeka destekli analiz
               </span>{" "}
               ile CV'nizi geliştirin, gerçekçi mülakat simülasyonları ile kendinizi test edin.
               <br />
-              <span className="text-base sm:text-lg lg:text-xl font-medium mt-3 md:mt-4 block" style={{color: '#00FFDE'}}>
+              <span className="text-sm sm:text-base md:text-lg font-medium mt-2 block" style={{color: '#00FFDE'}}>
                 ✨ Binlerce kişi kariyerini burada şekillendirdi
               </span>
             </p>
 
             {/* Enhanced animated buttons */}
             <div
-              className={`flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 justify-center items-center transform transition-all duration-1000 delay-600 px-4 ${
+              className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center transform transition-all duration-1000 delay-600 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
             >
               <Link href="/register" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto text-white px-6 sm:px-8 md:px-10 py-4 sm:py-5 text-lg sm:text-xl font-bold rounded-2xl shadow-2xl transform hover:scale-105 sm:hover:scale-110 transition-all duration-300 group relative overflow-hidden"
-                  style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)', boxShadow: '0 25px 50px -12px rgba(67, 0, 255, 0.3)'}}
+                  className="w-full sm:w-auto text-white px-6 py-3 text-base md:text-lg font-bold rounded-xl shadow-xl transform hover:scale-105 transition-all duration-300 group relative overflow-hidden"
+                  style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)', boxShadow: '0 10px 30px -5px rgba(67, 0, 255, 0.4)'}}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <Target className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                  <Target className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                   <span className="relative z-10">Ücretsiz Başla</span>
-                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" />
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
                 </Button>
               </Link>
               <Link href="/cv-analiz" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-2 text-white px-6 sm:px-8 md:px-10 py-4 sm:py-5 text-lg sm:text-xl font-semibold backdrop-blur-md rounded-2xl transition-all duration-300 hover:scale-105 sm:hover:scale-110 group relative overflow-hidden"
-                  style={{borderColor: '#00CAFF', backgroundColor: 'rgba(0, 202, 255, 0.1)', backdropFilter: 'blur(10px)'}}
+                  className="w-full sm:w-auto border-2 text-white px-6 py-3 text-base md:text-lg font-semibold backdrop-blur-md rounded-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden"
+                  style={{borderColor: '#FFFFFF', backgroundColor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(10px)'}}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <Award className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 group-hover:scale-110 transition-transform duration-300" />
+                  <Award className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
                   <span className="relative z-10">Demo İzle</span>
                 </Button>
               </Link>
@@ -248,37 +250,151 @@ export default function HomePage() {
 
             {/* Enhanced floating stats */}
             <div
-              className={`grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mt-16 sm:mt-20 md:mt-24 transform transition-all duration-1000 delay-800 px-4 ${
+              className={`grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-8 md:mt-10 transform transition-all duration-1000 delay-800 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
             >
               {stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="text-center group hover:scale-105 sm:hover:scale-110 transition-all duration-500 relative"
+                  className="text-center group hover:scale-105 sm:hover:scale-110 transition-all duration-500 relative h-full flex flex-col"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:border-white/30 transition-all duration-300 hover:shadow-2xl" style={{backgroundColor: 'rgba(255, 255, 255, 0.1)', boxShadow: '0 25px 50px -12px rgba(67, 0, 255, 0.2)'}}>
+                  <div className="backdrop-blur-md border border-white/30 rounded-xl p-4 hover:border-white/40 transition-all duration-300 hover:shadow-xl flex-1 flex flex-col justify-between h-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.15)'}}>
                     {/* Progress Bar */}
-                    <div className="w-full h-2 bg-white/20 rounded-full mb-4 overflow-hidden">
+                    <div className="w-full h-1.5 bg-white/30 rounded-full mb-3 overflow-hidden">
                       <div 
-                        className="h-2 rounded-full transition-all duration-1000 ease-out"
+                        className="h-1.5 rounded-full transition-all duration-1000 ease-out"
                         style={{
-                          background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 50%, #00FFDE 100%)',
+                          background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 100%)',
                           width: index === 0 ? '95%' : index === 1 ? '88%' : index === 2 ? '92%' : '85%'
                         }}
                       />
                     </div>
                     
-                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black bg-clip-text text-transparent mb-2 sm:mb-3 transition-all duration-300" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
-                      {stat.number}
-                    </div>
-                    <div className="text-xs sm:text-sm font-semibold uppercase tracking-wider group-hover:text-white transition-colors duration-300 text-black">
-                      {stat.label}
+                    <div className="flex-1 flex flex-col justify-center">
+                      <div className="text-xl sm:text-2xl md:text-3xl font-black bg-clip-text text-transparent mb-1.5 transition-all duration-300" style={{background: 'linear-gradient(90deg, #FFFFFF 0%, #00CAFF 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                        {stat.number}
+                      </div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-white/90 transition-colors duration-300 leading-tight">
+                        {stat.label}
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+            {/* Right Side - Hero Image */}
+            <div className="relative mt-12 lg:mt-0" style={{ perspective: '1000px' }}>
+              <div 
+                className={`relative z-10 transform transition-all duration-1000 hover:scale-105 ${
+                  isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-10 opacity-0 scale-75"
+                }`} 
+                style={{ 
+                  transitionDelay: "1000ms",
+                  transformStyle: 'preserve-3d',
+                  animation: isVisible ? 'zoomInFromBack 1.2s ease-out 1s forwards' : 'none'
+                }}
+              >
+                {/* Decorative blur effects */}
+                <div className={`absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-purple-500/20 to-cyan-400/20 rounded-3xl blur-2xl animate-pulse ${
+                  isVisible ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                }`} style={{ transition: 'all 1.5s ease-out', transitionDelay: '1.2s' }} />
+                <div className={`absolute -inset-2 bg-white/10 rounded-3xl blur-xl ${
+                  isVisible ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                }`} style={{ transition: 'all 1.5s ease-out', transitionDelay: '1.2s' }} />
+                
+                {/* Image Container */}
+                <div 
+                  className={`relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-white/5 p-3 md:p-4 ${
+                    isVisible ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                  }`}
+                  style={{ 
+                    transition: 'all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    transitionDelay: '1s',
+                    transformOrigin: 'center center'
+                  }}
+                >
+                  <img 
+                    src="/resim-4.png" 
+                    alt="CV Analiz ve Geliştirme - Profesyonel CV hazırlama ve analiz" 
+                    className="w-full h-auto rounded-xl object-cover transform transition-transform duration-700 hover:scale-[1.02]"
+                    style={{
+                      animation: isVisible ? 'zoomInImage 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 1s both' : 'none'
+                    }}
+                  />
+                  
+                  {/* Floating badge on image */}
+                  <div 
+                    className={`absolute top-4 right-4 md:top-6 md:right-6 bg-white/90 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg border border-white/20 ${
+                      isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                    }`}
+                    style={{ 
+                      transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      transitionDelay: '1.8s'
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-blue-600 animate-spin" style={{ animationDuration: "3s" }} />
+                      <span className="text-xs md:text-sm font-bold bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                        AI Destekli
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating decorative elements */}
+                <div 
+                  className={`absolute -bottom-6 -left-6 w-24 h-24 bg-gradient-to-r from-blue-400/30 to-purple-500/30 rounded-full blur-xl animate-pulse hidden lg:block ${
+                    isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                  }`}
+                  style={{ transition: 'all 1s ease-out', transitionDelay: '1.5s' }}
+                />
+                <div 
+                  className={`absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-xl animate-pulse hidden lg:block ${
+                    isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                  }`}
+                  style={{ transition: 'all 1s ease-out', transitionDelay: '1.7s' }}
+                />
+              </div>
+
+              {/* CSS Keyframes için style tag */}
+              <style jsx>{`
+                @keyframes zoomInFromBack {
+                  0% {
+                    transform: translateZ(-200px) scale(0.5);
+                    opacity: 0;
+                  }
+                  50% {
+                    transform: translateZ(-50px) scale(0.8);
+                    opacity: 0.5;
+                  }
+                  100% {
+                    transform: translateZ(0) scale(1);
+                    opacity: 1;
+                  }
+                }
+
+                @keyframes zoomInImage {
+                  0% {
+                    transform: scale(0.6) translateZ(-100px);
+                    opacity: 0;
+                    filter: blur(10px);
+                  }
+                  60% {
+                    transform: scale(0.95) translateZ(-20px);
+                    opacity: 0.8;
+                    filter: blur(2px);
+                  }
+                  100% {
+                    transform: scale(1) translateZ(0);
+                    opacity: 1;
+                    filter: blur(0);
+                  }
+                }
+              `}</style>
             </div>
           </div>
         </div>
@@ -286,7 +402,7 @@ export default function HomePage() {
       </section>
 
       {/* Revolutionary Features Section */}
-      <section className="py-24 relative overflow-hidden" style={{background: 'linear-gradient(to bottom, #FFFFFF 0%, #F8FAFF 50%, #E6F7FF 100%)'}}>
+      <section className="py-12 md:py-16 relative overflow-hidden" style={{background: 'linear-gradient(to bottom, #FFFFFF 0%, #F8FAFF 50%, #E6F7FF 100%)'}}>
         {/* Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse" style={{background: 'radial-gradient(circle, rgba(0, 202, 255, 0.3) 0%, rgba(0, 101, 248, 0.1) 100%)'}} />
@@ -295,18 +411,18 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold mb-6 shadow-lg" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)', color: '#FFFFFF'}}>
-              <Sparkles className="w-4 h-4 mr-2" />
+          <div className="text-center mb-10 md:mb-12">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-xs md:text-sm font-semibold mb-4 shadow-lg" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)', color: '#FFFFFF'}}>
+              <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-2" />
               Yapay Zeka Destekli Çözümler
             </div>
-            <h2 className="text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 leading-tight">
               Kariyerinizi{" "}
               <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                 Dönüştürün
               </span>
             </h2>
-            <p className="text-xl max-w-3xl mx-auto leading-relaxed text-black">
+            <p className="text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-gray-700">
               Gelişmiş AI teknolojisi ile CV'nizi analiz edin, gerçekçi mülakat simülasyonları ile kendinizi test edin ve kariyerinizde bir adım öne geçin.
             </p>
           </div>
@@ -356,7 +472,7 @@ export default function HomePage() {
           </div>
 
           {/* Interactive Stats Bar */}
-          <div className="mt-20 bg-white/60 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20">
+          <div className="mt-10 md:mt-12 bg-white/60 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center group">
@@ -374,7 +490,7 @@ export default function HomePage() {
       </section>
 
       {/* Interactive Benefits Showcase */}
-      <section className="py-24 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 50%, #4300FF 100%)'}}>
+      <section className="py-12 md:py-16 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 50%, #4300FF 100%)'}}>
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-full h-full" style={{background: 'linear-gradient(135deg, rgba(67, 0, 255, 0.1) 0%, rgba(0, 202, 255, 0.1) 50%, rgba(0, 255, 222, 0.1) 100%)'}} />
@@ -383,22 +499,22 @@ export default function HomePage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left Side - Benefits */}
             <div>
-              <div className="inline-flex items-center bg-white/10 backdrop-blur-md text-white px-6 py-3 rounded-full text-sm font-semibold mb-8 border border-white/20">
-                <Target className="w-4 h-4 mr-2" />
+              <div className="inline-flex items-center bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs md:text-sm font-semibold mb-4 md:mb-6 border border-white/20">
+                <Target className="w-3 h-3 md:w-4 md:h-4 mr-2" />
                 Neden Bizi Seçmelisiniz?
               </div>
               
-              <h2 className="text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 md:mb-6 leading-tight">
                 Kariyerinizde{" "}
-                <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #00CAFF 0%, #00FFDE 50%, #FFFFFF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                <span className="text-white drop-shadow-lg">
                   Fark Yaratın
                 </span>
               </h2>
               
-              <p className="text-xl mb-12 leading-relaxed" style={{color: '#00CAFF'}}>
+              <p className="text-base md:text-lg mb-8 leading-relaxed text-white/90">
                 Yapay zeka destekli analiz ve gerçekçi simülasyonlarla kariyerinizde bir adım öne geçin. 
                 Binlerce kullanıcı bu platformla hedeflerine ulaştı.
               </p>
@@ -489,7 +605,7 @@ export default function HomePage() {
       </section>
 
       {/* User Testimonials Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse" style={{background: 'radial-gradient(circle, rgba(0, 202, 255, 0.1) 0%, rgba(0, 101, 248, 0.05) 100%)'}} />
@@ -498,38 +614,38 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-8 py-4 rounded-full text-lg font-bold mb-8 shadow-2xl animate-pulse" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)', color: '#FFFFFF'}}>
-              <Star className="w-5 h-5 mr-3 animate-spin" style={{ animationDuration: "3s" }} />
+          <div className="text-center mb-10 md:mb-12">
+            <div className="inline-flex items-center px-4 py-2 md:px-6 md:py-3 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-xl" style={{background: 'linear-gradient(135deg, #00CAFF 0%, #4300FF 100%)', color: '#FFFFFF'}}>
+              <Star className="w-3 h-3 md:w-4 md:h-4 mr-2 animate-spin" style={{ animationDuration: "3s" }} />
               Kullanıcı Deneyimleri
             </div>
-            <h2 className="text-5xl lg:text-7xl font-black text-gray-900 mb-8 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
               Binlerce Kişi{" "}
-              <span className="bg-clip-text text-transparent animate-pulse" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 50%, #00FFDE 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Başarıya Ulaştı</span>
+              <span className="bg-clip-text text-transparent" style={{background: 'linear-gradient(90deg, #4300FF 0%, #0065F8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Başarıya Ulaştı</span>
             </h2>
-            <p className="text-2xl max-w-4xl mx-auto text-black leading-relaxed">
+            <p className="text-base md:text-lg max-w-2xl mx-auto text-gray-700 leading-relaxed">
               Gerçek kullanıcılarımızın deneyimlerini keşfedin ve siz de onlardan biri olun.
             </p>
             
             {/* Live Stats */}
-            <div className="flex justify-center items-center space-x-12 mt-12">
+            <div className="flex justify-center items-center space-x-6 md:space-x-12 mt-8">
               <div className="text-center">
-                <div className="text-3xl font-black text-blue-600">8,247+</div>
-                <div className="text-sm text-gray-600">Mutlu Kullanıcı</div>
+                <div className="text-xl md:text-2xl font-black text-blue-600">8,247+</div>
+                <div className="text-xs md:text-sm text-gray-600">Mutlu Kullanıcı</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-black text-green-600">92%</div>
-                <div className="text-sm text-gray-600">Başarı Oranı</div>
+                <div className="text-xl md:text-2xl font-black text-green-600">92%</div>
+                <div className="text-xs md:text-sm text-gray-600">Başarı Oranı</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-black text-purple-600">2,156+</div>
-                <div className="text-sm text-gray-600">Aktif Üye</div>
+                <div className="text-xl md:text-2xl font-black text-purple-600">2,156+</div>
+                <div className="text-xs md:text-sm text-gray-600">Aktif Üye</div>
               </div>
             </div>
           </div>
 
           {/* Enhanced Animated Testimonials Carousel */}
-          <div className="mt-16 mb-20 overflow-hidden relative px-6 sm:px-8 lg:px-12 py-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl bg-white/5 backdrop-blur-sm">
+          <div className="mt-8 md:mt-10 mb-12 overflow-hidden relative px-4 sm:px-6 lg:px-8 py-6 shadow-lg rounded-2xl bg-white/5 backdrop-blur-sm">
             {/* Floating particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               {[...Array(20)].map((_, i) => (
@@ -1028,7 +1144,7 @@ export default function HomePage() {
       </section>
 
       {/* Modern Footer */}
-      <footer className="text-white py-20 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 50%, #4300FF 100%)'}}>
+      <footer className="text-white py-12 md:py-16 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 50%, #4300FF 100%)'}}>
         {/* Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-full h-full" style={{background: 'linear-gradient(135deg, rgba(67, 0, 255, 0.05) 0%, rgba(0, 202, 255, 0.05) 50%, rgba(0, 255, 222, 0.05) 100%)'}} />
