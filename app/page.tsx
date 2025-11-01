@@ -541,64 +541,42 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Side - Interactive Demo */}
-            <div className="relative">
-              <div className="absolute inset-0 rounded-3xl blur-2xl" style={{background: 'linear-gradient(135deg, rgba(67, 0, 255, 0.2) 0%, rgba(0, 202, 255, 0.2) 100%)'}} />
-              <div className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:-translate-y-2">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}}>
-                      <TrendingUp className="w-8 h-8 text-white animate-pulse" />
-                    </div>
-                    <div>
-                      <h3 className="font-black text-white text-2xl">CV Analiz Sonucu</h3>
-                      <p className="text-sm" style={{color: '#00CAFF'}}>Gerçek zamanlı analiz</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-black" style={{color: '#00FFDE'}}>78/100</div>
-                    <div className="text-xs uppercase tracking-wider" style={{color: '#00CAFF'}}>Genel Puan</div>
-                  </div>
-                </div>
-
-                {/* Animated Progress Bar */}
-                <div className="mb-8">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-white font-semibold">Genel Performans</span>
-                    <span className="font-bold" style={{color: '#00FFDE'}}>78%</span>
-                  </div>
-                  <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden">
-                    <div
-                      className="h-4 rounded-full transition-all duration-3000 ease-out relative"
-                      style={{background: 'linear-gradient(90deg, #00CAFF 0%, #4300FF 50%, #00FFDE 100%)', width: "78%"}}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
-                    </div>
+            {/* Right Side - AI Analysis Image */}
+            <div className="relative" style={{ perspective: '1000px' }}>
+              {/* Decorative glow effects */}
+              <div className="absolute -inset-6 rounded-3xl blur-3xl opacity-60 animate-pulse" style={{background: 'radial-gradient(circle, rgba(0, 202, 255, 0.4) 0%, rgba(67, 0, 255, 0.3) 50%, rgba(0, 255, 222, 0.4) 100%)', animationDuration: '4s'}} />
+              <div className="absolute -inset-3 rounded-3xl blur-xl opacity-40" style={{background: 'linear-gradient(135deg, rgba(0, 202, 255, 0.3) 0%, rgba(67, 0, 255, 0.2) 100%)'}} />
+              
+              {/* Image Container with modern styling */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-gradient-to-br from-white/10 to-white/5 p-2 md:p-3 transform transition-all duration-700 hover:scale-[1.02] hover:shadow-3xl group">
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-cyan-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-cyan-500/10 transition-all duration-500 z-10 pointer-events-none rounded-3xl" />
+                
+                {/* Main Image */}
+                <img 
+                  src="/resim-5.png" 
+                  alt="Yapay Zeka Destekli CV Analizi - AI ile profesyonel kariyer değerlendirmesi" 
+                  className="w-full h-auto rounded-2xl object-cover relative z-0 transform transition-transform duration-700 group-hover:scale-[1.01]"
+                  style={{
+                    filter: 'brightness(1.05) contrast(1.1)',
+                  }}
+                />
+                
+                {/* Floating AI Badge */}
+                <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600/95 to-purple-600/95 backdrop-blur-md px-4 py-2 rounded-full shadow-2xl border border-white/30 z-20 group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-white animate-spin" style={{ animationDuration: "2s" }} />
+                    <span className="text-sm font-bold text-white">AI Analiz Sistemi</span>
                   </div>
                 </div>
 
-                {/* AI Recommendations */}
-                <div className="backdrop-blur-sm rounded-2xl p-6 border border-white/20" style={{background: 'linear-gradient(135deg, rgba(67, 0, 255, 0.2) 0%, rgba(0, 202, 255, 0.2) 100%)'}}>
-                  <div className="flex items-center mb-4">
-                    <Sparkles className="w-5 h-5 mr-2" style={{color: '#00FFDE'}} />
-                    <span className="font-semibold" style={{color: '#00FFDE'}}>AI Önerileri</span>
-                  </div>
-                  <p className="text-white/90 leading-relaxed">
-                    <strong style={{color: '#00FFDE'}}>İyileştirme:</strong> İş deneyimleri bölümünde daha spesifik 
-                    başarılarınızı belirtin. Teknik beceriler kısmını güncelleyin ve sertifikalarınızı ekleyin.
-                  </p>
-                </div>
-
-                {/* Interactive Elements */}
-                <div className="mt-6 flex space-x-4">
-                  <button className="flex-1 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg" style={{background: 'linear-gradient(135deg, #4300FF 0%, #0065F8 100%)'}}>
-                    Detaylı Rapor
-                  </button>
-                  <button className="px-6 py-3 border border-white/30 text-white rounded-xl hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                    Paylaş
-                  </button>
-                </div>
+                {/* Bottom gradient fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-900/60 via-blue-900/20 to-transparent rounded-b-2xl z-10 pointer-events-none" />
               </div>
+
+              {/* Animated floating particles */}
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-blue-500/30 rounded-full blur-xl animate-pulse hidden lg:block" style={{ animationDelay: '1s', animationDuration: '3s' }} />
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-purple-500/30 rounded-full blur-xl animate-pulse hidden lg:block" style={{ animationDelay: '2s', animationDuration: '4s' }} />
             </div>
           </div>
         </div>
