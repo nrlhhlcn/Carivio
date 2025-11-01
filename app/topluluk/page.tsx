@@ -15,6 +15,7 @@ import {
     getUserBookmarks,
     createReply,
     getRepliesByPost,
+    organizeRepliesIntoTree,
     Post,
     Reply
 } from '@/lib/firestore';
@@ -24,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { MessageCircle, Heart, Bookmark, Send, Maximize2, Search } from 'lucide-react';
+import { MessageCircle, Heart, Bookmark, Send, Maximize2, Search, Reply as ReplyIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/navbar';
@@ -34,6 +35,129 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// Nested yorum tipi (children içeren)
+type ReplyWithChildren = Reply & { children?: ReplyWithChildren[] };
+
+// Recursive Comment Component (ana sayfa için)
+const CommentItemForModal = ({ 
+  reply, 
+  postId, 
+  user, 
+  onReplyAdded 
+}: { 
+  reply: ReplyWithChildren
+  postId: string
+  user: any
+  onReplyAdded: () => void
+}) => {
+  const [showReplyBox, setShowReplyBox] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleReply = async () => {
+    if (!user || !replyText.trim()) return;
+    setIsSubmitting(true);
+    try {
+      await createReply({
+        postId,
+        parentReplyId: reply.id!,
+        userId: user.uid,
+        userDisplayName: user.displayName || 'Anonim',
+        userPhotoURL: user.photoURL || '/placeholder-user.jpg',
+        content: replyText,
+      });
+      setReplyText('');
+      setShowReplyBox(false);
+      onReplyAdded();
+    } catch {
+      toast({ title: 'Hata', description: 'Yanıt gönderilemedi.', variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mb-3">
+      <div className="flex items-start gap-3">
+        <Avatar className="flex-shrink-0">
+          <AvatarImage src={reply.userPhotoURL} />
+          <AvatarFallback>{reply.userDisplayName.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="bg-gray-100 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="font-semibold text-sm">{reply.userDisplayName}</p>
+              <p className="text-xs text-gray-500">
+                {new Date(reply.createdAt.seconds * 1000).toLocaleString()}
+              </p>
+            </div>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              {reply.content}
+            </p>
+          </div>
+          {user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-2 text-xs text-gray-600 hover:text-indigo-600"
+              onClick={() => setShowReplyBox(!showReplyBox)}
+            >
+              <ReplyIcon size={14} className="mr-1" />
+              Yanıtla
+            </Button>
+          )}
+          {showReplyBox && (
+            <div className="mt-3 ml-4 border-l-2 border-gray-200 pl-4">
+              <Textarea
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                placeholder="Yanıtınızı yazın..."
+                className="min-h-[60px] text-sm"
+              />
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={handleReply}
+                  disabled={isSubmitting || !replyText.trim()}
+                  size="sm"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-xs"
+                >
+                  {isSubmitting ? 'Gönderiliyor...' : 'Gönder'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowReplyBox(false);
+                    setReplyText('');
+                  }}
+                  className="text-xs"
+                >
+                  İptal
+                </Button>
+              </div>
+            </div>
+          )}
+          {/* Nested yorumları göster */}
+          {reply.children && reply.children.length > 0 && (
+            <div className="mt-3 ml-4 space-y-3 border-l-2 border-gray-200 pl-4">
+              {reply.children.map(child => (
+                <CommentItemForModal
+                  key={child.id}
+                  reply={child}
+                  postId={postId}
+                  user={user}
+                  onReplyAdded={onReplyAdded}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Gönderi Oluşturma Formu
 const CreatePostForm = ({ userTag, onPostCreated }: { userTag: string, onPostCreated: () => void }) => {
@@ -129,6 +253,7 @@ const ReplySection = ({ post, user }: { post: Post, user: any }) => {
         try {
             await createReply({
                 postId: post.id!,
+                parentReplyId: null,
                 userId: user.uid,
                 userDisplayName: user.displayName || 'Anonim',
                 userPhotoURL: user.photoURL || '/placeholder-user.jpg',
@@ -154,18 +279,28 @@ const ReplySection = ({ post, user }: { post: Post, user: any }) => {
             <div className="max-h-[60vh] overflow-y-auto p-4 space-y-4">
                 {isLoading && <p>Yükleniyor...</p>}
                 {!isLoading && replies.length === 0 && <p className="text-center text-gray-500">Henüz yanıt yok.</p>}
-                {replies.map(reply => (
-                    <div key={reply.id} className="flex items-start space-x-3">
-                        <Avatar>
-                            <AvatarImage src={reply.userPhotoURL} />
-                            <AvatarFallback>{reply.userDisplayName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 bg-gray-100 rounded-lg p-3">
-                            <p className="font-semibold text-sm">{reply.userDisplayName}</p>
-                            <p className="text-sm text-gray-700">{reply.content}</p>
-                        </div>
-                    </div>
-                ))}
+                {!isLoading && replies.length > 0 && (() => {
+                    const organized = organizeRepliesIntoTree(replies) as ReplyWithChildren[];
+                    return organized.map(reply => (
+                        <CommentItemForModal
+                            key={reply.id}
+                            reply={reply}
+                            postId={post.id!}
+                            user={user}
+                            onReplyAdded={() => {
+                                const fetchReplies = async () => {
+                                    try {
+                                        const replyData = await getRepliesByPost(post.id!);
+                                        setReplies(replyData);
+                                    } catch (error) {
+                                        toast({ title: 'Hata', description: 'Yanıtlar yüklenemedi.', variant: 'destructive' });
+                                    }
+                                };
+                                fetchReplies();
+                            }}
+                        />
+                    ));
+                })()}
             </div>
             <div className="p-4 border-t">
                 <div className="flex items-start space-x-3">
@@ -212,6 +347,7 @@ const PostDetailModalContent = ({ post, user }: { post: Post, user: any }) => {
         try {
             await createReply({
                 postId: post.id!,
+                parentReplyId: null,
                 userId: user.uid,
                 userDisplayName: user.displayName || 'Anonim',
                 userPhotoURL: user.photoURL || '/placeholder-user.jpg',
@@ -236,18 +372,30 @@ const PostDetailModalContent = ({ post, user }: { post: Post, user: any }) => {
             <div className="max-h-[50vh] overflow-y-auto space-y-3">
                 {isLoading && <p>Yükleniyor...</p>}
                 {!isLoading && replies.length === 0 && <p className="text-gray-500">Henüz yanıt yok.</p>}
-                {replies.map(reply => (
-                    <div key={reply.id} className="flex items-start space-x-3">
-                        <Avatar>
-                            <AvatarImage src={reply.userPhotoURL} />
-                            <AvatarFallback>{reply.userDisplayName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 bg-gray-100 rounded-lg p-3">
-                            <p className="font-semibold text-sm">{reply.userDisplayName}</p>
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{reply.content}</p>
-                        </div>
-                    </div>
-                ))}
+                {!isLoading && replies.length > 0 && (() => {
+                    const organized = organizeRepliesIntoTree(replies) as ReplyWithChildren[];
+                    return organized.map(reply => (
+                        <CommentItemForModal
+                            key={reply.id}
+                            reply={reply}
+                            postId={post.id!}
+                            user={user}
+                            onReplyAdded={() => {
+                                const fetchReplies = async () => {
+                                    setIsLoading(true);
+                                    try {
+                                        const replyData = await getRepliesByPost(post.id!);
+                                        setReplies(replyData);
+                                    } catch (error) {
+                                        toast({ title: 'Hata', description: 'Yanıtlar yüklenemedi.', variant: 'destructive' });
+                                    }
+                                    setIsLoading(false);
+                                };
+                                fetchReplies();
+                            }}
+                        />
+                    ));
+                })()}
             </div>
             <div className="p-2 border-t rounded-lg bg-white">
                 <div className="flex items-start space-x-3">

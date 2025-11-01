@@ -121,6 +121,7 @@ export interface Post {
 export interface Reply {
   id?: string;
   postId: string;
+  parentReplyId?: string | null; // null ise top-level comment, string ise nested comment
   userId: string;
   userDisplayName: string;
   userPhotoURL: string;
@@ -600,9 +601,13 @@ export const createReply = async (reply: Omit<Reply, "id" | "createdAt">) => {
     const replyRef = doc(collection(db, "replies"));
     transaction.set(replyRef, {
       ...reply,
+      parentReplyId: reply.parentReplyId || null,
       createdAt: Timestamp.now(),
     });
-    transaction.update(postRef, { replyCount: increment(1) });
+    // Sadece top-level yorumlar replyCount'a eklenir (nested yorumlar eklenmez)
+    if (!reply.parentReplyId) {
+      transaction.update(postRef, { replyCount: increment(1) });
+    }
   });
 };
 
@@ -616,7 +621,46 @@ export const getRepliesByPost = async (postId: string) => {
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
+    parentReplyId: doc.data().parentReplyId || null,
   })) as Reply[];
+};
+
+// Nested yorumları hiyerarşik yapıya dönüştüren helper fonksiyon
+export const organizeRepliesIntoTree = (replies: Reply[]): Reply[] => {
+  const replyMap = new Map<string, Reply & { children?: Reply[] }>();
+  const topLevelReplies: Reply[] = [];
+
+  // Tüm yorumları map'e ekle
+  replies.forEach(reply => {
+    replyMap.set(reply.id!, { ...reply, children: [] });
+  });
+
+  // Her yorumu parent'ına bağla veya top-level olarak işaretle
+  replies.forEach(reply => {
+    const replyWithChildren = replyMap.get(reply.id!)!;
+    if (reply.parentReplyId && replyMap.has(reply.parentReplyId)) {
+      const parent = replyMap.get(reply.parentReplyId)!;
+      if (!parent.children) parent.children = [];
+      parent.children.push(replyWithChildren);
+    } else {
+      topLevelReplies.push(replyWithChildren);
+    }
+  });
+
+  // Çocukları da sırala (oluşturulma zamanına göre)
+  const sortReplies = (rs: Reply[]): Reply[] => {
+    return rs.map(r => {
+      if ((r as any).children && (r as any).children.length > 0) {
+        return {
+          ...r,
+          children: sortReplies((r as any).children),
+        } as any;
+      }
+      return r;
+    });
+  };
+
+  return sortReplies(topLevelReplies);
 };
 
 export const getUserLikes = async (userId: string): Promise<string[]> => {

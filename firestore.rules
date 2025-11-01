@@ -252,11 +252,14 @@ service cloud.firestore {
       allow read: if isSignedIn();
       
       // Yorum oluştururken validasyon
+      // parentReplyId opsiyonel - null olabilir veya geçerli bir reply ID olmalı
       allow create: if isSignedIn() && 
                        request.resource.data.userId == request.auth.uid &&
                        hasRequiredFields(['postId', 'userId', 'userDisplayName', 'content', 'createdAt']) &&
                        hasValidContent(request.resource.data.content) &&
-                       request.resource.data.postId != null;
+                       request.resource.data.postId != null &&
+                       (request.resource.data.parentReplyId == null || 
+                        request.resource.data.parentReplyId is string);
       
       // Yorumlar güncellenemez (silip yeniden oluşturulmalı)
       allow update: if false;
