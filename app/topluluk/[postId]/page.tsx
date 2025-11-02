@@ -20,6 +20,7 @@ import { ArrowLeft, Reply as ReplyIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import Navbar from '@/components/navbar'
 import { useToast } from '@/hooks/use-toast'
+import UserPreviewModal from '@/components/UserPreviewModal'
 
 // Nested yorum tipi (children içeren)
 type ReplyWithChildren = Reply & { children?: ReplyWithChildren[] }
@@ -39,6 +40,7 @@ const CommentItem = ({
   const [showReplyBox, setShowReplyBox] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showUserModal, setShowUserModal] = useState(false)
   const { toast } = useToast()
 
   const handleReply = async () => {
@@ -73,7 +75,12 @@ const CommentItem = ({
         <div className="flex-1 min-w-0">
           <div className="bg-gray-100 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <p className="font-medium text-sm">{reply.userDisplayName}</p>
+              <button
+                onClick={() => setShowUserModal(true)}
+                className="font-medium text-sm text-indigo-600 hover:text-indigo-800 hover:underline transition-colors cursor-pointer"
+              >
+                {reply.userDisplayName}
+              </button>
               <p className="text-xs text-gray-500">
                 {new Date(reply.createdAt.seconds * 1000).toLocaleString()}
               </p>
@@ -82,6 +89,13 @@ const CommentItem = ({
               {reply.content}
             </p>
           </div>
+          <UserPreviewModal
+            userId={reply.userId}
+            userDisplayName={reply.userDisplayName}
+            userPhotoURL={reply.userPhotoURL}
+            isOpen={showUserModal}
+            onClose={() => setShowUserModal(false)}
+          />
           {user && (
             <Button
               variant="ghost"
@@ -153,6 +167,7 @@ export default function PostDetailPage() {
   const [replies, setReplies] = useState<Reply[]>([])
   const [loading, setLoading] = useState(true)
   const [newReply, setNewReply] = useState('')
+  const [showPostUserModal, setShowPostUserModal] = useState(false)
 
   const load = useCallback(async () => {
     if (!params?.postId) return
@@ -219,10 +234,22 @@ export default function PostDetailPage() {
                   <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold">{post.userDisplayName}</p>
+                  <button
+                    onClick={() => setShowPostUserModal(true)}
+                    className="font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition-colors cursor-pointer"
+                  >
+                    {post.userDisplayName}
+                  </button>
                   <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleString()}</p>
                 </div>
               </div>
+              <UserPreviewModal
+                userId={post.userId}
+                userDisplayName={post.userDisplayName}
+                userPhotoURL={post.userPhotoURL || '/placeholder-user.jpg'}
+                isOpen={showPostUserModal}
+                onClose={() => setShowPostUserModal(false)}
+              />
             </CardHeader>
             <CardContent className="p-6">
               <div className="text-gray-800 whitespace-pre-wrap break-all" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>

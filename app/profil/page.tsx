@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Switch } from "@/components/ui/switch"
 import {
   User,
   Calendar,
@@ -43,6 +44,8 @@ import {
   Clock,
   BarChart3,
   Zap,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 
 // Mevcut sektör/alan seçenekleri
@@ -86,6 +89,7 @@ const defaultStats = {
   totalActiveDays: 0,
   streak: 0,
   tag: undefined,
+  isProfilePublic: true,
 }
 
 // Aktivite tipi
@@ -222,6 +226,7 @@ export default function ProfilePage() {
     totalActiveDays: number
     streak: number
     tag?: string
+    isProfilePublic?: boolean
   }>({
     id: '',
     firstName: 'Kullanıcı',
@@ -251,6 +256,7 @@ export default function ProfilePage() {
       isVerified: user?.emailVerified || false,
       // Firebase'den gelen istatistikleri kullan, yoksa varsayılanları kullan
       ...(userStats || defaultStats),
+      isProfilePublic: userStats?.isProfilePublic !== undefined ? userStats.isProfilePublic : true,
     }
     setFormData(updatedUserData)
   }, [user, userStats])
@@ -273,26 +279,25 @@ export default function ProfilePage() {
           displayName: `${formData.firstName} ${formData.lastName}`.trim()
         })
         
-        // Tag bilgisini userStats'a kaydet
-        if (formData.tag) {
-          await saveUserStats({
-            userId: user.uid,
-            tag: formData.tag,
-            displayName: `${formData.firstName} ${formData.lastName}`.trim(),
-            photoURL: user.photoURL || '',
-            currentRank: formData.currentRank,
-            totalScore: formData.totalScore,
-            cvScore: formData.cvScore,
-            interviewScore: formData.interviewScore,
-            badge: formData.badge,
-            level: formData.level,
-            completedAnalyses: formData.completedAnalyses,
-            completedInterviews: formData.completedInterviews,
-            totalActiveDays: formData.totalActiveDays,
-            streak: formData.streak,
-            lastActivityDate: new Date(),
-          })
-        }
+        // Tag ve profil gizlilik bilgisini userStats'a kaydet
+        await saveUserStats({
+          userId: user.uid,
+          tag: formData.tag,
+          displayName: `${formData.firstName} ${formData.lastName}`.trim(),
+          photoURL: user.photoURL || '',
+          currentRank: formData.currentRank,
+          totalScore: formData.totalScore,
+          cvScore: formData.cvScore,
+          interviewScore: formData.interviewScore,
+          badge: formData.badge,
+          level: formData.level,
+          completedAnalyses: formData.completedAnalyses,
+          completedInterviews: formData.completedInterviews,
+          totalActiveDays: formData.totalActiveDays,
+          streak: formData.streak,
+          lastActivityDate: new Date(),
+          isProfilePublic: formData.isProfilePublic !== undefined ? formData.isProfilePublic : true,
+        })
         
         toast({
           title: "Başarılı!",
@@ -328,9 +333,34 @@ export default function ProfilePage() {
       isVerified: user?.emailVerified || false,
       // Firebase'den gelen istatistikleri kullan, yoksa varsayılanları kullan
       ...(userStats || defaultStats),
+      isProfilePublic: userStats?.isProfilePublic !== undefined ? userStats.isProfilePublic : true,
     }
     setFormData(updatedUserData)
     setIsEditing(false)
+  }
+
+  const handleSaveProfileVisibility = async (isPublic: boolean) => {
+    if (!user) return
+    try {
+      await saveUserStats({
+        userId: user.uid,
+        ...(userStats || defaultStats),
+        isProfilePublic: isPublic,
+      })
+      toast({
+        title: "Başarılı!",
+        description: isPublic ? "Profiliniz artık herkese açık" : "Profiliniz gizlendi",
+      })
+    } catch (error) {
+      console.error('Profil görünürlüğü güncellenirken hata:', error)
+      toast({
+        title: "Hata!",
+        description: "Ayar kaydedilirken bir hata oluştu.",
+        variant: "destructive",
+      })
+      // Geri al
+      setFormData(prev => ({ ...prev, isProfilePublic: !isPublic }))
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -1202,13 +1232,32 @@ export default function ProfilePage() {
                         
                         <div className="space-y-4">
                           <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-green-200">
-                            <div>
-                              <h5 className="font-medium text-gray-900">Profil Görünürlüğü</h5>
-                              <p className="text-sm text-gray-600">Profilinizi kimler görebilir</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                {formData.isProfilePublic ? (
+                                  <Eye className="w-4 h-4 text-green-600" />
+                                ) : (
+                                  <EyeOff className="w-4 h-4 text-gray-500" />
+                                )}
+                                <h5 className="font-medium text-gray-900">Profil Görünsün</h5>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                {formData.isProfilePublic 
+                                  ? "Diğer kullanıcılar profilinizi görebilir" 
+                                  : "Profiliniz gizli - diğer kullanıcılar göremez"}
+                              </p>
                             </div>
-                            <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-50">
-                              Yönet
-                            </Button>
+                            <div className="flex items-center gap-3 ml-4">
+                              <Switch
+                                checked={formData.isProfilePublic !== false}
+                                onCheckedChange={(checked) => {
+                                  setFormData(prev => ({ ...prev, isProfilePublic: checked }))
+                                  // Otomatik kaydet
+                                  handleSaveProfileVisibility(checked)
+                                }}
+                                className="data-[state=checked]:bg-green-600"
+                              />
+                            </div>
                           </div>
                           
                           <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-green-200">

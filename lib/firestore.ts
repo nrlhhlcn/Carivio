@@ -67,6 +67,7 @@ export interface UserStats {
   tag?: string;
   displayName?: string;
   photoURL?: string;
+  isProfilePublic?: boolean; // Profil görünürlük ayarı (varsayılan: true)
 }
 
 // Basit kullanıcı profili (users koleksiyonu)
@@ -695,6 +696,37 @@ export const getPostsByUser = async (userId: string): Promise<Post[]> => {
   const snap = await getDocs(q);
   const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Post[];
   return items.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+};
+
+// Kullanıcının yaptığı tüm yorumları getir
+export const getRepliesByUser = async (userId: string): Promise<Reply[]> => {
+  try {
+    const q = query(
+      collection(db, "replies"),
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      parentReplyId: doc.data().parentReplyId || null,
+    })) as Reply[];
+  } catch (error) {
+    console.error("getRepliesByUser error:", error);
+    // Eğer index yoksa, orderBy olmadan dene
+    const q2 = query(
+      collection(db, "replies"),
+      where("userId", "==", userId)
+    );
+    const querySnapshot = await getDocs(q2);
+    const items = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      parentReplyId: doc.data().parentReplyId || null,
+    })) as Reply[];
+    return items.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+  }
 };
 
 // Belirli ID'lerdeki gönderiler (10'luk gruplar halinde)

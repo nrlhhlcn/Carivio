@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import UserPreviewModal from '@/components/UserPreviewModal';
 
 // Nested yorum tipi (children içeren)
 type ReplyWithChildren = Reply & { children?: ReplyWithChildren[] };
@@ -54,6 +55,7 @@ const CommentItemForModal = ({
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
   const { toast } = useToast();
 
   const handleReply = async () => {
@@ -88,7 +90,12 @@ const CommentItemForModal = ({
         <div className="flex-1 min-w-0">
           <div className="bg-gray-100 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <p className="font-semibold text-sm">{reply.userDisplayName}</p>
+              <button
+                onClick={() => setShowUserModal(true)}
+                className="font-semibold text-sm text-indigo-600 hover:text-indigo-800 hover:underline transition-colors cursor-pointer"
+              >
+                {reply.userDisplayName}
+              </button>
               <p className="text-xs text-gray-500">
                 {new Date(reply.createdAt.seconds * 1000).toLocaleString()}
               </p>
@@ -97,6 +104,13 @@ const CommentItemForModal = ({
               {reply.content}
             </p>
           </div>
+          <UserPreviewModal
+            userId={reply.userId}
+            userDisplayName={reply.userDisplayName}
+            userPhotoURL={reply.userPhotoURL}
+            isOpen={showUserModal}
+            onClose={() => setShowUserModal(false)}
+          />
           {user && (
             <Button
               variant="ghost"
@@ -417,6 +431,8 @@ const PostDetailModalContent = ({ post, user }: { post: Post, user: any }) => {
 
 // Gönderi Kartı
 const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle, onReplyCreated, user }: { post: Post, isLiked: boolean, isBookmarked: boolean, onLikeToggle: (postId: string) => void, onBookmarkToggle: (postId: string) => void, onReplyCreated: (postId: string) => void, user: any }) => {
+    const [showUserModal, setShowUserModal] = useState(false);
+
     return (
         <>
             {/* Card + top-right detail link to dedicated page */}
@@ -431,10 +447,25 @@ const PostCard = ({ post, isLiked, isBookmarked, onLikeToggle, onBookmarkToggle,
                                                 <AvatarFallback>{post.userDisplayName?.charAt(0) || 'A'}</AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="font-semibold text-gray-800">{post.userDisplayName}</p>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowUserModal(true);
+                                                    }}
+                                                    className="font-semibold text-gray-800 hover:text-indigo-600 hover:underline transition-colors cursor-pointer"
+                                                >
+                                                    {post.userDisplayName}
+                                                </button>
                                                 <p className="text-xs text-gray-500">@{post.userTag} · {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}</p>
                                             </div>
                                 </div>
+                                <UserPreviewModal
+                                    userId={post.userId}
+                                    userDisplayName={post.userDisplayName}
+                                    userPhotoURL={post.userPhotoURL || '/placeholder-user.jpg'}
+                                    isOpen={showUserModal}
+                                    onClose={() => setShowUserModal(false)}
+                                />
                                 <Link href={`/topluluk/${post.id}`} className="absolute top-2 right-2">
                                     <Button size="icon" variant="ghost" className="rounded-full hover:bg-blue-50/70 hover:text-blue-600" aria-label="Detayları aç">
                                         <Maximize2 size={18} />
