@@ -1,11 +1,16 @@
 import base64
 import io
 import os
-from typing import Dict
+import sys
+import subprocess
+import tempfile
+from pathlib import Path
+from typing import Dict, Optional
 import json
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from PIL import Image
 
@@ -20,7 +25,7 @@ MODEL_PATH = os.environ.get("EMOTION_MODEL_PATH", os.path.join(os.path.dirname(_
 
 CLASS_ORDER = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 
-app = FastAPI(title="Emotion Service", version="1.0.0")
+app = FastAPI(title="Carivio API Service", version="1.0.0", description="CV Analysis & Video Analysis API")
 
 # CORS for frontend (localhost:3000)
 app.add_middleware(
@@ -171,6 +176,96 @@ async def websocket_video_analysis(websocket: WebSocket):
     finally:
         print(">>> WebSocket temizligi yapiliyor")
 
+# CV Analysis Endpoint
+@app.post("/api/cv/score")
+async def cv_score(
+    file: UploadFile = File(...),
+    sector: str = Form(default="INFORMATION-TECHNOLOGY"),
+    jd_text: Optional[str] = Form(default=None),
+    jd_file: Optional[UploadFile] = File(default=None)
+):
+    """
+    CV Analizi endpoint'i
+    PDF dosyasını alır ve ATS skorunu döndürür
+    """
+    try:
+        # Project root'u bul (server/fastapi'den bir üst dizin)
+        project_root = Path(__file__).resolve().parent.parent.parent
+        cv_dir = project_root / "cv"
+        script_path = cv_dir / "ats_scoring_enhanced.py"
+        
+        if not script_path.exists():
+            raise HTTPException(status_code=500, detail=f"CV script bulunamadı: {script_path}")
+        
+        # Temp dosya oluştur
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            content = await file.read()
+            tmp_file.write(content)
+            tmp_pdf_path = tmp_file.name
+        
+        # JD file varsa temp'e kaydet
+        tmp_jd_path = None
+        if jd_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_jd:
+                jd_content = await jd_file.read()
+                tmp_jd.write(jd_content)
+                tmp_jd_path = tmp_jd.name
+        
+        try:
+            # Python script'ini çalıştır
+            python_cmd = sys.executable  # Mevcut Python interpreter'ı kullan
+            args = [str(script_path), "--file", tmp_pdf_path, "--sector", sector]
+            
+            if jd_text and jd_text.strip():
+                args.extend(["--jd-text", jd_text])
+            elif tmp_jd_path:
+                args.extend(["--jd-file", tmp_jd_path])
+            
+            result = subprocess.run(
+                args,
+                cwd=str(cv_dir),
+                capture_output=True,
+                text=True,
+                env={**os.environ, "PYTHONUTF8": "1"}
+            )
+            
+            if result.returncode != 0:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"CV analizi hatası: {result.stderr}"
+                )
+            
+            # JSON output'u parse et
+            stdout = result.stdout.strip()
+            json_start = stdout.find('{')
+            json_end = stdout.rfind('}') + 1
+            
+            if json_start == -1:
+                raise HTTPException(status_code=500, detail="Geçersiz CV analiz sonucu")
+            
+            json_str = stdout[json_start:json_end]
+            result_data = json.loads(json_str)
+            
+            return JSONResponse(content={"ok": True, "result": result_data})
+            
+        finally:
+            # Temp dosyaları temizle
+            try:
+                os.unlink(tmp_pdf_path)
+            except:
+                pass
+            if tmp_jd_path:
+                try:
+                    os.unlink(tmp_jd_path)
+                except:
+                    pass
+                    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"CV analizi hatası: {str(e)}")
+
+
 # Health check for video analyzer
 @app.get("/health/video-analyzer")
 def video_analyzer_health():
@@ -179,6 +274,19 @@ def video_analyzer_health():
         "analyzer_ready": True,
         "mediapipe_version": "0.10.8",
         "opencv_available": True
+    }
+
+
+# General health check
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "services": {
+            "cv_analysis": True,
+            "video_analysis": True,
+            "emotion_detection": True
+        }
     }
 
 # (moved build_fernet above)

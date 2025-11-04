@@ -10,3 +10,7 @@ opencv-python>=4.8.0
 opencv-contrib-python>=4.8.0
 websockets>=11.0
 
+# CV Analysis dependencies (shared with cv/requirements.txt)
+# Note: CV analysis script runs in subprocess, uses cv/requirements.txt
+# But we need these for potential direct imports
+
