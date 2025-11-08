@@ -1,6 +1,6 @@
 // Mobile Firebase Configuration
 import { initializeApp, getApps, getApp } from 'firebase/app'
-import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth'
+import { initializeAuth, getAuth, getReactNativePersistence, type Auth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -25,7 +25,7 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
 // Initialize Auth with React Native persistence
 // React Native için initializeAuth kullanılmalı (getAuth değil)
-let auth
+let auth: Auth
 try {
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage)

@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Alert,
   ActivityIndicator,
   Modal,
   Image,
   RefreshControl,
+  TextInput,
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'
@@ -32,6 +31,11 @@ import {
   getUserStats,
 } from '../services/firestore'
 import { Timestamp } from 'firebase/firestore'
+import { theme } from '../theme'
+import { Text } from '../components/ui/Text'
+import { Button } from '../components/ui/Button'
+import { Card } from '../components/ui/Card'
+import { Input } from '../components/ui/Input'
 
 const tags = ['Tümü', 'Frontend', 'Backend', 'Fullstack', 'Mobile', 'DevOps', 'Data Science']
 
@@ -65,10 +69,6 @@ export default function CommunityScreen() {
     try {
       const stats = await getUserStats(user.uid)
       setUserTag(stats?.tag || 'Frontend')
-      // Boolean değerleri garantile (eğer kullanılıyorsa)
-      if (stats && stats.isProfilePublic !== undefined && typeof stats.isProfilePublic === 'string') {
-        // Silently fix the boolean value if needed
-      }
     } catch (error) {
       console.error('User data load error:', error)
     }
@@ -210,10 +210,10 @@ export default function CommunityScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Topluluk</Text>
-        <Text style={styles.subtitle}>Sektörünüzle ilgili tartışmalara katılın</Text>
-      </View>
+      <LinearGradient colors={theme.colors.gradientPrimary} style={styles.header}>
+        <Text variant="heading1" style={styles.title}>Topluluk</Text>
+        <Text variant="body" style={styles.subtitle}>Sektörünüzle ilgili tartışmalara katılın</Text>
+      </LinearGradient>
 
       <ScrollView
         horizontal
@@ -227,7 +227,7 @@ export default function CommunityScreen() {
             onPress={() => setSelectedTag(tag)}
             style={[styles.tag, selectedTag === tag && styles.tagSelected]}
           >
-            <Text style={[styles.tagText, selectedTag === tag && styles.tagTextSelected]}>
+            <Text variant="body" style={[styles.tagText, selectedTag === tag && styles.tagTextSelected]}>
               {tag}
             </Text>
           </TouchableOpacity>
@@ -235,38 +235,39 @@ export default function CommunityScreen() {
       </ScrollView>
 
       {user && (
-        <View style={styles.createPostCard}>
+        <Card style={styles.createPostCard}>
           <View style={styles.createPostHeader}>
             {user.photoURL ? (
               <Image source={{ uri: user.photoURL }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarText}>{user.displayName?.charAt(0) || 'U'}</Text>
+                <Text variant="heading3" style={styles.avatarText}>{user.displayName?.charAt(0) || 'U'}</Text>
               </View>
             )}
             <TextInput
               style={styles.postInput}
               placeholder="Alanınızla ilgili bir tartışma başlatın..."
+              placeholderTextColor={theme.colors.gray400}
               value={newPostContent}
               onChangeText={setNewPostContent}
               multiline
               maxLength={500}
             />
           </View>
-          <TouchableOpacity
+          <Button
+            title="Gönder"
             onPress={handleCreatePost}
             disabled={!newPostContent.trim()}
-            style={[styles.sendButton, !newPostContent.trim() && styles.sendButtonDisabled]}
-          >
-            <MaterialIcons name="send" size={20} color="#fff" />
-            <Text style={styles.sendButtonText}>Gönder</Text>
-          </TouchableOpacity>
-        </View>
+            variant="primary"
+            iconRight={<MaterialIcons name="send" size={20} color={theme.colors.white} />}
+            style={styles.sendButton}
+          />
+        </Card>
       )}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4300FF" />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <ScrollView
@@ -275,61 +276,62 @@ export default function CommunityScreen() {
         >
           {posts.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <MaterialIcons name="forum" size={64} color="#9ca3af" />
-              <Text style={styles.emptyText}>Henüz gönderi yok</Text>
-              <Text style={styles.emptySubtext}>İlk gönderiyi siz oluşturun!</Text>
+              <MaterialIcons name="forum" size={64} color={theme.colors.gray400} />
+              <Text variant="heading3" style={styles.emptyText}>Henüz gönderi yok</Text>
+              <Text variant="body" style={styles.emptySubtext}>İlk gönderiyi siz oluşturun!</Text>
             </View>
           ) : (
             posts.map((post) => (
               <TouchableOpacity
                 key={post.id}
                 onPress={() => openPostModal(post)}
-                style={styles.postCard}
               >
-                <View style={styles.postHeader}>
-                  {post.userPhotoURL ? (
-                    <Image source={{ uri: post.userPhotoURL }} style={styles.postAvatar} />
-                  ) : (
-                    <View style={styles.postAvatarPlaceholder}>
-                      <Text style={styles.postAvatarText}>
-                        {post.userDisplayName.charAt(0)}
-                      </Text>
+                <Card style={styles.postCard}>
+                  <View style={styles.postHeader}>
+                    {post.userPhotoURL ? (
+                      <Image source={{ uri: post.userPhotoURL }} style={styles.postAvatar} />
+                    ) : (
+                      <View style={styles.postAvatarPlaceholder}>
+                        <Text variant="heading3" style={styles.postAvatarText}>
+                          {post.userDisplayName.charAt(0)}
+                        </Text>
+                      </View>
+                    )}
+                    <View style={styles.postHeaderText}>
+                      <Text variant="heading3" style={styles.postAuthor}>{post.userDisplayName}</Text>
+                      <Text variant="muted" style={styles.postTag}>{post.userTag}</Text>
                     </View>
-                  )}
-                  <View style={styles.postHeaderText}>
-                    <Text style={styles.postAuthor}>{post.userDisplayName}</Text>
-                    <Text style={styles.postTag}>{post.userTag}</Text>
+                    <Text variant="muted" style={styles.postDate}>{formatDate(post.createdAt)}</Text>
                   </View>
-                  <Text style={styles.postDate}>{formatDate(post.createdAt)}</Text>
-                </View>
-                <Text style={styles.postContent}>{post.content}</Text>
-                <View style={styles.postFooter}>
-                  <TouchableOpacity
-                    onPress={() => handleLike(post.id!)}
-                    style={styles.postAction}
-                  >
-                    <MaterialIcons
-                      name={userLikes.includes(post.id!) ? 'favorite' : 'favorite-border'}
-                      size={20}
-                      color={userLikes.includes(post.id!) ? '#ef4444' : '#6b7280'}
-                    />
-                    <Text style={styles.postActionText}>{post.likeCount}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.postAction}>
-                    <MaterialIcons name="comment" size={20} color="#6b7280" />
-                    <Text style={styles.postActionText}>{post.replyCount}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleBookmark(post.id!)}
-                    style={styles.postAction}
-                  >
-                    <MaterialIcons
-                      name={userBookmarks.includes(post.id!) ? 'bookmark' : 'bookmark-border'}
-                      size={20}
-                      color={userBookmarks.includes(post.id!) ? '#3b82f6' : '#6b7280'}
-                    />
-                  </TouchableOpacity>
-                </View>
+                  <Text variant="body" style={styles.postContent}>{post.content}</Text>
+                  <View style={styles.postFooter}>
+                    <TouchableOpacity
+                      onPress={() => handleLike(post.id!)}
+                      style={styles.postAction}
+                    >
+                      <MaterialIcons
+                        name={userLikes.includes(post.id!) ? 'favorite' : 'favorite-border'}
+                        size={20}
+                        color={userLikes.includes(post.id!) ? theme.colors.danger : theme.colors.gray500}
+                      />
+                      <Text variant="body" style={styles.postActionText}>{post.likeCount}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.postAction}>
+                      <MaterialIcons name="comment" size={20} color={theme.colors.gray500} />
+                      <Text variant="body" style={styles.postActionText}>{post.replyCount}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleBookmark(post.id!)}
+                      style={styles.postAction}
+                    >
+                      <MaterialIcons
+                        name={userBookmarks.includes(post.id!) ? 'bookmark' : 'bookmark-border'}
+                        size={20}
+                        color={userBookmarks.includes(post.id!) ? theme.colors.info : theme.colors.gray500}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </Card>
               </TouchableOpacity>
             ))
           )}
@@ -340,15 +342,15 @@ export default function CommunityScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Yanıtlar</Text>
+              <Text variant="heading2" style={styles.modalTitle}>Yanıtlar</Text>
               <TouchableOpacity onPress={() => setSelectedPost(null)}>
-                <MaterialIcons name="close" size={24} color="#6b7280" />
+                <MaterialIcons name="close" size={24} color={theme.colors.gray500} />
               </TouchableOpacity>
             </View>
 
             {selectedPost && (
               <>
-                <View style={styles.modalPost}>
+                <Card style={styles.modalPost}>
                   <View style={styles.postHeader}>
                     {selectedPost.userPhotoURL ? (
                       <Image
@@ -357,25 +359,25 @@ export default function CommunityScreen() {
                       />
                     ) : (
                       <View style={styles.postAvatarPlaceholder}>
-                        <Text style={styles.postAvatarText}>
+                        <Text variant="heading3" style={styles.postAvatarText}>
                           {selectedPost.userDisplayName.charAt(0)}
                         </Text>
                       </View>
                     )}
                     <View style={styles.postHeaderText}>
-                      <Text style={styles.postAuthor}>{selectedPost.userDisplayName}</Text>
-                      <Text style={styles.postTag}>{selectedPost.userTag}</Text>
+                      <Text variant="heading3" style={styles.postAuthor}>{selectedPost.userDisplayName}</Text>
+                      <Text variant="muted" style={styles.postTag}>{selectedPost.userTag}</Text>
                     </View>
                   </View>
-                  <Text style={styles.postContent}>{selectedPost.content}</Text>
-                </View>
+                  <Text variant="body" style={styles.postContent}>{selectedPost.content}</Text>
+                </Card>
 
                 <ScrollView style={styles.repliesContainer}>
                   {replies.length === 0 ? (
-                    <Text style={styles.noRepliesText}>Henüz yanıt yok</Text>
+                    <Text variant="body" style={styles.noRepliesText}>Henüz yanıt yok</Text>
                   ) : (
                     replies.map((reply) => (
-                      <View key={reply.id} style={styles.replyItem}>
+                      <Card key={reply.id} style={styles.replyItem}>
                         <View style={styles.replyHeader}>
                           {reply.userPhotoURL ? (
                             <Image
@@ -384,18 +386,18 @@ export default function CommunityScreen() {
                             />
                           ) : (
                             <View style={styles.replyAvatarPlaceholder}>
-                              <Text style={styles.replyAvatarText}>
+                              <Text variant="body" style={styles.replyAvatarText}>
                                 {reply.userDisplayName.charAt(0)}
                               </Text>
                             </View>
                           )}
                           <View style={styles.replyHeaderText}>
-                            <Text style={styles.replyAuthor}>{reply.userDisplayName}</Text>
-                            <Text style={styles.replyDate}>{formatDate(reply.createdAt)}</Text>
+                            <Text variant="heading3" style={styles.replyAuthor}>{reply.userDisplayName}</Text>
+                            <Text variant="muted" style={styles.replyDate}>{formatDate(reply.createdAt)}</Text>
                           </View>
                         </View>
-                        <Text style={styles.replyContent}>{reply.content}</Text>
-                      </View>
+                        <Text variant="body" style={styles.replyContent}>{reply.content}</Text>
+                      </Card>
                     ))
                   )}
                 </ScrollView>
@@ -405,6 +407,7 @@ export default function CommunityScreen() {
                     <TextInput
                       style={styles.replyInput}
                       placeholder="Yanıtınızı yazın..."
+                      placeholderTextColor={theme.colors.gray400}
                       value={newReply}
                       onChangeText={setNewReply}
                       multiline
@@ -414,7 +417,7 @@ export default function CommunityScreen() {
                       disabled={!newReply.trim()}
                       style={[styles.replyButton, !newReply.trim() && styles.replyButtonDisabled]}
                     >
-                      <MaterialIcons name="send" size={20} color="#fff" />
+                      <MaterialIcons name="send" size={20} color={theme.colors.white} />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -430,112 +433,85 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 40,
+    padding: theme.spacing.xl,
+    paddingTop: 60,
+    paddingBottom: theme.spacing['3xl'],
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.white,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6b7280',
+    color: 'rgba(255,255,255,0.9)',
   },
   tagsContainer: {
     maxHeight: 60,
   },
   tagsContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing.md,
   },
   tag: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f3f4f6',
-    marginRight: 8,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radii.pill,
+    backgroundColor: theme.colors.gray100,
+    marginRight: theme.spacing.sm,
   },
   tagSelected: {
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
   },
   tagText: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
     fontWeight: '500',
   },
   tagTextSelected: {
-    color: '#fff',
+    color: theme.colors.white,
   },
   createPostCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    margin: theme.spacing.xl,
+    marginTop: -theme.spacing['2xl'],
   },
   createPostHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   avatarPlaceholder: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   avatarText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.white,
   },
   postInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: theme.colors.gray200,
+    borderRadius: theme.radii.md,
+    padding: theme.spacing.md,
     fontSize: 14,
-    color: '#1f2937',
+    color: theme.colors.gray900,
+    backgroundColor: theme.colors.gray50,
     minHeight: 80,
     maxHeight: 120,
   },
   sendButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4300FF',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  sendButtonDisabled: {
-    opacity: 0.5,
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 8,
+    marginTop: theme.spacing.sm,
   },
   loadingContainer: {
     flex: 1,
@@ -549,175 +525,150 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: theme.spacing['4xl'],
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#6b7280',
-    marginTop: 16,
+    color: theme.colors.gray500,
+    marginTop: theme.spacing.lg,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#9ca3af',
-    marginTop: 8,
+    color: theme.colors.gray400,
+    marginTop: theme.spacing.sm,
   },
   postCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginHorizontal: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.lg,
   },
   postHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
   },
   postAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   postAvatarPlaceholder: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   postAvatarText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.white,
   },
   postHeaderText: {
     flex: 1,
   },
   postAuthor: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
+    color: theme.colors.gray800,
   },
   postTag: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
     marginTop: 2,
   },
   postDate: {
-    fontSize: 12,
-    color: '#9ca3af',
+    color: theme.colors.gray400,
   },
   postContent: {
-    fontSize: 14,
-    color: '#374151',
+    color: theme.colors.gray700,
     lineHeight: 20,
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
   },
   postFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
+    gap: theme.spacing['2xl'],
   },
   postAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: theme.spacing.xs,
   },
   postActionText: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    color: theme.colors.gray800,
   },
   modalPost: {
-    paddingBottom: 16,
+    paddingBottom: theme.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    marginBottom: 16,
+    borderBottomColor: theme.colors.gray200,
+    marginBottom: theme.spacing.lg,
   },
   repliesContainer: {
     maxHeight: 400,
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
   },
   noRepliesText: {
     textAlign: 'center',
-    color: '#9ca3af',
-    marginTop: 20,
+    color: theme.colors.gray400,
+    marginTop: theme.spacing.xl,
   },
   replyItem: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.lg,
   },
   replyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   replyAvatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    marginRight: 8,
+    marginRight: theme.spacing.sm,
   },
   replyAvatarPlaceholder: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: theme.spacing.sm,
   },
   replyAvatarText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: theme.colors.white,
   },
   replyHeaderText: {
     flex: 1,
   },
   replyAuthor: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
+    color: theme.colors.gray800,
   },
   replyDate: {
-    fontSize: 12,
-    color: '#9ca3af',
+    color: theme.colors.gray400,
     marginTop: 2,
   },
   replyContent: {
-    fontSize: 14,
-    color: '#374151',
+    color: theme.colors.gray700,
     lineHeight: 20,
     marginLeft: 40,
   },
@@ -725,17 +676,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
-    paddingTop: 16,
+    borderTopColor: theme.colors.gray200,
+    paddingTop: theme.spacing.lg,
   },
   replyInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: theme.colors.gray200,
+    borderRadius: theme.radii.md,
+    padding: theme.spacing.md,
     fontSize: 14,
-    color: '#1f2937',
+    color: theme.colors.gray900,
+    backgroundColor: theme.colors.gray50,
     minHeight: 40,
     maxHeight: 100,
   },
@@ -743,13 +695,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: theme.spacing.sm,
   },
   replyButtonDisabled: {
     opacity: 0.5,
   },
 })
-

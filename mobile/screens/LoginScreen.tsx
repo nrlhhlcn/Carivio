@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { View, StyleSheet, Alert } from 'react-native'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigation } from '@react-navigation/native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { theme } from '../theme'
+import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
+import { Text } from '../components/ui/Text'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -27,37 +32,49 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🚀 Carivio</Text>
-      <Text style={styles.subtitle}>Giriş Yap</Text>
+      <LinearGradient colors={[theme.colors.white, theme.colors.gray50]} style={styles.header}>
+        <Text variant="heading1" style={styles.brand}>
+          Carivio
+        </Text>
+        <Text variant="muted">Hesabınıza giriş yapın</Text>
+      </LinearGradient>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+      <View style={styles.card}>
+        <Input
+          label="Email"
+          placeholder="ornek@mail.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <Input
+          label="Şifre"
+          placeholder="••••••••"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Şifre"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      />
+        <Button title="Giriş Yap" onPress={handleLogin} />
+        <View style={{ height: theme.spacing.md }} />
+        <Button
+          title="Google ile Giriş"
+          variant="outline"
+          onPress={handleGoogleLogin}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Giriş Yap</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
-        <Text style={styles.buttonText}>Google ile Giriş</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('Register' as never)}>
-        <Text style={styles.link}>Hesabın yok mu? Kayıt Ol</Text>
-      </TouchableOpacity>
+        <View style={styles.footerRow}>
+          <Text variant="body">Hesabın yok mu?</Text>
+          <Text
+            variant="body"
+            style={styles.link}
+            onPress={() => navigation.navigate('Register' as never)}
+          >
+            Kayıt Ol
+          </Text>
+        </View>
+      </View>
     </View>
   )
 }
@@ -65,52 +82,35 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    paddingTop: theme.spacing['4xl'],
+    paddingBottom: theme.spacing['2xl'],
+    alignItems: 'center',
+  },
+  brand: {
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
+  },
+  card: {
+    marginHorizontal: theme.spacing['2xl'],
+    padding: theme.spacing['2xl'],
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radii.lg,
+    ...theme.shadows.card,
+  },
+  footerRow: {
+    marginTop: theme.spacing.lg,
+    flexDirection: 'row',
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 32,
-    color: '#666',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#4300FF',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  googleButton: {
-    backgroundColor: '#4285F4',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '600',
+    alignItems: 'center',
+    gap: theme.spacing.sm as any,
   },
   link: {
-    textAlign: 'center',
-    color: '#4300FF',
-    marginTop: 16,
+    color: theme.colors.primary,
+    marginLeft: theme.spacing.sm,
+    fontWeight: '600',
   },
 })
 

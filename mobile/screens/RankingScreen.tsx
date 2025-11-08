@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -13,6 +12,9 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useAuth } from '../contexts/AuthContext'
 import { getLeaderboard, getCvLeaderboard, getUserStats, UserStats } from '../services/firestore'
+import { theme } from '../theme'
+import { Text } from '../components/ui/Text'
+import { Card } from '../components/ui/Card'
 
 type LeaderboardType = 'total' | 'cv'
 
@@ -51,7 +53,6 @@ export default function RankingScreen() {
     try {
       const stats = await getUserStats(user.uid)
       if (stats) {
-        // Boolean değerleri garantile
         const cleanStats = { ...stats }
         if (cleanStats.isProfilePublic !== undefined && typeof cleanStats.isProfilePublic === 'string') {
           cleanStats.isProfilePublic = cleanStats.isProfilePublic === 'true' || cleanStats.isProfilePublic === 'True'
@@ -82,7 +83,7 @@ export default function RankingScreen() {
       default:
         return (
           <View style={styles.rankNumber}>
-            <Text style={styles.rankNumberText}>#{rank}</Text>
+            <Text variant="body" style={styles.rankNumberText}>#{rank}</Text>
           </View>
         )
     }
@@ -104,10 +105,10 @@ export default function RankingScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Sıralama Tablosu</Text>
-        <Text style={styles.subtitle}>Diğer kullanıcılarla yarışın ve rozetler kazanın</Text>
-      </View>
+      <LinearGradient colors={theme.colors.gradientPrimary} style={styles.header}>
+        <Text variant="heading1" style={styles.title}>Sıralama Tablosu</Text>
+        <Text variant="body" style={styles.subtitle}>Diğer kullanıcılarla yarışın ve rozetler kazanın</Text>
+      </LinearGradient>
 
       <View style={styles.tabs}>
         <TouchableOpacity
@@ -115,10 +116,10 @@ export default function RankingScreen() {
           style={[styles.tab, selectedTab === 'total' && styles.tabSelected]}
         >
           <LinearGradient
-            colors={selectedTab === 'total' ? ['#4300FF', '#0065F8'] : ['#f3f4f6', '#f3f4f6']}
+            colors={selectedTab === 'total' ? theme.colors.gradientPrimary : [theme.colors.gray100, theme.colors.gray200]}
             style={styles.tabGradient}
           >
-            <Text style={[styles.tabText, selectedTab === 'total' && styles.tabTextSelected]}>
+            <Text variant="body" style={[styles.tabText, selectedTab === 'total' && styles.tabTextSelected]}>
               Toplam Puan
             </Text>
           </LinearGradient>
@@ -128,10 +129,10 @@ export default function RankingScreen() {
           style={[styles.tab, selectedTab === 'cv' && styles.tabSelected]}
         >
           <LinearGradient
-            colors={selectedTab === 'cv' ? ['#4300FF', '#0065F8'] : ['#f3f4f6', '#f3f4f6']}
+            colors={selectedTab === 'cv' ? theme.colors.gradientPrimary : [theme.colors.gray100, theme.colors.gray200]}
             style={styles.tabGradient}
           >
-            <Text style={[styles.tabText, selectedTab === 'cv' && styles.tabTextSelected]}>
+            <Text variant="body" style={[styles.tabText, selectedTab === 'cv' && styles.tabTextSelected]}>
               CV Skoru
             </Text>
           </LinearGradient>
@@ -139,36 +140,36 @@ export default function RankingScreen() {
       </View>
 
       {userStats && (
-        <View style={styles.userCard}>
-          <LinearGradient colors={['#dbeafe', '#e9d5ff']} style={styles.userCardGradient}>
-            <Text style={styles.userCardTitle}>Sizin Sıralamanız</Text>
+        <Card style={styles.userCard}>
+          <LinearGradient colors={theme.colors.gradientSurface} style={styles.userCardGradient}>
+            <Text variant="heading3" style={styles.userCardTitle}>Sizin Sıralamanız</Text>
             <View style={styles.userCardStats}>
               <View style={styles.userCardStat}>
-                <Text style={styles.userCardStatValue}>
+                <Text variant="heading2" style={styles.userCardStatValue}>
                   {getUserRank() || '-'}
                 </Text>
-                <Text style={styles.userCardStatLabel}>Sıralama</Text>
+                <Text variant="label" style={styles.userCardStatLabel}>Sıralama</Text>
               </View>
               <View style={styles.userCardStat}>
-                <Text style={styles.userCardStatValue}>
+                <Text variant="heading2" style={styles.userCardStatValue}>
                   {selectedTab === 'total' ? userStats.totalScore : userStats.cvScore}
                 </Text>
-                <Text style={styles.userCardStatLabel}>
+                <Text variant="label" style={styles.userCardStatLabel}>
                   {selectedTab === 'total' ? 'Toplam Puan' : 'CV Skoru'}
                 </Text>
               </View>
               <View style={styles.userCardStat}>
-                <Text style={styles.userCardStatValue}>{userStats.level}</Text>
-                <Text style={styles.userCardStatLabel}>Seviye</Text>
+                <Text variant="heading2" style={styles.userCardStatValue}>{userStats.level}</Text>
+                <Text variant="label" style={styles.userCardStatLabel}>Seviye</Text>
               </View>
             </View>
           </LinearGradient>
-        </View>
+        </Card>
       )}
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4300FF" />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <ScrollView
@@ -179,7 +180,7 @@ export default function RankingScreen() {
             const rank = index + 1
             const isCurrentUser = user && item.userId === user.uid
             return (
-              <View
+              <Card
                 key={item.id || item.userId}
                 style={[styles.leaderboardItem, isCurrentUser && styles.leaderboardItemHighlighted]}
               >
@@ -191,23 +192,23 @@ export default function RankingScreen() {
                     <Image source={{ uri: item.photoURL }} style={styles.avatar} />
                   ) : (
                     <View style={styles.avatarPlaceholder}>
-                      <Text style={styles.avatarText}>
+                      <Text variant="heading3" style={styles.avatarText}>
                         {getInitials(item.displayName || 'Kullanıcı')}
                       </Text>
                     </View>
                   )}
                 </View>
                 <View style={styles.infoSection}>
-                  <Text style={styles.userName}>{item.displayName || 'Kullanıcı'}</Text>
-                  <Text style={styles.userBadge}>{item.badge || 'Yeni Katılımcı'}</Text>
+                  <Text variant="heading3" style={styles.userName}>{item.displayName || 'Kullanıcı'}</Text>
+                  <Text variant="muted" style={styles.userBadge}>{item.badge || 'Yeni Katılımcı'}</Text>
                 </View>
                 <View style={styles.scoreSection}>
-                  <Text style={styles.scoreValue}>
+                  <Text variant="heading2" style={styles.scoreValue}>
                     {selectedTab === 'total' ? item.totalScore : item.cvScore}
                   </Text>
-                  <Text style={styles.scoreLabel}>Puan</Text>
+                  <Text variant="label" style={styles.scoreLabel}>Puan</Text>
                 </View>
-              </View>
+              </Card>
             )
           })}
         </ScrollView>
@@ -219,68 +220,59 @@ export default function RankingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 40,
+    padding: theme.spacing.xl,
+    paddingTop: 60,
+    paddingBottom: theme.spacing['3xl'],
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 8,
+    color: theme.colors.white,
+    marginBottom: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6b7280',
+    color: 'rgba(255,255,255,0.9)',
     textAlign: 'center',
   },
   tabs: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    gap: 12,
+    paddingHorizontal: theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
+    gap: theme.spacing.md,
   },
   tab: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: theme.radii.md,
     overflow: 'hidden',
-  },
-  tabGradient: {
-    paddingVertical: 12,
-    alignItems: 'center',
   },
   tabSelected: {
-    shadowColor: '#4300FF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    ...theme.shadows.soft,
+  },
+  tabGradient: {
+    paddingVertical: theme.spacing.md,
+    alignItems: 'center',
   },
   tabText: {
-    fontSize: 14,
+    color: theme.colors.gray500,
     fontWeight: '600',
-    color: '#6b7280',
   },
   tabTextSelected: {
-    color: '#fff',
+    color: theme.colors.white,
   },
   userCard: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
+    marginHorizontal: theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
     overflow: 'hidden',
+    padding: 0,
   },
   userCardGradient: {
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   userCardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 16,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.lg,
   },
   userCardStats: {
     flexDirection: 'row',
@@ -290,14 +282,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userCardStatValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.xs,
   },
   userCardStatLabel: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   loadingContainer: {
     flex: 1,
@@ -310,21 +299,14 @@ const styles = StyleSheet.create({
   leaderboardItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 12,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginHorizontal: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
+    padding: theme.spacing.lg,
   },
   leaderboardItemHighlighted: {
     backgroundColor: '#eff6ff',
     borderWidth: 2,
-    borderColor: '#4300FF',
+    borderColor: theme.colors.primary,
   },
   rankSection: {
     width: 40,
@@ -335,17 +317,16 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.colors.gray100,
     justifyContent: 'center',
     alignItems: 'center',
   },
   rankNumberText: {
-    fontSize: 14,
+    color: theme.colors.gray500,
     fontWeight: 'bold',
-    color: '#6b7280',
   },
   avatarSection: {
-    marginLeft: 12,
+    marginLeft: theme.spacing.md,
   },
   avatar: {
     width: 48,
@@ -356,40 +337,32 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.white,
   },
   infoSection: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: theme.spacing.md,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.xs,
   },
   userBadge: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   scoreSection: {
     alignItems: 'flex-end',
   },
   scoreValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4300FF',
-    marginBottom: 4,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
   },
   scoreLabel: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
 })

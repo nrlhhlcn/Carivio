@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Image,
-  TextInput,
   Alert,
   RefreshControl,
 } from 'react-native'
@@ -24,6 +22,11 @@ import {
   InterviewResult,
 } from '../services/firestore'
 import { Timestamp } from 'firebase/firestore'
+import { theme } from '../theme'
+import { Text } from '../components/ui/Text'
+import { Button } from '../components/ui/Button'
+import { Card } from '../components/ui/Card'
+import { Input } from '../components/ui/Input'
 
 const TAG_OPTIONS = [
   { value: 'Frontend', label: 'Frontend' },
@@ -66,7 +69,6 @@ export default function ProfileScreen() {
       setInterviewResults(interviewData)
       if (stats) {
         setTag(stats.tag || 'Frontend')
-        // Boolean değeri garantile - string "true"/"false" değerlerini de handle et
         const isPublic = stats.isProfilePublic
         let publicValue: boolean
         if (typeof isPublic === 'string') {
@@ -74,7 +76,7 @@ export default function ProfileScreen() {
         } else if (typeof isPublic === 'boolean') {
           publicValue = isPublic
         } else {
-          publicValue = true // default
+          publicValue = true
         }
         setIsProfilePublic(publicValue)
       }
@@ -95,7 +97,6 @@ export default function ProfileScreen() {
     if (!user) return
 
     try {
-      // Boolean değeri garantile - kesinlikle boolean olmalı
       const publicValue: boolean = !!isProfilePublic
       
       await saveUserStats({
@@ -135,7 +136,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4300FF" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     )
   }
@@ -145,35 +146,33 @@ export default function ProfileScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
     >
-      <View style={styles.header}>
+      <LinearGradient colors={theme.colors.gradientPrimary} style={styles.header}>
         <View style={styles.profileHeader}>
           {user?.photoURL ? (
             <Image source={{ uri: user.photoURL }} style={styles.avatar} />
           ) : (
             <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>
+              <Text variant="heading1" style={styles.avatarText}>
                 {getInitials(user?.displayName || 'Kullanıcı')}
               </Text>
             </View>
           )}
-          <Text style={styles.userName}>{user?.displayName || 'Kullanıcı'}</Text>
-          <Text style={styles.userEmail}>{user?.email}</Text>
-          <TouchableOpacity
+          <Text variant="heading2" style={styles.userName}>{user?.displayName || 'Kullanıcı'}</Text>
+          <Text variant="body" style={styles.userEmail}>{user?.email}</Text>
+          <Button
+            title={isEditing ? 'İptal' : 'Düzenle'}
             onPress={() => setIsEditing(!isEditing)}
+            variant="outline"
+            iconLeft={<MaterialIcons name="edit" size={20} color={theme.colors.primary} />}
             style={styles.editButton}
-          >
-            <MaterialIcons name="edit" size={20} color="#4300FF" />
-            <Text style={styles.editButtonText}>
-              {isEditing ? 'İptal' : 'Düzenle'}
-            </Text>
-          </TouchableOpacity>
+          />
         </View>
-      </View>
+      </LinearGradient>
 
       {isEditing && (
-        <View style={styles.editCard}>
-          <Text style={styles.editLabel}>Sektör/Alan</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <Card style={styles.editCard}>
+          <Text variant="heading3" style={styles.editLabel}>Sektör/Alan</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagsScroll}>
             {TAG_OPTIONS.map((option) => (
               <TouchableOpacity
                 key={option.value}
@@ -184,6 +183,7 @@ export default function ProfileScreen() {
                 ]}
               >
                 <Text
+                  variant="body"
                   style={[
                     styles.tagOptionText,
                     tag === option.value && styles.tagOptionTextSelected,
@@ -196,7 +196,7 @@ export default function ProfileScreen() {
           </ScrollView>
 
           <View style={styles.publicSwitch}>
-            <Text style={styles.editLabel}>Profil Görünürlüğü</Text>
+            <Text variant="heading3" style={styles.editLabel}>Profil Görünürlüğü</Text>
             <TouchableOpacity
               onPress={() => setIsProfilePublic(!isProfilePublic)}
               style={[
@@ -208,12 +208,13 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-            <LinearGradient colors={['#4300FF', '#0065F8']} style={styles.saveButtonGradient}>
-              <Text style={styles.saveButtonText}>Kaydet</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+          <Button
+            title="Kaydet"
+            onPress={handleSave}
+            variant="primary"
+            style={styles.saveButton}
+          />
+        </Card>
       )}
 
       <View style={styles.tabs}>
@@ -221,7 +222,7 @@ export default function ProfileScreen() {
           onPress={() => setActiveTab('overview')}
           style={[styles.tab, activeTab === 'overview' && styles.tabActive]}
         >
-          <Text style={[styles.tabText, activeTab === 'overview' && styles.tabTextActive]}>
+          <Text variant="body" style={[styles.tabText, activeTab === 'overview' && styles.tabTextActive]}>
             Genel Bakış
           </Text>
         </TouchableOpacity>
@@ -229,7 +230,7 @@ export default function ProfileScreen() {
           onPress={() => setActiveTab('stats')}
           style={[styles.tab, activeTab === 'stats' && styles.tabActive]}
         >
-          <Text style={[styles.tabText, activeTab === 'stats' && styles.tabTextActive]}>
+          <Text variant="body" style={[styles.tabText, activeTab === 'stats' && styles.tabTextActive]}>
             İstatistikler
           </Text>
         </TouchableOpacity>
@@ -237,7 +238,7 @@ export default function ProfileScreen() {
           onPress={() => setActiveTab('activity')}
           style={[styles.tab, activeTab === 'activity' && styles.tabActive]}
         >
-          <Text style={[styles.tabText, activeTab === 'activity' && styles.tabTextActive]}>
+          <Text variant="body" style={[styles.tabText, activeTab === 'activity' && styles.tabTextActive]}>
             Aktivite
           </Text>
         </TouchableOpacity>
@@ -245,98 +246,98 @@ export default function ProfileScreen() {
 
       {activeTab === 'overview' && (
         <View style={styles.content}>
-          <View style={styles.statsCard}>
-            <LinearGradient colors={['#dbeafe', '#e9d5ff']} style={styles.statsGradient}>
+          <Card style={styles.statsCard}>
+            <LinearGradient colors={theme.colors.gradientSurface} style={styles.statsGradient}>
               <View style={styles.statsGrid}>
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{userStats?.totalScore || 0}</Text>
-                  <Text style={styles.statLabel}>Toplam Puan</Text>
+                  <Text variant="heading2" style={styles.statValue}>{userStats?.totalScore || 0}</Text>
+                  <Text variant="label" style={styles.statLabel}>Toplam Puan</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{userStats?.cvScore || 0}</Text>
-                  <Text style={styles.statLabel}>CV Skoru</Text>
+                  <Text variant="heading2" style={styles.statValue}>{userStats?.cvScore || 0}</Text>
+                  <Text variant="label" style={styles.statLabel}>CV Skoru</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{userStats?.interviewScore || 0}</Text>
-                  <Text style={styles.statLabel}>Mülakat Skoru</Text>
+                  <Text variant="heading2" style={styles.statValue}>{userStats?.interviewScore || 0}</Text>
+                  <Text variant="label" style={styles.statLabel}>Mülakat Skoru</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{userStats?.level || 'Başlangıç'}</Text>
-                  <Text style={styles.statLabel}>Seviye</Text>
+                  <Text variant="heading2" style={styles.statValue}>{userStats?.level || 'Başlangıç'}</Text>
+                  <Text variant="label" style={styles.statLabel}>Seviye</Text>
                 </View>
               </View>
             </LinearGradient>
-          </View>
+          </Card>
 
-          <View style={styles.badgeCard}>
-            <Text style={styles.cardTitle}>Rozet</Text>
+          <Card style={styles.badgeCard}>
+            <Text variant="heading3" style={styles.cardTitle}>Rozet</Text>
             <View style={styles.badge}>
               <MaterialIcons name="workspace-premium" size={24} color="#fbbf24" />
-              <Text style={styles.badgeText}>{userStats?.badge || 'Yeni Katılımcı'}</Text>
+              <Text variant="body" style={styles.badgeText}>{userStats?.badge || 'Yeni Katılımcı'}</Text>
             </View>
-          </View>
+          </Card>
         </View>
       )}
 
       {activeTab === 'stats' && (
         <View style={styles.content}>
-          <View style={styles.statsDetailCard}>
-            <Text style={styles.cardTitle}>Detaylı İstatistikler</Text>
+          <Card style={styles.statsDetailCard}>
+            <Text variant="heading3" style={styles.cardTitle}>Detaylı İstatistikler</Text>
             <View style={styles.statsList}>
               <View style={styles.statsRow}>
-                <Text style={styles.statsRowLabel}>Tamamlanan Analizler</Text>
-                <Text style={styles.statsRowValue}>{userStats?.completedAnalyses || 0}</Text>
+                <Text variant="body" style={styles.statsRowLabel}>Tamamlanan Analizler</Text>
+                <Text variant="body" style={styles.statsRowValue}>{userStats?.completedAnalyses || 0}</Text>
               </View>
               <View style={styles.statsRow}>
-                <Text style={styles.statsRowLabel}>Tamamlanan Mülakatlar</Text>
-                <Text style={styles.statsRowValue}>{userStats?.completedInterviews || 0}</Text>
+                <Text variant="body" style={styles.statsRowLabel}>Tamamlanan Mülakatlar</Text>
+                <Text variant="body" style={styles.statsRowValue}>{userStats?.completedInterviews || 0}</Text>
               </View>
               <View style={styles.statsRow}>
-                <Text style={styles.statsRowLabel}>Aktif Günler</Text>
-                <Text style={styles.statsRowValue}>{userStats?.totalActiveDays || 0}</Text>
+                <Text variant="body" style={styles.statsRowLabel}>Aktif Günler</Text>
+                <Text variant="body" style={styles.statsRowValue}>{userStats?.totalActiveDays || 0}</Text>
               </View>
               <View style={styles.statsRow}>
-                <Text style={styles.statsRowLabel}>Seri</Text>
-                <Text style={styles.statsRowValue}>{userStats?.streak || 0} gün</Text>
+                <Text variant="body" style={styles.statsRowLabel}>Seri</Text>
+                <Text variant="body" style={styles.statsRowValue}>{userStats?.streak || 0} gün</Text>
               </View>
             </View>
-          </View>
+          </Card>
         </View>
       )}
 
       {activeTab === 'activity' && (
         <View style={styles.content}>
-          <Text style={styles.sectionTitle}>CV Analizleri</Text>
+          <Text variant="heading3" style={styles.sectionTitle}>CV Analizleri</Text>
           {cvResults.length === 0 ? (
-            <Text style={styles.emptyText}>Henüz CV analizi yapılmamış</Text>
+            <Text variant="body" style={styles.emptyText}>Henüz CV analizi yapılmamış</Text>
           ) : (
             cvResults.map((result) => (
-              <View key={result.id} style={styles.activityItem}>
-                <MaterialIcons name="description" size={24} color="#3b82f6" />
+              <Card key={result.id} style={styles.activityItem}>
+                <MaterialIcons name="description" size={24} color={theme.colors.info} />
                 <View style={styles.activityContent}>
-                  <Text style={styles.activityTitle}>{result.fileName}</Text>
-                  <Text style={styles.activityDesc}>
+                  <Text variant="heading3" style={styles.activityTitle}>{result.fileName}</Text>
+                  <Text variant="muted" style={styles.activityDesc}>
                     Skor: {result.overallScore}/100 - {formatDate(result.analysisDate)}
                   </Text>
                 </View>
-              </View>
+              </Card>
             ))
           )}
 
-          <Text style={styles.sectionTitle}>Mülakatlar</Text>
+          <Text variant="heading3" style={styles.sectionTitle}>Mülakatlar</Text>
           {interviewResults.length === 0 ? (
-            <Text style={styles.emptyText}>Henüz mülakat yapılmamış</Text>
+            <Text variant="body" style={styles.emptyText}>Henüz mülakat yapılmamış</Text>
           ) : (
             interviewResults.map((result) => (
-              <View key={result.id} style={styles.activityItem}>
-                <MaterialIcons name="videocam" size={24} color="#10b981" />
+              <Card key={result.id} style={styles.activityItem}>
+                <MaterialIcons name="videocam" size={24} color={theme.colors.success} />
                 <View style={styles.activityContent}>
-                  <Text style={styles.activityTitle}>Mülakat Simülasyonu</Text>
-                  <Text style={styles.activityDesc}>
+                  <Text variant="heading3" style={styles.activityTitle}>Mülakat Simülasyonu</Text>
+                  <Text variant="muted" style={styles.activityDesc}>
                     Skor: {result.overallScore}/100 - {formatDate(result.interviewDate || new Date())}
                   </Text>
                 </View>
-              </View>
+              </Card>
             ))
           )}
         </View>
@@ -348,7 +349,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -356,8 +357,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    padding: 20,
-    paddingTop: 40,
+    padding: theme.spacing.xl,
+    paddingTop: 60,
+    paddingBottom: theme.spacing['3xl'],
   },
   profileHeader: {
     alignItems: 'center',
@@ -366,158 +368,126 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
+    borderWidth: 4,
+    borderColor: theme.colors.white,
   },
   avatarPlaceholder: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
+    borderWidth: 4,
+    borderColor: theme.colors.white,
   },
   avatarText: {
-    color: '#fff',
-    fontSize: 36,
-    fontWeight: 'bold',
+    color: theme.colors.primary,
   },
   userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.white,
+    marginBottom: theme.spacing.xs,
   },
   userEmail: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 16,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: theme.spacing.lg,
   },
   editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#4300FF',
-  },
-  editButtonText: {
-    color: '#4300FF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 8,
+    marginTop: theme.spacing.sm,
   },
   editCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    margin: theme.spacing.xl,
+    marginTop: -theme.spacing['2xl'],
   },
   editLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 12,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.md,
+  },
+  tagsScroll: {
+    marginBottom: theme.spacing.lg,
   },
   tagOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f3f4f6',
-    marginRight: 8,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radii.pill,
+    backgroundColor: theme.colors.gray100,
+    marginRight: theme.spacing.sm,
   },
   tagOptionSelected: {
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
   },
   tagOptionText: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   tagOptionTextSelected: {
-    color: '#fff',
+    color: theme.colors.white,
   },
   publicSwitch: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
   },
   switch: {
     width: 50,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#d1d5db',
+    backgroundColor: theme.colors.gray300,
     justifyContent: 'center',
     paddingHorizontal: 2,
   },
   switchActive: {
-    backgroundColor: '#4300FF',
+    backgroundColor: theme.colors.primary,
   },
   switchThumb: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.white,
   },
   switchThumbActive: {
     transform: [{ translateX: 20 }],
   },
   saveButton: {
-    marginTop: 20,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  saveButtonGradient: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: theme.spacing.md,
   },
   tabs: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: theme.colors.gray200,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: '#4300FF',
+    borderBottomColor: theme.colors.primary,
   },
   tabText: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   tabTextActive: {
-    color: '#4300FF',
+    color: theme.colors.primary,
     fontWeight: '600',
   },
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl,
   },
   statsCard: {
-    borderRadius: 16,
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
     overflow: 'hidden',
+    padding: 0,
   },
   statsGradient: {
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -527,111 +497,75 @@ const styles = StyleSheet.create({
   statItem: {
     width: '48%',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
   },
   statValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.xs,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   badgeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: theme.spacing.xl,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 12,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.md,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   badgeText: {
-    fontSize: 16,
-    color: '#1f2937',
-    marginLeft: 12,
+    color: theme.colors.gray800,
+    marginLeft: theme.spacing.md,
   },
   statsDetailCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: theme.spacing.xl,
   },
   statsList: {
-    marginTop: 12,
+    marginTop: theme.spacing.md,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: theme.colors.gray100,
   },
   statsRowLabel: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
   statsRowValue: {
-    fontSize: 14,
+    color: theme.colors.gray800,
     fontWeight: '600',
-    color: '#1f2937',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 16,
-    marginTop: 8,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.lg,
+    marginTop: theme.spacing.md,
   },
   emptyText: {
-    fontSize: 14,
-    color: '#9ca3af',
+    color: theme.colors.gray400,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: theme.spacing.xl,
   },
   activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: theme.spacing.md,
+    padding: theme.spacing.lg,
   },
   activityContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: theme.spacing.md,
   },
   activityTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.xs,
   },
   activityDesc: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
   },
 })

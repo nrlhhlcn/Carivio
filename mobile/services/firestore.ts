@@ -36,6 +36,20 @@ export interface UserStats {
   isProfilePublic?: boolean
 }
 
+// Basit kullanıcı profili (users koleksiyonu)
+export interface BasicUserDoc {
+  id?: string
+  userId: string
+  email: string
+  firstName?: string
+  lastName?: string
+  displayName?: string
+  photoURL?: string
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
+  tag?: string
+}
+
 export interface CVAnalysis {
   id?: string
   userId: string
@@ -316,5 +330,41 @@ export const getUserInterviewResults = async (userId: string): Promise<Interview
   )
   const snapshot = await getDocs(q)
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as InterviewResult))
+}
+
+// USERS collection helpers
+export const upsertUserDoc = async (
+  user: Omit<BasicUserDoc, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> => {
+  try {
+    const q = query(
+      collection(db, 'users'),
+      where('userId', '==', user.userId),
+    )
+    const snap = await getDocs(q)
+    // Remove undefined fields (Firestore doesn't allow undefined)
+    const cleaned: Record<string, any> = {}
+    Object.entries(user).forEach(([k, v]) => {
+      if (v !== undefined) cleaned[k] = v
+    })
+    const payload = {
+      ...cleaned,
+      updatedAt: Timestamp.now(),
+    }
+    if (snap.empty) {
+      const docRef = await addDoc(collection(db, 'users'), {
+        ...payload,
+        createdAt: Timestamp.now(),
+      })
+      return docRef.id
+    } else {
+      const ref = snap.docs[0].ref
+      await updateDoc(ref, payload)
+      return ref.id
+    }
+  } catch (e) {
+    console.error('users upsert error:', e)
+    throw e
+  }
 }
 

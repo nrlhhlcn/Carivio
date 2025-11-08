@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -11,6 +10,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
+import { theme } from '../theme'
+import { Text } from '../components/ui/Text'
+import { Button } from '../components/ui/Button'
+import { Card } from '../components/ui/Card'
 
 const { width } = Dimensions.get('window')
 
@@ -75,7 +78,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient colors={['#4300FF', '#0065F8', '#4300FF']} style={styles.hero}>
+      <LinearGradient colors={theme.colors.gradientPrimary} style={styles.hero}>
         <Animated.View style={{ opacity: fadeAnim }}>
           <View style={styles.heroContent}>
             <View style={styles.badge}>
@@ -83,82 +86,79 @@ export default function HomeScreen() {
               <Text style={styles.badgeText}>Kariyerinizin geleceği burada başlıyor</Text>
             </View>
 
-            <Text style={styles.heroTitle}>
+            <Text variant="heading1" style={styles.heroTitle}>
               CV'nizi{' '}
-              <Text style={styles.heroTitleHighlight}>analiz edin</Text>
+              <Text variant="heading1" style={styles.heroTitleHighlight}>analiz edin</Text>
             </Text>
-            <Text style={styles.heroSubtitle}>mülakatlara hazırlanın</Text>
+            <Text variant="heading2" style={styles.heroSubtitle}>mülakatlara hazırlanın</Text>
 
             <Text style={styles.heroDescription}>
               Yapay zeka destekli CV analizi ve mülakat simülasyonu ile kariyerinizde bir adım öne çıkın.
             </Text>
 
-            <TouchableOpacity
+            <Button
+              title="Hemen Başla"
               onPress={() => navigation.navigate('CVAnalysis' as never)}
+              variant="primary"
+              iconRight={<MaterialIcons name="arrow-forward" size={20} color={theme.colors.white} />}
               style={styles.ctaButton}
-            >
-              <LinearGradient colors={['#fff', '#f0f0f0']} style={styles.ctaButtonGradient}>
-                <Text style={styles.ctaButtonText}>Hemen Başla</Text>
-                <MaterialIcons name="arrow-forward" size={20} color="#4300FF" />
-              </LinearGradient>
-            </TouchableOpacity>
+            />
           </View>
         </Animated.View>
       </LinearGradient>
 
       <View style={styles.statsSection}>
         {stats.map((stat, index) => (
-          <View key={index} style={styles.statCard}>
-            <MaterialIcons name={stat.icon as any} size={24} color="#4300FF" />
-            <Text style={styles.statNumber}>{stat.number}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
-          </View>
+          <Card key={index} style={styles.statCard}>
+            <MaterialIcons name={stat.icon as any} size={24} color={theme.colors.primary} />
+            <Text variant="heading2" style={styles.statNumber}>{stat.number}</Text>
+            <Text variant="label" style={styles.statLabel}>{stat.label}</Text>
+          </Card>
         ))}
       </View>
 
       <View style={styles.featuresSection}>
-        <Text style={styles.sectionTitle}>Özellikler</Text>
-        <Text style={styles.sectionSubtitle}>Kariyerinizi geliştirmek için ihtiyacınız olan her şey</Text>
+        <Text variant="heading1" style={styles.sectionTitle}>Özellikler</Text>
+        <Text variant="body" style={styles.sectionSubtitle}>Kariyerinizi geliştirmek için ihtiyacınız olan her şey</Text>
 
         <View style={styles.featuresGrid}>
           {features.map((feature, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => navigation.navigate(feature.screen as never)}
-              style={styles.featureCard}
             >
-              <LinearGradient colors={feature.color} style={styles.featureIcon}>
-                <MaterialIcons name={feature.icon as any} size={32} color="#fff" />
-              </LinearGradient>
-              <Text style={styles.featureTitle}>{feature.title}</Text>
-              <Text style={styles.featureDescription}>{feature.description}</Text>
+              <Card style={styles.featureCard}>
+                <LinearGradient colors={feature.color} style={styles.featureIcon}>
+                  <MaterialIcons name={feature.icon as any} size={32} color="#fff" />
+                </LinearGradient>
+                <Text variant="heading3" style={styles.featureTitle}>{feature.title}</Text>
+                <Text variant="body" style={styles.featureDescription}>{feature.description}</Text>
+              </Card>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
       <View style={styles.benefitsSection}>
-        <Text style={styles.sectionTitle}>Neden Carivio?</Text>
+        <Text variant="heading1" style={styles.sectionTitle}>Neden Carivio?</Text>
         <View style={styles.benefitsList}>
           {benefits.map((benefit, index) => (
-            <View key={index} style={styles.benefitItem}>
-              <MaterialIcons name="check-circle" size={24} color="#10b981" />
-              <Text style={styles.benefitText}>{benefit}</Text>
-            </View>
+            <Card key={index} style={styles.benefitItem}>
+              <MaterialIcons name="check-circle" size={24} color={theme.colors.success} />
+              <Text variant="body" style={styles.benefitText}>{benefit}</Text>
+            </Card>
           ))}
         </View>
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Kariyerinizi geliştirmek için bugün başlayın</Text>
-        <TouchableOpacity
+        <Text variant="heading3" style={styles.footerText}>Kariyerinizi geliştirmek için bugün başlayın</Text>
+        <Button
+          title="Ücretsiz Başla"
           onPress={() => navigation.navigate('CVAnalysis' as never)}
+          variant="primary"
           style={styles.footerButton}
-        >
-          <LinearGradient colors={['#4300FF', '#0065F8']} style={styles.footerButtonGradient}>
-            <Text style={styles.footerButtonText}>Ücretsiz Başla</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   )
@@ -167,12 +167,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   hero: {
     paddingTop: 60,
     paddingBottom: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: theme.spacing.xl,
     alignItems: 'center',
   },
   heroContent: {
@@ -183,183 +183,126 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 24,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radii.pill,
+    marginBottom: theme.spacing['2xl'],
   },
   badgeText: {
-    color: '#fff',
+    color: theme.colors.white,
     fontSize: 12,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: theme.spacing.sm,
   },
   heroTitle: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#fff',
+    color: theme.colors.white,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
   },
   heroTitleHighlight: {
     color: '#00FFDE',
   },
   heroSubtitle: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#fff',
+    color: theme.colors.white,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
   },
   heroDescription: {
     fontSize: 16,
     color: 'rgba(255,255,255,0.9)',
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: theme.spacing['3xl'],
     lineHeight: 24,
   },
   ctaButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  ctaButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-  },
-  ctaButtonText: {
-    color: '#4300FF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 8,
+    width: '100%',
   },
   statsSection: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 20,
+    padding: theme.spacing.xl,
     justifyContent: 'space-between',
   },
   statCard: {
     width: (width - 60) / 2,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
     alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: theme.spacing.lg,
   },
   statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginTop: 8,
-    marginBottom: 4,
+    color: theme.colors.gray800,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.gray500,
     textAlign: 'center',
   },
   featuresSection: {
-    padding: 20,
-    paddingTop: 40,
+    padding: theme.spacing.xl,
+    paddingTop: theme.spacing['4xl'],
   },
   sectionTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 8,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.sm,
     textAlign: 'center',
   },
   sectionSubtitle: {
-    fontSize: 16,
-    color: '#6b7280',
+    color: theme.colors.gray500,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: theme.spacing['3xl'],
   },
   featuresGrid: {
-    gap: 16,
+    gap: theme.spacing.lg,
   },
   featureCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    marginBottom: 16,
+    padding: theme.spacing['2xl'],
+    marginBottom: theme.spacing.lg,
   },
   featureIcon: {
     width: 64,
     height: 64,
-    borderRadius: 16,
+    borderRadius: theme.radii.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.lg,
   },
   featureTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 8,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing.sm,
   },
   featureDescription: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.gray500,
     lineHeight: 20,
   },
   benefitsSection: {
-    padding: 20,
-    paddingTop: 40,
-    backgroundColor: '#f9fafb',
+    padding: theme.spacing.xl,
+    paddingTop: theme.spacing['4xl'],
+    backgroundColor: theme.colors.gray50,
   },
   benefitsList: {
-    gap: 16,
+    gap: theme.spacing.lg,
   },
   benefitItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    padding: theme.spacing.lg,
   },
   benefitText: {
     flex: 1,
-    fontSize: 14,
-    color: '#374151',
-    marginLeft: 12,
+    color: theme.colors.gray700,
+    marginLeft: theme.spacing.md,
     lineHeight: 20,
   },
   footer: {
-    padding: 40,
+    padding: theme.spacing['4xl'],
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 24,
+    color: theme.colors.gray800,
+    marginBottom: theme.spacing['2xl'],
     textAlign: 'center',
   },
   footerButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
     width: '100%',
-  },
-  footerButtonGradient: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 })

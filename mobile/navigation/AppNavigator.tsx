@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useAuth } from '../contexts/AuthContext'
+import { theme } from '../theme'
 
 // Screens
 import LoginScreen from '../screens/LoginScreen'
@@ -22,6 +23,18 @@ function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: theme.colors.gray200,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 6,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: -4,
+        },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof MaterialIcons.glyphMap = 'home'
 
@@ -41,8 +54,8 @@ function MainTabs() {
 
           return <MaterialIcons name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: '#4300FF',
-        tabBarInactiveTintColor: '#6b7280',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.gray500,
         headerShown: false,
       })}
     >
