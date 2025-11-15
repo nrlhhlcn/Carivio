@@ -60,8 +60,24 @@ export default function ProfileScreen() {
     try {
       const [stats, cvData, interviewData] = await Promise.all([
         getUserStats(user.uid),
-        getUserCVAnalysisResults(user.uid),
-        getUserInterviewResults(user.uid),
+        getUserCVAnalysisResults(user.uid).catch((err) => {
+          console.error('CV Analysis Results error:', err)
+          // Index hatası için boş array döndür
+          if (err?.code === 'failed-precondition' || err?.message?.includes('index')) {
+            console.warn('Firestore index eksik. Firebase Console\'da index oluşturun.')
+            return []
+          }
+          throw err
+        }),
+        getUserInterviewResults(user.uid).catch((err) => {
+          console.error('Interview Results error:', err)
+          // Index hatası için boş array döndür
+          if (err?.code === 'failed-precondition' || err?.message?.includes('index')) {
+            console.warn('Firestore index eksik. Firebase Console\'da index oluşturun.')
+            return []
+          }
+          throw err
+        }),
       ])
 
       setUserStats(stats)
@@ -80,8 +96,18 @@ export default function ProfileScreen() {
         }
         setIsProfilePublic(publicValue)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('User data load error:', error)
+      // Index hatası için kullanıcıya bilgi ver
+      if (error?.code === 'failed-precondition' || error?.message?.includes('index')) {
+        Alert.alert(
+          'Firestore Index Gerekli',
+          'Bu sorgu için Firestore\'da index oluşturmanız gerekiyor.\n\n' +
+          'Hata mesajındaki linke tıklayarak index\'i otomatik oluşturabilirsiniz.\n\n' +
+          'Veya Firebase Console > Firestore > Indexes bölümünden manuel oluşturabilirsiniz.',
+          [{ text: 'Tamam' }]
+        )
+      }
     } finally {
       setLoading(false)
     }

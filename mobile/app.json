@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
+    "scheme": "carivio",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.carivio.mobile",
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "529042072863-ne11qb21mphgc5arqlgbjghr2tlu0dhf.apps.googleusercontent.com"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {

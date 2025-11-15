@@ -28,18 +28,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Google OAuth Client ID - Firebase Console'dan alınan Web Client ID
+// Google OAuth Client IDs
 // Firebase Console > Authentication > Sign-in method > Google > Web Client ID
+// Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client IDs
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
-  // Google OAuth hook'u - Expo Go için sadece webClientId yeterli
+  // Google OAuth hook'u
+  // Expo Go için sadece webClientId yeterli
+  // Development build için iOS client ID de gerekli
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: GOOGLE_WEB_CLIENT_ID, // Firebase Console'dan alınan Web Client ID
-    clientId: GOOGLE_WEB_CLIENT_ID, // Expo Go için aynı ID kullanılır
+    iosClientId: GOOGLE_IOS_CLIENT_ID || undefined, // Google Cloud Console'dan alınan iOS Client ID (development build için)
+    scopes: ['openid', 'profile', 'email'], // Gerekli scopes
   })
 
   useEffect(() => {
@@ -104,6 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
     } else if (response?.type === 'error') {
       console.error('Google OAuth error:', response.error)
+      if (response.error?.code === '400') {
+        console.error('400 Hatası: Redirect URI uyumsuzluğu olabilir. Google Cloud Console\'da Authorized redirect URIs\'yi kontrol edin.')
+      }
     }
   }, [response])
 
@@ -140,7 +148,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await promptAsync()
     } catch (error: any) {
       console.error('Google sign in prompt error:', error)
-      throw new Error('Google ile giriş başlatılamadı: ' + (error.message || 'Bilinmeyen hata'))
+      const errorMessage = error?.message || 'Bilinmeyen hata'
+      
+      // 400 hatası için özel mesaj
+      if (errorMessage.includes('400') || errorMessage.includes('redirect_uri_mismatch')) {
+        throw new Error(
+          'Google OAuth 400 Hatası: Redirect URI uyumsuzluğu.\n\n' +
+          'Yapılacaklar:\n' +
+          '1. Google Cloud Console\'a git: https://console.cloud.google.com/\n' +
+          '2. APIs & Services > Credentials > Web Client ID\'nizi açın\n' +
+          '3. Authorized redirect URIs\'ye şunları ekleyin (sadece domain içeren URI\'lar):\n' +
+          '   - https://auth.expo.io/@ahmet_akdmrrr/mobile\n' +
+          '   - exp://127.0.0.1:8081\n' +
+          '   - exp://localhost:8081\n' +
+          '   NOT: carivio:// gibi scheme-only URI\'lar eklemeyin!\n' +
+          '4. Save\'e tıklayın ve uygulamayı yeniden başlatın'
+        )
+      }
+      
+      throw new Error('Google ile giriş başlatılamadı: ' + errorMessage)
     }
   }
 
