@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Image,
   RefreshControl,
+  Dimensions,
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -15,6 +16,8 @@ import { getLeaderboard, getCvLeaderboard, getUserStats, UserStats } from '../se
 import { theme } from '../theme'
 import { Text } from '../components/ui/Text'
 import { Card } from '../components/ui/Card'
+
+const { width } = Dimensions.get('window')
 
 type LeaderboardType = 'total' | 'cv'
 
@@ -225,7 +228,7 @@ const styles = StyleSheet.create({
   header: {
     padding: theme.spacing.xl,
     paddingTop: 60,
-    paddingBottom: theme.spacing['3xl'],
+    paddingBottom: theme.spacing.xl,
     alignItems: 'center',
   },
   title: {
@@ -239,6 +242,7 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     paddingHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.lg,
     marginBottom: theme.spacing.xl,
     gap: theme.spacing.md,
   },
@@ -263,6 +267,7 @@ const styles = StyleSheet.create({
   },
   userCard: {
     marginHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.lg,
     marginBottom: theme.spacing.xl,
     overflow: 'hidden',
     padding: 0,
@@ -277,9 +282,12 @@ const styles = StyleSheet.create({
   userCardStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    flexWrap: 'wrap',
   },
   userCardStat: {
     alignItems: 'center',
+    minWidth: width < 375 ? '30%' : 'auto',
+    marginBottom: theme.spacing.sm,
   },
   userCardStatValue: {
     color: theme.colors.gray800,

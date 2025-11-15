@@ -10,6 +10,7 @@ import {
   Image,
   RefreshControl,
   TextInput,
+  Dimensions,
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'
@@ -36,6 +37,8 @@ import { Text } from '../components/ui/Text'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
+
+const { width } = Dimensions.get('window')
 
 const tags = ['Tümü', 'Frontend', 'Backend', 'Fullstack', 'Mobile', 'DevOps', 'Data Science']
 
@@ -215,55 +218,57 @@ export default function CommunityScreen() {
         <Text variant="body" style={styles.subtitle}>Sektörünüzle ilgili tartışmalara katılın</Text>
       </LinearGradient>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tagsContainer}
-        contentContainerStyle={styles.tagsContent}
-      >
-        {tags.map((tag) => (
-          <TouchableOpacity
-            key={tag}
-            onPress={() => setSelectedTag(tag)}
-            style={[styles.tag, selectedTag === tag && styles.tagSelected]}
-          >
-            <Text variant="body" style={[styles.tagText, selectedTag === tag && styles.tagTextSelected]}>
-              {tag}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.stickySection}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tagsContainer}
+          contentContainerStyle={styles.tagsContent}
+        >
+          {tags.map((tag) => (
+            <TouchableOpacity
+              key={tag}
+              onPress={() => setSelectedTag(tag)}
+              style={[styles.tag, selectedTag === tag && styles.tagSelected]}
+            >
+              <Text variant="body" style={[styles.tagText, selectedTag === tag && styles.tagTextSelected]}>
+                {tag}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-      {user && (
-        <Card style={styles.createPostCard}>
-          <View style={styles.createPostHeader}>
-            {user.photoURL ? (
-              <Image source={{ uri: user.photoURL }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text variant="heading3" style={styles.avatarText}>{user.displayName?.charAt(0) || 'U'}</Text>
-              </View>
-            )}
-            <TextInput
-              style={styles.postInput}
-              placeholder="Alanınızla ilgili bir tartışma başlatın..."
-              placeholderTextColor={theme.colors.gray400}
-              value={newPostContent}
-              onChangeText={setNewPostContent}
-              multiline
-              maxLength={500}
+        {user && (
+          <Card style={styles.createPostCard}>
+            <View style={styles.createPostHeader}>
+              {user.photoURL ? (
+                <Image source={{ uri: user.photoURL }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Text variant="heading3" style={styles.avatarText}>{user.displayName?.charAt(0) || 'U'}</Text>
+                </View>
+              )}
+              <TextInput
+                style={styles.postInput}
+                placeholder="Alanınızla ilgili bir tartışma başlatın..."
+                placeholderTextColor={theme.colors.gray400}
+                value={newPostContent}
+                onChangeText={setNewPostContent}
+                multiline
+                maxLength={500}
+              />
+            </View>
+            <Button
+              title="Gönder"
+              onPress={handleCreatePost}
+              disabled={!newPostContent.trim()}
+              variant="primary"
+              iconRight={<MaterialIcons name="send" size={20} color={theme.colors.white} />}
+              style={styles.sendButton}
             />
-          </View>
-          <Button
-            title="Gönder"
-            onPress={handleCreatePost}
-            disabled={!newPostContent.trim()}
-            variant="primary"
-            iconRight={<MaterialIcons name="send" size={20} color={theme.colors.white} />}
-            style={styles.sendButton}
-          />
-        </Card>
-      )}
+          </Card>
+        )}
+      </View>
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -438,7 +443,7 @@ const styles = StyleSheet.create({
   header: {
     padding: theme.spacing.xl,
     paddingTop: 60,
-    paddingBottom: theme.spacing['3xl'],
+    paddingBottom: theme.spacing.xl,
   },
   title: {
     color: theme.colors.white,
@@ -446,6 +451,11 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: 'rgba(255,255,255,0.9)',
+  },
+  stickySection: {
+    backgroundColor: theme.colors.background,
+    zIndex: 10,
+    paddingBottom: theme.spacing.md,
   },
   tagsContainer: {
     maxHeight: 60,
@@ -472,8 +482,9 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
   },
   createPostCard: {
-    margin: theme.spacing.xl,
-    marginTop: -theme.spacing['2xl'],
+    marginHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   createPostHeader: {
     flexDirection: 'row',
@@ -504,7 +515,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.gray200,
     borderRadius: theme.radii.md,
     padding: theme.spacing.md,
-    fontSize: 14,
+    fontSize: width < 375 ? 13 : 14,
     color: theme.colors.gray900,
     backgroundColor: theme.colors.gray50,
     minHeight: 80,
